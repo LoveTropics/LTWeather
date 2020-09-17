@@ -1,0 +1,107 @@
+buildscript {
+    repositories {
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
+        mavenCentral()
+        mavenLocal()
+    }
+    dependencies {
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '3.+', changing: true
+    }
+}
+apply plugin: 'net.minecraftforge.gradle'
+apply plugin: 'eclipse'
+
+group = 'com.lovetropics.weather'
+archivesBaseName = 'LTWeather'
+
+ext.buildnumber = 0
+project.buildnumber = System.getenv('BUILD_NUMBER') ?: 'custom'
+version = "${mod_version}-${release_type}+${buildnumber}"
+
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
+
+minecraft {
+    mappings channel: 'snapshot', version: '20200510-1.15.1'
+    
+    accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
+
+    runs {
+        client {
+        	taskName 'ltweather_client'
+        	
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                lovetropics {
+                    source sourceSets.main
+                }
+            }
+        }
+
+        server {
+        	taskName 'ltweather_server'
+        
+            workingDirectory project.file('run')
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                lovetropics {
+                    source sourceSets.main
+                }
+            }
+        }
+        
+        data {
+        	taskName 'ltweather_data'
+        
+            workingDirectory project.file('run')
+            
+            environment 'target', 'fmluserdevdata'
+
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
+
+            mods {
+                lovetropics {
+                    source sourceSets.main
+                }
+            }
+            
+			args '--mod', 'lovetropics', '--all', '--output', '"' + rootProject.file('src/generated/resources/') + '"',
+				 '--existing', '"' + sourceSets.main.resources.srcDirs[0] + '"' 
+			
+        }
+    }
+}
+
+sourceSets.main.resources {
+	srcDir 'src/generated/resources'
+}
+
+repositories {
+	mavenLocal()
+}
+
+dependencies {
+    minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+}
+
+jar {
+    manifest {
+        attributes([
+            "Specification-Title": "ltweather",
+            "Specification-Vendor": "lovetropics",
+            "Specification-Version": "1", // We are version 1 of ourselves
+            "Implementation-Title": project.name,
+            "Implementation-Version": "${version}",
+            "Implementation-Vendor" :"lovetropics",
+            "Implementation-Timestamp": new Date().format("yyyy-MM-dd'T'HH:mm:ssZ")
+        ])
+    }
+}
