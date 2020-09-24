@@ -76,7 +76,7 @@ public class EventHandlerForge {
 		//TODO: 1.14 relocate to its own mod hooks
 		//extendedrenderer.particle.ParticleRegistry.init(event);
 
-		if (!event.getMap().getBasePath().equals("textures")) {
+		if (!event.getMap().getTextureLocation().getPath().equals("textures")) {
 			return;
 		}
 		
@@ -174,7 +174,8 @@ public class EventHandlerForge {
 
 		World world = Minecraft.getInstance().world;
 		
-        if (SceneEnhancer.isFogOverridding() && (!ltOverride || (world == null || DimensionManager.getRegistry().getValue(TropicraftWorldUtils.SURVIVE_THE_TIDE_ID).map(type -> world.getDimension().getType() == type).orElse(Boolean.FALSE)))) {
+		// TODO minigames
+        if (SceneEnhancer.isFogOverridding() && (!ltOverride || (world == null || world.getDimension().getType().getRegistryName().getNamespace().equals("ltminigames")))) {
 			//backup original fog colors that are actively being adjusted based on time of day
 			SceneEnhancer.stormFogRedOrig = event.getRed();
 			SceneEnhancer.stormFogGreenOrig = event.getGreen();
@@ -197,7 +198,8 @@ public class EventHandlerForge {
 
 		World world = Minecraft.getInstance().world;
 
-		if (SceneEnhancer.isFogOverridding() && (!ltOverride || (world == null || DimensionManager.getRegistry().getValue(TropicraftWorldUtils.SURVIVE_THE_TIDE_ID).map(type -> world.getDimension().getType() == type).orElse(Boolean.FALSE)))) {
+		// TODO minigames
+		if (SceneEnhancer.isFogOverridding() && (!ltOverride || (world == null || world.getDimension().getType().getRegistryName().getNamespace().equals("ltminigames")))) {
         	//event.setCanceled(true);
         	//event.setDensity(SceneEnhancer.stormFogDensity);
 
@@ -314,10 +316,10 @@ public class EventHandlerForge {
 	@OnlyIn(Dist.CLIENT)
 	public void clientChat(ClientChatEvent event) {
 		String msg = event.getMessage();
-
-		if (msg.equals("/" + CommandReloadConfig.getCommandName() + " client")) {
-			ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get());
-		}
+// TODO configs?
+//		if (msg.equals("/" + CommandReloadConfig.getCommandName() + " client")) {
+//			ConfigTracker.INSTANCE.loadConfigs(ModConfig.Type.CLIENT, FMLPaths.CONFIGDIR.get());
+//		}
 	}
 
 	public static HashMap<UUID, Boolean> lookupPlayerUUIDToCrawlActive_Server = new HashMap<>();

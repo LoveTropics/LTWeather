@@ -2,9 +2,11 @@ package weather2.client.entity;
 
 import java.util.Random;
 
+import com.mojang.blaze3d.matrix.MatrixStack;
 import com.mojang.blaze3d.platform.GlStateManager;
 import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.IRenderTypeBuffer;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererManager;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
@@ -21,16 +23,10 @@ public class RenderLightningBolt extends EntityRenderer<EntityLightningBolt>
         super(renderManagerIn);
     }
 
-    /**
-     * Actually renders the given argument. This is a synthetic bridge method, always casting down its argument and then
-     * handing it off to a worker function which does the actual work. In all probabilty, the class Render is generic
-     * (Render<T extends Entity>) and this method has signature public void func_76986_a(T entity, double d, double d1,
-     * double d2, float f, float f1). But JAD is pre 1.5 so doe
-     */
     @Override
-    public void doRender(EntityLightningBolt entity, double x, double y, double z, float entityYaw, float partialTicks)
-    {
-        Tessellator tessellator = Tessellator.getInstance();
+    public void render(EntityLightningBolt entity, float entityYaw, float partialTicks, MatrixStack matrixStackIn,
+    		IRenderTypeBuffer bufferIn, int packedLightIn) {
+    	Tessellator tessellator = Tessellator.getInstance();
         BufferBuilder worldrenderer = tessellator.getBuffer();
         GlStateManager.disableTexture();
         GlStateManager.disableLighting();
@@ -109,8 +105,8 @@ public class RenderLightningBolt extends EntityRenderer<EntityLightningBolt>
 
                     for (int j1 = 0; j1 < 5; ++j1)
                     {
-                        double d8 = x + 0.5D - d6;
-                        double d9 = z + 0.5D - d6;
+                        double d8 = 0.5D - d6;
+                        double d9 = 0.5D - d6;
 
                         if (j1 == 1 || j1 == 2)
                         {
@@ -122,8 +118,8 @@ public class RenderLightningBolt extends EntityRenderer<EntityLightningBolt>
                             d9 += d6 * 2.0D;
                         }
 
-                        double d10 = x + 0.5D - d7;
-                        double d11 = z + 0.5D - d7;
+                        double d10 = 0.5D - d7;
+                        double d11 = 0.5D - d7;
 
                         if (j1 == 1 || j1 == 2)
                         {
@@ -135,8 +131,8 @@ public class RenderLightningBolt extends EntityRenderer<EntityLightningBolt>
                             d11 += d7 * 2.0D;
                         }
 
-                        worldrenderer.pos(d10 + d2, y + (double)(i1 * 16), d11 + d3).color(0.45F, 0.45F, 0.5F, 0.3F).endVertex();
-                        worldrenderer.pos(d8 + d4, y + (double)((i1 + 1) * 16), d9 + d5).color(0.45F, 0.45F, 0.5F, 0.3F).endVertex();
+                        worldrenderer.pos(d10 + d2, (double)(i1 * 16), d11 + d3).color(0.45F, 0.45F, 0.5F, 0.3F).endVertex();
+                        worldrenderer.pos(d8 + d4, (double)((i1 + 1) * 16), d9 + d5).color(0.45F, 0.45F, 0.5F, 0.3F).endVertex();
                     }
 
                     tessellator.draw();
@@ -149,11 +145,8 @@ public class RenderLightningBolt extends EntityRenderer<EntityLightningBolt>
         GlStateManager.enableTexture();
     }
 
-    /**
-     * Returns the location of an entity's texture. Doesn't seem to be called unless you call Render.bindEntityTexture.
-     */
-    protected ResourceLocation getEntityTexture(EntityLightningBolt entity)
-    {
-        return null;
-    }
+	@Override
+	public ResourceLocation getEntityTexture(EntityLightningBolt entity) {
+		return null;
+	}
 }

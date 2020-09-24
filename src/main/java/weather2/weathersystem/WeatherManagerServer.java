@@ -8,6 +8,7 @@ import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraftforge.fml.network.NetworkDirection;
@@ -96,7 +97,7 @@ public class WeatherManagerServer extends WeatherManagerBase {
 			if (world.getGameTime() % rate == 0) {
 				for (int i = 0; i < getStormObjects().size(); i++) {
 					WeatherObject so = getStormObjects().get(i);
-					PlayerEntity closestPlayer = world.getClosestPlayer(so.posGround.xCoord, so.posGround.zCoord, ConfigMisc.Misc_simBoxRadiusCutoff);
+					PlayerEntity closestPlayer = world.getClosestPlayer(so.posGround.x, so.posGround.z, ConfigMisc.Misc_simBoxRadiusCutoff);
 					
 					//removed check is done in WeatherManagerBase
 					if (closestPlayer == null || ConfigMisc.Aesthetic_Only_Mode) {
@@ -304,12 +305,12 @@ public class WeatherManagerServer extends WeatherManagerBase {
 	public boolean trySandstormForPlayer(PlayerEntity player, long lastSandstormTime) {
 		boolean sandstormMade = false;
 		if (lastSandstormTime == 0 || lastSandstormTime + ConfigSand.Sandstorm_TimeBetweenInTicks < player.getEntityWorld().getGameTime()) {
-			sandstormMade = trySpawnSandstormNearPos(player.getEntityWorld(), new Vec3(player.getPositionVector()));
+			sandstormMade = trySpawnSandstormNearPos(player.getEntityWorld(), player.getPositionVector());
 		}
 		return sandstormMade;
 	}
 	
-	public boolean trySpawnSandstormNearPos(World world, Vec3 posIn) {
+	public boolean trySpawnSandstormNearPos(World world, Vec3d posIn) {
 		/**
 		 * 1. Start upwind
 		 * 2. Find random spot near there loaded and in desert
@@ -332,8 +333,8 @@ public class WeatherManagerServer extends WeatherManagerBase {
 		int findTriesMax = 30;
 		for (int i = 0; i < findTriesMax; i++) {
 			
-			int x = MathHelper.floor(posIn.xCoord + vecX + rand.nextInt(searchRadius * 2) - searchRadius);
-			int z = MathHelper.floor(posIn.zCoord + vecZ + rand.nextInt(searchRadius * 2) - searchRadius);
+			int x = MathHelper.floor(posIn.x + vecX + rand.nextInt(searchRadius * 2) - searchRadius);
+			int z = MathHelper.floor(posIn.z + vecZ + rand.nextInt(searchRadius * 2) - searchRadius);
 			
 			BlockPos pos = new BlockPos(x, 0, z);
 			
@@ -406,7 +407,7 @@ public class WeatherManagerServer extends WeatherManagerBase {
 
 					sandstorm.initFirstTime();
 					BlockPos posSpawn = new BlockPos(WeatherUtilBlock.getPrecipitationHeightSafe(world, posFindLastGoodUpwind)).add(0, 1, 0);
-					sandstorm.initSandstormSpawn(new Vec3(posSpawn));
+					sandstorm.initSandstormSpawn(new Vec3d(posSpawn));
 					addStormObject(sandstorm);
 					syncStormNew(sandstorm);
 
@@ -437,7 +438,7 @@ public class WeatherManagerServer extends WeatherManagerBase {
 		int tryCountCur = 0;
 		int spawnX = -1;
 		int spawnZ = -1;
-		Vec3 tryPos = null;
+		Vec3d tryPos = null;
 		StormObject soClose = null;
 		PlayerEntity playerClose = null;
 		
@@ -450,9 +451,9 @@ public class WeatherManagerServer extends WeatherManagerBase {
 		double vecZ = Math.cos(Math.toRadians(angle)) * windOffsetDist;
 		
 		while (tryCountCur++ == 0 || (tryCountCur < tryCountMax && (soClose != null || playerClose != null))) {
-			spawnX = (int) (entP.posX - vecX + rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn) - rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn));
-			spawnZ = (int) (entP.posZ - vecZ + rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn) - rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn));
-			tryPos = new Vec3(spawnX, StormObject.layers.get(layer), spawnZ);
+			spawnX = (int) (entP.getPosX() - vecX + rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn) - rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn));
+			spawnZ = (int) (entP.getPosZ() - vecZ + rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn) - rand.nextInt(ConfigMisc.Misc_simBoxRadiusSpawn));
+			tryPos = new Vec3d(spawnX, StormObject.layers.get(layer), spawnZ);
 			soClose = getClosestStormAny(tryPos, ConfigMisc.Cloud_Formation_MinDistBetweenSpawned);
 			playerClose = entP.world.getClosestPlayer(spawnX, 50, spawnZ, closestToPlayer, false);
 		}
@@ -520,9 +521,9 @@ public class WeatherManagerServer extends WeatherManagerBase {
 		data.putString("packetCommand", "WeatherData");
 		data.putString("command", "syncLightningNew");
 		CompoundNBT nbt = new CompoundNBT();
-		nbt.putInt("posX", MathHelper.floor(parEnt.posX/* * 32.0D*/));
-		nbt.putInt("posY", MathHelper.floor(parEnt.posY/* * 32.0D*/));
-		nbt.putInt("posZ", MathHelper.floor(parEnt.posZ/* * 32.0D*/));
+		nbt.putInt("posX", MathHelper.floor(parEnt.getPosX()/* * 32.0D*/));
+		nbt.putInt("posY", MathHelper.floor(parEnt.getPosY()/* * 32.0D*/));
+		nbt.putInt("posZ", MathHelper.floor(parEnt.getPosZ()/* * 32.0D*/));
 		nbt.putInt("entityID", parEnt.getEntityId());
 		nbt.putBoolean("custom", custom);
 		data.put("data", nbt);

@@ -5,6 +5,9 @@ import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
+
+import com.mojang.blaze3d.vertex.IVertexBuilder;
+
 import extendedrenderer.particle.entity.ParticleTexFX;
 
 public class ParticleSandstorm extends ParticleTexFX {
@@ -26,7 +29,7 @@ public class ParticleSandstorm extends ParticleTexFX {
 	 */
 
 	@Override
-	public void renderParticle(BufferBuilder worldRendererIn, ActiveRenderInfo entityIn, float partialTicks, float rotationX, float rotationZ, float rotationYZ, float rotationXY, float rotationXZ) {
-		super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX, rotationZ, rotationYZ, rotationXY, rotationXZ);
+	public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
+		super.renderParticle(buffer, renderInfo, partialTicks);
 	}
 }

@@ -23,6 +23,10 @@ public class ParticleTexFX extends EntityRotFX {
         this.setMaxAge(100);
         this.setCanCollide(false);
     }
+	
+	public float getParticleGravity() {
+		return this.particleGravity;
+	}
 
     /*@Override
     public int getFXLayer()

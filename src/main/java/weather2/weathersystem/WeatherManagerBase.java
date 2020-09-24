@@ -3,16 +3,22 @@ package weather2.weathersystem;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
-import java.util.*;
-
-import CoroUtil.util.CoroUtilPhysics;
-import net.minecraft.nbt.CompressedStreamTools;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.io.FileUtils;
 
+import CoroUtil.util.CoroUtilFile;
+import CoroUtil.util.CoroUtilPhysics;
+import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.nbt.CompressedStreamTools;
+import net.minecraft.util.math.BlockPos;
+import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import weather2.ServerTickHandler;
 import weather2.Weather;
 import weather2.config.ConfigStorm;
@@ -21,8 +27,6 @@ import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.storm.WeatherObject;
 import weather2.weathersystem.storm.WeatherObjectSandstorm;
 import weather2.weathersystem.wind.WindManager;
-import CoroUtil.util.CoroUtilFile;
-import CoroUtil.util.Vec3;
 
 public class WeatherManagerBase {
 
@@ -248,15 +252,15 @@ public class WeatherManagerBase {
 		}
 	}*/
 	
-	public StormObject getClosestStormAny(Vec3 parPos, double maxDist) {
+	public StormObject getClosestStormAny(Vec3d parPos, double maxDist) {
 		return getClosestStorm(parPos, maxDist, -1, true);
 	}
 	
-	public StormObject getClosestStorm(Vec3 parPos, double maxDist, int severityFlagMin) {
+	public StormObject getClosestStorm(Vec3d parPos, double maxDist, int severityFlagMin) {
 		return getClosestStorm(parPos, maxDist, severityFlagMin, false);
 	}
 	
-	public StormObject getClosestStorm(Vec3 parPos, double maxDist, int severityFlagMin, boolean orRain) {
+	public StormObject getClosestStorm(Vec3d parPos, double maxDist, int severityFlagMin, boolean orRain) {
 		
 		/*StormObject closestStorm = null;
 		double closestDist = Double.MAX_VALUE;
@@ -294,7 +298,7 @@ public class WeatherManagerBase {
 	}
 
 	public boolean isPrecipitatingAt(BlockPos pos) {
-		return isPrecipitatingAt(new Vec3(pos));
+		return isPrecipitatingAt(new Vec3d(pos));
 	}
 
 	/**
@@ -303,7 +307,7 @@ public class WeatherManagerBase {
 	 * @param parPos
 	 * @return
 	 */
-	public boolean isPrecipitatingAt(Vec3 parPos) {
+	public boolean isPrecipitatingAt(Vec3d parPos) {
 		/*List<WeatherObject> listStorms = getStormObjects();
 
 		for (int i = 0; i < listStorms.size(); i++) {
@@ -334,7 +338,7 @@ public class WeatherManagerBase {
 	 * @param maxDist
 	 * @return
 	 */
-	public WeatherObjectSandstorm getClosestSandstorm(Vec3 parPos, double maxDist) {
+	public WeatherObjectSandstorm getClosestSandstorm(Vec3d parPos, double maxDist) {
 		
 		WeatherObjectSandstorm closestStorm = null;
 		double closestDist = 9999999;
@@ -369,7 +373,7 @@ public class WeatherManagerBase {
 	 * @param parPos
 	 * @return
 	 */
-	public WeatherObjectSandstorm getClosestSandstormByIntensity(Vec3 parPos/*, double maxDist*/) {
+	public WeatherObjectSandstorm getClosestSandstormByIntensity(Vec3d parPos/*, double maxDist*/) {
 
 		WeatherObjectSandstorm bestStorm = null;
 		double closestDist = 9999999;
@@ -383,7 +387,7 @@ public class WeatherManagerBase {
 				WeatherObjectSandstorm sandstorm = (WeatherObjectSandstorm) wo;
 				if (sandstorm == null || sandstorm.isDead) continue;
 
-				List<Vec3> field_75884_a = sandstorm.getSandstormAsShape();
+				List<Vec3d> field_75884_a = sandstorm.getSandstormAsShape();
 
 				double scale = sandstorm.getSandstormScale();
 				boolean inStorm = CoroUtilPhysics.isInConvexShape(parPos, field_75884_a);
@@ -410,7 +414,7 @@ public class WeatherManagerBase {
 		return bestStorm;
 	}
 
-	public List<WeatherObject> getSandstormsAround(Vec3 parPos, double maxDist) {
+	public List<WeatherObject> getSandstormsAround(Vec3d parPos, double maxDist) {
 		List<WeatherObject> storms = new ArrayList<>();
 
 		for (int i = 0; i < getStormObjects().size(); i++) {
@@ -428,7 +432,7 @@ public class WeatherManagerBase {
 		return storms;
 	}
 
-    public List<WeatherObject> getStormsAroundForDeflector(Vec3 parPos, double maxDist) {
+    public List<WeatherObject> getStormsAroundForDeflector(Vec3d parPos, double maxDist) {
         List<WeatherObject> storms = new ArrayList<>();
 
         for (int i = 0; i < getStormObjects().size(); i++) {
@@ -441,7 +445,7 @@ public class WeatherManagerBase {
                 }
             } else if (wo instanceof WeatherObjectSandstorm && ConfigStorm.Storm_Deflector_RemoveSandstorms) {
                 WeatherObjectSandstorm sandstorm = (WeatherObjectSandstorm)wo;
-                List<Vec3> field_75884_a = sandstorm.getSandstormAsShape();
+                List<Vec3d> field_75884_a = sandstorm.getSandstormAsShape();
                 double distToStorm = CoroUtilPhysics.getDistanceToShape(parPos, field_75884_a);
                 if (distToStorm < maxDist) {
                     storms.add(wo);
@@ -452,7 +456,7 @@ public class WeatherManagerBase {
         return storms;
     }
 
-	public List<WeatherObject> getStormsAround(Vec3 parPos, double maxDist) {
+	public List<WeatherObject> getStormsAround(Vec3d parPos, double maxDist) {
 		List<WeatherObject> storms = new ArrayList<>();
 		
 		for (int i = 0; i < getStormObjects().size(); i++) {
@@ -465,7 +469,7 @@ public class WeatherManagerBase {
 				}
 			} else if (wo instanceof WeatherObjectSandstorm) {
 				WeatherObjectSandstorm sandstorm = (WeatherObjectSandstorm)wo;
-				List<Vec3> field_75884_a = sandstorm.getSandstormAsShape();
+				List<Vec3d> field_75884_a = sandstorm.getSandstormAsShape();
 				double distToStorm = CoroUtilPhysics.getDistanceToShape(parPos, field_75884_a);
 				if (distToStorm < maxDist) {
 					storms.add(wo);

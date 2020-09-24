@@ -11,8 +11,6 @@ import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
-import net.tropicraft.lovetropics.common.config.ConfigLT;
-import net.tropicraft.lovetropics.common.dimension.TropicraftWorldUtils;
 import weather2.client.SceneEnhancer;
 import weather2.config.ConfigFoliage;
 import weather2.config.ConfigMisc;
@@ -98,38 +96,40 @@ public class ClientTickHandler
     
     public void onTickInGame()
     {
-
-    	if (ConfigLT.GENERAL.UseCrouch.get()) {
-			tickCrawl();
-		}
+// TODO crawl
+//    	if (ConfigLT.GENERAL.UseCrouch.get()) {
+//			tickCrawl();
+//		}
 
 		if (ConfigMisc.Client_PotatoPC_Mode) return;
 
         Minecraft mc = Minecraft.getInstance();
         World world = mc.world;
         
-        if (ConfigMisc.Misc_proxyRenderOverrideEnabled) {
-        	if (!(mc.gameRenderer instanceof EntityRendererProxyWeather2Mini)) {
-				oldRenderer = mc.gameRenderer;
-        		EntityRendererProxyWeather2Mini temp = new EntityRendererProxyWeather2Mini(mc, mc.getResourceManager());
-		        mc.gameRenderer = temp;
-        	}
-    	} else {
-    		if ((mc.gameRenderer instanceof EntityRendererProxyWeather2Mini)) {
-    			if (oldRenderer != null) {
-    				mc.gameRenderer = oldRenderer;
-				} else {
-					mc.gameRenderer = new GameRenderer(mc, mc.getResourceManager(), mc.getRenderTypeBuffers());
-				}
-
-    		}
-    	}
+        // TODO GameRenderer override
+//        if (ConfigMisc.Misc_proxyRenderOverrideEnabled) {
+//        	if (!(mc.gameRenderer instanceof EntityRendererProxyWeather2Mini)) {
+//				oldRenderer = mc.gameRenderer;
+//        		EntityRendererProxyWeather2Mini temp = new EntityRendererProxyWeather2Mini(mc, mc.getResourceManager());
+//		        mc.gameRenderer = temp;
+//        	}
+//    	} else {
+//    		if ((mc.gameRenderer instanceof EntityRendererProxyWeather2Mini)) {
+//    			if (oldRenderer != null) {
+//    				mc.gameRenderer = oldRenderer;
+//				} else {
+//					mc.gameRenderer = new GameRenderer(mc, mc.getResourceManager(), mc.getRenderTypeBuffers());
+//				}
+//
+//    		}
+//    	}
 
 		if (world != null) {
 			checkClientWeather();
 
 			weatherManager.tick();
-			minigameWeatherInstance.tick(null);
+			// TODO minigames
+//			minigameWeatherInstance.tick(null);
 
 			if (!clientConfigData.Aesthetic_Only_Mode && ConfigMisc.Misc_ForceVanillaCloudsOff && world.getDimension().getType().getId() == 0) {
 				mc.gameSettings.cloudOption = CloudOption.OFF;
@@ -138,7 +138,8 @@ public class ClientTickHandler
 			//TODO: split logic up a bit better for this, if this is set to false mid sandstorm, fog is stuck on,
 			// with sandstorms and other things it might not represent the EZ config option
 			// Make sure we're in STT, TODO make this more efficient
-			if (DimensionManager.getRegistry().getValue(TropicraftWorldUtils.SURVIVE_THE_TIDE_ID).map(type -> world.getDimension().getType() == type).orElse(Boolean.FALSE)) {
+			// TODO minigames
+			if (world.getDimension().getType().getRegistryName().getNamespace().equals("ltminigames")) {
 				//weatherManager.tick();
 
 				sceneEnhancer.tickClient();
@@ -288,7 +289,8 @@ public class ClientTickHandler
 
     	lastWorld = world;
     	weatherManager = new WeatherManagerClient(world.getDimension().getType().getId());
-		minigameWeatherInstance = new MinigameWeatherInstanceClient();
+    	// TODO minigames
+//		minigameWeatherInstance = new MinigameWeatherInstanceClient();
 
 		//request a full sync from server
 		CompoundNBT data = new CompoundNBT();

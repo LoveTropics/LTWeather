@@ -8,7 +8,6 @@ import com.mojang.brigadier.CommandDispatcher;
 import com.mojang.brigadier.arguments.StringArgumentType;
 import com.mojang.brigadier.context.CommandContext;
 
-import CoroUtil.util.Vec3;
 import net.minecraft.command.CommandSource;
 import net.minecraft.command.Commands;
 import net.minecraft.entity.EntityType;
@@ -207,7 +206,7 @@ public class CommandWeather2 {
 
 							//sandstorm.pos = new Vec3(player.posX, player.world.getHeight(new BlockPos(player.posX, 0, player.posZ)).getY() + 1, player.posZ);
 
-							Vec3 pos = new Vec3(posVec.x, world.getHeight(Heightmap.Type.MOTION_BLOCKING, new BlockPos(posVec.x, 0, posVec.z)).getY() + 1, posVec.z);
+							Vec3d pos = new Vec3d(posVec.x, world.getHeight(Heightmap.Type.MOTION_BLOCKING, new BlockPos(posVec.x, 0, posVec.z)).getY() + 1, posVec.z);
 
 
 							/**
@@ -217,8 +216,7 @@ public class CommandWeather2 {
 							double vecX = -Math.sin(Math.toRadians(angle));
 							double vecZ = Math.cos(Math.toRadians(angle));
 							double speed = 150D;
-							pos.xCoord -= vecX * speed;
-							pos.zCoord -= vecZ * speed;
+							pos = pos.subtract(vecX * speed, 0, vecZ * speed);
 
 							sandstorm.initFirstTime();
 							sandstorm.initSandstormSpawn(pos);
@@ -232,7 +230,7 @@ public class CommandWeather2 {
 							wm.windMan.lowWindTimer = 0;
 
 						} else if (var2[2].equalsIgnoreCase("sandstorm")) {
-							boolean spawned = wm.trySpawnSandstormNearPos(world, new Vec3(posVec));
+							boolean spawned = wm.trySpawnSandstormNearPos(world, posVec);
 							spawnCloudStorm = false;
 							if (!spawned) {
 								sendCommandSenderMsg(source, "couldnt find spot to spawn");

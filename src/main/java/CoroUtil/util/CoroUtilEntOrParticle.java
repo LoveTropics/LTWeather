@@ -1,5 +1,6 @@
 package CoroUtil.util;
 
+import extendedrenderer.particle.entity.EntityRotFX;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.math.MathHelper;
@@ -16,7 +17,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static double getPosXParticle(Object obj) {
-		return ((Particle)obj).posX;
+		return ((EntityRotFX)obj).getPosX();
 	}
 	
 	public static double getPosY(Object obj) {
@@ -28,7 +29,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static double getPosYParticle(Object obj) {
-		return ((Particle)obj).posY;
+		return ((EntityRotFX)obj).getPosY();
 	}
 	
 	public static double getPosZ(Object obj) {
@@ -40,7 +41,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static double getPosZParticle(Object obj) {
-		return ((Particle)obj).posZ;
+		return ((EntityRotFX)obj).getPosZ();
 	}
 	
 	public static double getMotionX(Object obj) {
@@ -52,7 +53,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static double getMotionXParticle(Object obj) {
-		return ((Particle)obj).motionX;
+		return ((EntityRotFX)obj).getMotionX();
 	}
 	
 	public static double getMotionY(Object obj) {
@@ -64,7 +65,7 @@ public class CoroUtilEntOrParticle {
 	}
 	
 	private static double getMotionYParticle(Object obj) {
-		return ((Particle)obj).motionY;
+		return ((EntityRotFX)obj).getMotionY();
 	}
 	
 	public static double getMotionZ(Object obj) {
@@ -76,7 +77,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static double getMotionZParticle(Object obj) {
-		return ((Particle)obj).motionZ;
+		return ((EntityRotFX)obj).getMotionZ();
 	}
 	
 	public static void setMotionX(Object obj, double val) {
@@ -88,7 +89,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static void setMotionXParticle(Object obj, double val) {
-		((Particle)obj).motionX = val;
+		((EntityRotFX)obj).setMotionX(val);
 	}
 	
 	public static void setMotionY(Object obj, double val) {
@@ -100,7 +101,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static void setMotionYParticle(Object obj, double val) {
-		((Particle)obj).motionY = val;
+		((EntityRotFX)obj).setMotionY(val);
 	}
 	
 	public static void setMotionZ(Object obj, double val) {
@@ -112,7 +113,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static void setMotionZParticle(Object obj, double val) {
-		((Particle)obj).motionZ = val;
+		((EntityRotFX)obj).setMotionZ(val);
 	}
 	
 	public static World getWorld(Object obj) {
@@ -124,7 +125,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static World getWorldParticle(Object obj) {
-		return ((Particle)obj).world;
+		return ((EntityRotFX)obj).getWorld();
 	}
 
 	public static double getDistance(Object obj, double x, double y, double z)
@@ -145,7 +146,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static void setPosXParticle(Object obj, double val) {
-		((Particle)obj).posX = val;
+		((EntityRotFX)obj).setPosX(val);
 	}
 
 	public static void setPosY(Object obj, double val) {
@@ -158,7 +159,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static void setPosYParticle(Object obj, double val) {
-		((Particle)obj).posY = val;
+		((EntityRotFX)obj).setPosY(val);
 	}
 
 	public static void setPosZ(Object obj, double val) {
@@ -171,7 +172,7 @@ public class CoroUtilEntOrParticle {
 	}
 
 	private static void setPosZParticle(Object obj, double val) {
-		((Particle)obj).posZ = val;
+		((EntityRotFX)obj).setPosZ(val);
 	}
 	
 }
