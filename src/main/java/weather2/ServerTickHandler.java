@@ -1,5 +1,8 @@
 package weather2;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 import CoroUtil.forge.CULog;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -7,15 +10,11 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.network.PacketDistributor;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-import net.tropicraft.lovetropics.common.dimension.TropicraftWorldUtils;
 import weather2.config.ConfigMisc;
 import weather2.util.WeatherUtil;
 import weather2.util.WeatherUtilConfig;
 import weather2.weathersystem.WeatherManagerBase;
 import weather2.weathersystem.WeatherManagerServer;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class ServerTickHandler
 {   

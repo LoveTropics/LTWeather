@@ -281,10 +281,9 @@ public class WindManager {
 				}
 
 				if (ConfigLTOverrides.windSpeedOverride) {
-					// TODO minigames
-//					if (WeatherUtil.getWeatherMinigameInstance() != null) {
-//                        windSpeedGlobal = WeatherUtil.getWeatherMinigameInstance().getWindSpeed();
-//					}
+					WeatherUtil.getWeatherBehavior().ifPresent(behavior -> {
+                        windSpeedGlobal = behavior.getMinigameWeatherInstance().getWindSpeed();
+					});
 				}
 				
 	            //smooth use

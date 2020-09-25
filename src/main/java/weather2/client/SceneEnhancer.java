@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.Random;
 
+import com.lovetropics.minigames.common.minigames.MinigameManager;
 import com.mojang.blaze3d.platform.GlStateManager;
 
 import CoroUtil.api.weather.IWindHandler;
@@ -255,9 +256,7 @@ public class SceneEnhancer implements Runnable {
 			throwable.printStackTrace();
 		}*/
 
-		if (client.world != null && client.player != null &&
-		        // TODO interface directly with weather minigame behavior
-		        client.world.getDimension().getType().getRegistryName().getNamespace().equals("ltminigames")) {
+		if (client.world != null && client.player != null && WeatherUtil.isMinigameWorld(client.world)) {
 			profileSurroundings();
 			tryAmbientSounds();
 		}

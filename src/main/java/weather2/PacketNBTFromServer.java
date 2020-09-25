@@ -63,7 +63,7 @@ public class PacketNBTFromServer {
                     } else if (packetCommand.equals(WeatherNetworking.NBT_PACKET_COMMAND_MINIGAME)) {
                         ClientTickHandler.checkClientWeather();
 
-                        ClientTickHandler.minigameWeatherInstance.deserialize(nbt.getCompound(WeatherNetworking.NBT_PACKET_DATA_MINIGAME));
+                        ClientTickHandler.minigameWeatherInstance.deserializeNBT(nbt.getCompound(WeatherNetworking.NBT_PACKET_DATA_MINIGAME));
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

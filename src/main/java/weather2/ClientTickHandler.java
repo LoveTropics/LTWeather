@@ -128,8 +128,7 @@ public class ClientTickHandler
 			checkClientWeather();
 
 			weatherManager.tick();
-			// TODO minigames
-//			minigameWeatherInstance.tick(null);
+			minigameWeatherInstance.tick(null);
 
 			if (!clientConfigData.Aesthetic_Only_Mode && ConfigMisc.Misc_ForceVanillaCloudsOff && world.getDimension().getType().getId() == 0) {
 				mc.gameSettings.cloudOption = CloudOption.OFF;
@@ -290,7 +289,7 @@ public class ClientTickHandler
     	lastWorld = world;
     	weatherManager = new WeatherManagerClient(world.getDimension().getType().getId());
     	// TODO minigames
-//		minigameWeatherInstance = new MinigameWeatherInstanceClient();
+		minigameWeatherInstance = new MinigameWeatherInstanceClient();
 
 		//request a full sync from server
 		CompoundNBT data = new CompoundNBT();

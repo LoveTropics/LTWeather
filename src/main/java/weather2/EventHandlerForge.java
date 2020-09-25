@@ -1,5 +1,9 @@
 package weather2;
 
+import java.nio.FloatBuffer;
+import java.util.HashMap;
+import java.util.UUID;
+
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 
@@ -20,7 +24,6 @@ import net.minecraftforge.client.event.EntityViewRenderEvent.FogDensity;
 import net.minecraftforge.client.event.EntityViewRenderEvent.RenderFogEvent;
 import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.client.event.TextureStitchEvent;
-import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.EntityJoinWorldEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -30,21 +33,11 @@ import net.minecraftforge.eventbus.api.EventPriority;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.config.ConfigTracker;
-import net.minecraftforge.fml.config.ModConfig;
-import net.minecraftforge.fml.loading.FMLPaths;
-import net.tropicraft.lovetropics.common.command.CommandReloadConfig;
-import net.tropicraft.lovetropics.common.dimension.TropicraftWorldUtils;
 import weather2.api.WeatherUtilData;
 import weather2.client.SceneEnhancer;
-import weather2.config.ConfigLTOverrides;
 import weather2.config.ConfigMisc;
 import weather2.weathersystem.storm.TornadoHelper;
 import weather2.weathersystem.wind.WindManager;
-
-import java.nio.FloatBuffer;
-import java.util.HashMap;
-import java.util.UUID;
 
 @Mod.EventBusSubscriber(modid = Weather.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
 public class EventHandlerForge {

@@ -1,7 +1,11 @@
 package weather2.weathersystem;
 
+import java.util.Iterator;
+import java.util.Random;
+
+import javax.annotation.Nullable;
+
 import CoroUtil.util.CoroUtilEntity;
-import CoroUtil.util.Vec3;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -20,18 +24,14 @@ import weather2.config.ConfigMisc;
 import weather2.config.ConfigSand;
 import weather2.config.ConfigStorm;
 import weather2.player.PlayerData;
-import weather2.util.*;
+import weather2.util.CachedNBTTagCompound;
+import weather2.util.WeatherUtil;
+import weather2.util.WeatherUtilBlock;
+import weather2.util.WeatherUtilConfig;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.storm.WeatherObject;
 import weather2.weathersystem.storm.WeatherObjectSandstorm;
 import weather2.weathersystem.wind.WindManager;
-
-import javax.annotation.Nullable;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Random;
-import java.util.stream.Collectors;
 
 public class WeatherManagerServer extends WeatherManagerBase {
 

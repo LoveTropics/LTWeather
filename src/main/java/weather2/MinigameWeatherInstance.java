@@ -1,14 +1,21 @@
 package weather2;
 
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
-import net.tropicraft.lovetropics.common.config.ConfigLT;
-import net.tropicraft.lovetropics.common.minigames.IMinigameWeatherInstance;
-import net.tropicraft.lovetropics.common.minigames.definitions.survive_the_tide.SurviveTheTideMinigameDefinition;
-
 import java.util.Random;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
+import com.lovetropics.minigames.common.config.ConfigLT;
+import com.lovetropics.minigames.common.minigames.IMinigameDefinition;
+import com.lovetropics.minigames.common.minigames.IMinigameInstance;
+import com.lovetropics.minigames.common.minigames.weather.IMinigameWeatherInstance;
+
+import net.minecraft.entity.player.PlayerEntity;
+import net.minecraft.nbt.CompoundNBT;
+
 public class MinigameWeatherInstance implements IMinigameWeatherInstance {
+	
+	private static final Logger LOGGER = LogManager.getLogger();
 
     /**
      *
@@ -81,7 +88,7 @@ public class MinigameWeatherInstance implements IMinigameWeatherInstance {
     }
 
     @Override
-	public void tick(SurviveTheTideMinigameDefinition minigameDefinition) {
+	public void tick(IMinigameInstance minigameDefinition) {
 
     }
 
@@ -126,7 +133,7 @@ public class MinigameWeatherInstance implements IMinigameWeatherInstance {
     }
 
     @Override
-	public CompoundNBT serialize() {
+	public CompoundNBT serializeNBT() {
         CompoundNBT nbt = new CompoundNBT();
 
         nbt.putLong("heavyRainfallTime", heavyRainfallTime);
@@ -140,7 +147,7 @@ public class MinigameWeatherInstance implements IMinigameWeatherInstance {
     }
 
     @Override
-	public void deserialize(CompoundNBT nbt) {
+	public void deserializeNBT(CompoundNBT nbt) {
         heavyRainfallTime = nbt.getLong("heavyRainfallTime");
         acidRainTime = nbt.getLong("acidRainTime");
         heatwaveTime = nbt.getLong("heatwaveTime");

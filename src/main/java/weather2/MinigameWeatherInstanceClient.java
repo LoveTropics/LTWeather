@@ -1,11 +1,10 @@
 package weather2;
 
+import com.lovetropics.minigames.common.minigames.IMinigameInstance;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
-import net.minecraft.world.gen.Heightmap;
-import net.tropicraft.lovetropics.common.minigames.definitions.survive_the_tide.SurviveTheTideMinigameDefinition;
 
 public class MinigameWeatherInstanceClient extends MinigameWeatherInstance {
 
@@ -21,8 +20,8 @@ public class MinigameWeatherInstanceClient extends MinigameWeatherInstance {
     }
 
     @Override
-    public void tick(SurviveTheTideMinigameDefinition minigameDefinition) {
-        super.tick(minigameDefinition);
+    public void tick(IMinigameInstance minigame) {
+        super.tick(minigame);
 
         World world = Minecraft.getInstance().world;
         if (world == null) return;

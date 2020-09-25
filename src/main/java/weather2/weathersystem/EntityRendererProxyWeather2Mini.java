@@ -1,10 +1,12 @@
 package weather2.weathersystem;
 
 import com.mojang.blaze3d.platform.GlStateManager;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.GameRenderer;
+import net.minecraft.client.renderer.RenderTypeBuffers;
 import net.minecraft.client.renderer.Tessellator;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
 import net.minecraft.resources.IResourceManager;
 import net.minecraft.util.ResourceLocation;
@@ -17,14 +19,14 @@ import weather2.ClientTickHandler;
 import weather2.Weather;
 import weather2.config.ConfigMisc;
 
-public class EntityRendererProxyWeather2Mini extends GameRenderer
+public class EntityRendererProxyWeather2Mini extends WorldRenderer
 {
 
 	public static final ResourceLocation RAIN_TEXTURES_GREEN = new ResourceLocation(Weather.MODID, "textures/environment/rain_green.png");
 
-    public EntityRendererProxyWeather2Mini(Minecraft var1, IResourceManager resMan)
+    public EntityRendererProxyWeather2Mini(Minecraft var1, RenderTypeBuffers buffers)
     {
-        super(var1, resMan);
+        super(var1, buffers);
     }
 
     @Override

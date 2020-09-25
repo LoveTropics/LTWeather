@@ -1,9 +1,15 @@
 package weather2.weathersystem.storm;
 
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Random;
+import java.util.UUID;
+
+import com.mojang.authlib.GameProfile;
+
 import CoroUtil.forge.CULog;
 import CoroUtil.util.CoroUtilBlock;
-import CoroUtil.util.Vec3;
-import com.mojang.authlib.GameProfile;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -20,6 +26,7 @@ import net.minecraft.util.SoundEvents;
 import net.minecraft.util.math.AxisAlignedBB;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
+import net.minecraft.util.math.Vec3d;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Heightmap;
@@ -38,8 +45,6 @@ import weather2.util.WeatherUtil;
 import weather2.util.WeatherUtilBlock;
 import weather2.util.WeatherUtilEntity;
 import weather2.util.WeatherUtilSound;
-
-import java.util.*;
 
 public class TornadoHelper {
 	
@@ -237,12 +242,12 @@ public class TornadoHelper {
         
         //confirm this is correct, changing to formation use!
         //int spawnYOffset = (int) storm.currentTopYBlock;
-        int spawnYOffset = (int) storm.posBaseFormationPos.yCoord;
+        int spawnYOffset = (int) storm.posBaseFormationPos.y;
 
         if (!parWorld.isRemote && (ConfigTornado.Storm_Tornado_grabBlocks || storm.isFirenado)/*getStorm().grabsBlocks*/)
         {
             int yStart = 00;
-            int yEnd = (int)storm.pos.yCoord/* + 72*/;
+            int yEnd = (int)storm.pos.y/* + 72*/;
             int yInc = 1;
 
             //commented out for weather2
@@ -251,7 +256,7 @@ public class TornadoHelper {
                 yStart = 10;
                 yEnd = 40;
             }*/
-            Biome bgb = parWorld.getBiome(new BlockPos(MathHelper.floor(storm.pos.xCoord), 0, MathHelper.floor(storm.pos.zCoord)));
+            Biome bgb = parWorld.getBiome(new BlockPos(MathHelper.floor(storm.pos.x), 0, MathHelper.floor(storm.pos.z)));
         	
             //prevent grabbing in high areas (hills)
             //TODO: 1.10 make sure minHeight/maxHeight converted to baseHeight/scale is correct, guessing we can just not factor in variation
@@ -300,11 +305,11 @@ public class TornadoHelper {
 	                    //System.out.println(posY);
 	                    //int tryX = (int)posX+k-((mod_EntMover.tornadoBaseSize/2)+(ii/2));
 	                    //int tryZ = (int)posZ+l-((mod_EntMover.tornadoBaseSize/2)+(ii/2));
-	                    int tryX = (int)storm.pos.xCoord + rand.nextInt(tornadoBaseSize + (ii)) - ((tornadoBaseSize / 2) + (ii / 2));
-	                    int tryZ = (int)storm.pos.zCoord + rand.nextInt(tornadoBaseSize + (ii)) - ((tornadoBaseSize / 2) + (ii / 2));
+	                    int tryX = (int)storm.pos.x + rand.nextInt(tornadoBaseSize + (ii)) - ((tornadoBaseSize / 2) + (ii / 2));
+	                    int tryZ = (int)storm.pos.z + rand.nextInt(tornadoBaseSize + (ii)) - ((tornadoBaseSize / 2) + (ii / 2));
 	
-	                    double d0 = storm.pos.xCoord - tryX;
-	                    double d2 = storm.pos.zCoord - tryZ;
+	                    double d0 = storm.pos.x - tryX;
+	                    double d2 = storm.pos.z - tryZ;
 	                    double dist = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
 	                    BlockPos pos = new BlockPos(tryX, tryY, tryZ);
 	                    
@@ -362,12 +367,12 @@ public class TornadoHelper {
 							randSize = 10;
 						//}
 	                	
-	                    int tryX = (int)storm.pos.xCoord + rand.nextInt(randSize) - randSize/2;
+	                    int tryX = (int)storm.pos.x + rand.nextInt(randSize) - randSize/2;
 	                    int tryY = (int)spawnYOffset - 2 + rand.nextInt(8);
-	                    int tryZ = (int)storm.pos.zCoord + rand.nextInt(randSize) - randSize/2;
+	                    int tryZ = (int)storm.pos.z + rand.nextInt(randSize) - randSize/2;
 	
-	                    double d0 = storm.pos.xCoord - tryX;
-	                    double d2 = storm.pos.zCoord - tryZ;
+	                    double d0 = storm.pos.x - tryX;
+	                    double d2 = storm.pos.z - tryZ;
 	                    double dist = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
 	                    
 	                    if (dist < tornadoBaseSize/2 + randSize/2 && tryRipCount < tryRipMax)
@@ -403,7 +408,7 @@ public class TornadoHelper {
             seesLight = true;
         }
 
-        if (Math.abs((spawnYOffset - storm.pos.yCoord)) > 5)
+        if (Math.abs((spawnYOffset - storm.pos.y)) > 5)
         {
             seesLight = true;
         }
@@ -411,7 +416,7 @@ public class TornadoHelper {
 		if (!parWorld.isRemote && storm.isFirenado) {
         	if (storm.levelCurIntensityStage >= storm.STATE_STAGE1)
 			for (int i = 0; i < firesPerTickMax; i++) {
-				BlockPos posUp = new BlockPos(storm.posGround.xCoord, storm.posGround.yCoord + rand.nextInt(30), storm.posGround.zCoord);
+				BlockPos posUp = new BlockPos(storm.posGround.x, storm.posGround.y + rand.nextInt(30), storm.posGround.z);
 				BlockState state = parWorld.getBlockState(posUp);
 				if (CoroUtilBlock.isAir(state.getBlock())) {
 					//parWorld.setBlockState(posUp, Blocks.FIRE.getDefaultState());
@@ -431,13 +436,13 @@ public class TornadoHelper {
 
 			int randSize = 10;
 
-			int tryX = (int)storm.pos.xCoord + rand.nextInt(randSize) - randSize/2;
+			int tryX = (int)storm.pos.x + rand.nextInt(randSize) - randSize/2;
 
-			int tryZ = (int)storm.pos.zCoord + rand.nextInt(randSize) - randSize/2;
+			int tryZ = (int)storm.pos.z + rand.nextInt(randSize) - randSize/2;
 			int tryY = parWorld.getHeight(Heightmap.Type.MOTION_BLOCKING, new BlockPos(tryX, 0, tryZ)).getY() - 1;
 
-			double d0 = storm.pos.xCoord - tryX;
-			double d2 = storm.pos.zCoord - tryZ;
+			double d0 = storm.pos.x - tryX;
+			double d2 = storm.pos.z - tryZ;
 			double dist = (double)MathHelper.sqrt(d0 * d0 + d2 * d2);
 
 			if (dist < tornadoBaseSize/2 + randSize/2 && tryRipCount < tryRipMax) {
@@ -505,7 +510,7 @@ public class TornadoHelper {
         	int blockCount = getBlockCountForDim(parWorld);
 
 			//old per storm blockCount seems glitched... lets use a global we cache count of
-            if (parWorld.isBlockLoaded(new BlockPos(storm.pos.xCoord, 128, storm.pos.zCoord)) &&
+            if (parWorld.isBlockLoaded(new BlockPos(storm.pos.x, 128, storm.pos.z)) &&
 				lastGrabTime < System.currentTimeMillis() &&
 				tickGrabCount < ConfigTornado.Storm_Tornado_maxBlocksGrabbedPerTick) {
 
@@ -513,7 +518,7 @@ public class TornadoHelper {
 
                 if (blockID != Blocks.SNOW)
                 {
-                	boolean playerClose = parWorld.getClosestPlayer(storm.posBaseFormationPos.xCoord, storm.posBaseFormationPos.yCoord, storm.posBaseFormationPos.zCoord, 140, false) != null;
+                	boolean playerClose = parWorld.getClosestPlayer(storm.posBaseFormationPos.x, storm.posBaseFormationPos.y, storm.posBaseFormationPos.z, 140, false) != null;
                     if (playerClose) {
 	                    
 	                    //blockCount++;
@@ -658,7 +663,7 @@ public class TornadoHelper {
     	//canEntityBeSeen commented out till replaced with coord one, might cause issues
     	
         double dist = grabDist;
-        AxisAlignedBB aabb = new AxisAlignedBB(storm.pos.xCoord, storm.currentTopYBlock, storm.pos.zCoord, storm.pos.xCoord, storm.currentTopYBlock, storm.pos.zCoord);
+        AxisAlignedBB aabb = new AxisAlignedBB(storm.pos.x, storm.currentTopYBlock, storm.pos.z, storm.pos.x, storm.currentTopYBlock, storm.pos.z);
         aabb = aabb.grow(dist, this.storm.maxHeight * 3, dist);
         List list = parWorld.getEntitiesWithinAABB(Entity.class, aabb);
         boolean foundEnt = false;
@@ -671,7 +676,7 @@ public class TornadoHelper {
                 Entity entity1 = (Entity)list.get(i);
 
                 if (canGrabEntity(entity1)) {
-					if (getDistanceXZ(storm.posBaseFormationPos, entity1.posX, entity1.posY, entity1.posZ) < dist)
+					if (getDistanceXZ(storm.posBaseFormationPos, entity1.getPosX(), entity1.getPosY(), entity1.getPosZ()) < dist)
 					{
 						//TODO: 1.14 uncomment and remove false
 						if (false/* && (entity1 instanceof EntityMovingBlock && !((EntityMovingBlock)entity1).collideFalling)*/)
@@ -706,19 +711,19 @@ public class TornadoHelper {
         return foundEnt;
     }
     
-    public double getDistanceXZ(Vec3 parVec, double var1, double var3, double var5)
+    public double getDistanceXZ(Vec3d parVec, double var1, double var3, double var5)
     {
-        double var7 = parVec.xCoord - var1;
+        double var7 = parVec.x - var1;
         //double var9 = ent.posY - var3;
-        double var11 = parVec.zCoord - var5;
+        double var11 = parVec.z - var5;
         return (double)MathHelper.sqrt(var7 * var7/* + var9 * var9*/ + var11 * var11);
     }
     
     public double getDistanceXZ(Entity ent, double var1, double var3, double var5)
     {
-        double var7 = ent.posX - var1;
+        double var7 = ent.getPosX() - var1;
         //double var9 = ent.posY - var3;
-        double var11 = ent.posZ - var5;
+        double var11 = ent.getPosZ() - var5;
         return (double)MathHelper.sqrt(var7 * var7/* + var9 * var9*/ + var11 * var11);
     }
     
@@ -739,7 +744,7 @@ public class TornadoHelper {
         if (storm.stormType == storm.TYPE_WATER) {
         	close = 200;
         }
-        Vec3 plPos = new Vec3(mc.player.posX, mc.player.posY, mc.player.posZ);
+        Vec3d plPos = new Vec3d(mc.player.getPosX(), mc.player.getPosY(), mc.player.getPosZ());
         
         double distToPlayer = this.storm.posGround.distanceTo(plPos);
         
@@ -780,7 +785,7 @@ public class TornadoHelper {
             if (playFarSound) {
 				if (mc.world.getGameTime() % 40 == 0) {
 					isOutsideCached = WeatherUtilEntity.isPosOutside(mc.world,
-							new Vec3(mc.player.getPosition().getX()+0.5F, mc.player.getPosition().getY()+0.5F, mc.player.getPosition().getZ()+0.5F));
+							new Vec3d(mc.player.getPosition().getX()+0.5F, mc.player.getPosition().getY()+0.5F, mc.player.getPosition().getZ()+0.5F));
 				}
 				if (isOutsideCached) {
 					tryPlaySound(WeatherUtilSound.snd_wind_far, 2, mc.player, volScaleFar, far);

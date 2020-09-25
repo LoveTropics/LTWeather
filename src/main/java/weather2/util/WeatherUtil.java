@@ -2,8 +2,14 @@ package weather2.util;
 
 import java.util.Calendar;
 import java.util.HashMap;
+import java.util.Optional;
 import java.util.function.BiFunction;
 import java.util.function.Function;
+
+import com.lovetropics.minigames.common.minigames.IMinigameInstance;
+import com.lovetropics.minigames.common.minigames.MinigameManager;
+import com.lovetropics.minigames.common.minigames.behaviours.MinigameBehaviorTypes;
+import com.lovetropics.minigames.common.minigames.behaviours.instances.survive_the_tide.WeatherEventsMinigameBehavior;
 
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -22,9 +28,6 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-import net.tropicraft.lovetropics.common.minigames.IMinigameWeatherInstance;
-import net.tropicraft.lovetropics.common.minigames.MinigameManager;
-import net.tropicraft.lovetropics.common.minigames.definitions.survive_the_tide.SurviveTheTideMinigameDefinition;
 
 public class WeatherUtil {
 
@@ -373,21 +376,21 @@ public class WeatherUtil {
         }
     }
 
-    public static SurviveTheTideMinigameDefinition getSurviveTheTideGame() {
-        if (MinigameManager.getInstance().getCurrentMinigame() != null &&
-                MinigameManager.getInstance().getCurrentMinigame().getDefinition() instanceof SurviveTheTideMinigameDefinition) {
-            return ((SurviveTheTideMinigameDefinition) MinigameManager.getInstance().getCurrentMinigame().getDefinition());
-        }
-        return null;
+    // TODO minigames some of these are called clientside and will not work there, need solution in LTMinigames
+    public static IMinigameInstance getCurrentMinigame() {
+    	return MinigameManager.getInstance().getCurrentMinigame();
     }
 
-    public static IMinigameWeatherInstance getWeatherMinigameInstance() {
-        if (MinigameManager.getInstance().getCurrentMinigame() != null &&
-                MinigameManager.getInstance().getCurrentMinigame().getDefinition() instanceof SurviveTheTideMinigameDefinition) {
-            return ((SurviveTheTideMinigameDefinition) MinigameManager.getInstance().getCurrentMinigame().getDefinition()).getMinigameWeatherInstance();
-        }
-        return null;
+    public static Optional<WeatherEventsMinigameBehavior> getWeatherBehavior() {
+    	return getCurrentMinigame().getDefinition().getBehavior(MinigameBehaviorTypes.WEATHER_EVENTS.get());
+    }
+
+    public static boolean currentMinigameHasWeather() {
+    	return getWeatherBehavior().isPresent();
     }
     
-    
+    public static boolean isMinigameWorld(World world) {
+    	IMinigameInstance minigame = getCurrentMinigame();
+    	return minigame != null && minigame.getWorld() == world;
+    }
 }
