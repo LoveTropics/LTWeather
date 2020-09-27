@@ -89,7 +89,7 @@ public class MinigameWeatherInstance implements IMinigameWeatherInstance {
     
     @Override
     public void onStart(IMinigameInstance minigame) {
-
+    	setMinigameActive(true);
     }
 
     @Override
