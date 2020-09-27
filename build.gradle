@@ -28,8 +28,8 @@ minecraft {
 
     runs {
         client {
-        	taskName 'ltweather_client'
-        	
+            taskName 'ltweather_client'
+            
             workingDirectory project.file('run')
 
             property 'forge.logging.markers', 'REGISTRIES'
@@ -43,7 +43,7 @@ minecraft {
         }
 
         server {
-        	taskName 'ltweather_server'
+            taskName 'ltweather_server'
         
             workingDirectory project.file('run')
 
@@ -58,7 +58,7 @@ minecraft {
         }
         
         data {
-        	taskName 'ltweather_data'
+            taskName 'ltweather_data'
         
             workingDirectory project.file('run')
             
@@ -73,23 +73,28 @@ minecraft {
                 }
             }
             
-			args '--mod', 'lovetropics', '--all', '--output', '"' + rootProject.file('src/generated/resources/') + '"',
-				 '--existing', '"' + sourceSets.main.resources.srcDirs[0] + '"' 
-			
+            args '--mod', 'lovetropics', '--all', '--output', '"' + rootProject.file('src/generated/resources/') + '"',
+                 '--existing', '"' + sourceSets.main.resources.srcDirs[0] + '"' 
+            
         }
     }
 }
 
 sourceSets.main.resources {
-	srcDir 'src/generated/resources'
+    srcDir 'src/generated/resources'
 }
 
 repositories {
-	mavenLocal()
+    mavenLocal()
+    maven {
+        url "http://maven.tterrag.com/"
+    }
 }
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
+
+    implementation fg.deobf("com.lovetropics.minigames:LTMinigames:${ltminigames_version}:all")
 }
 
 jar {

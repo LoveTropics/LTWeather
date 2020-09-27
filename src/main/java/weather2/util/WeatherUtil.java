@@ -376,13 +376,14 @@ public class WeatherUtil {
         }
     }
 
-    // TODO minigames some of these are called clientside and will not work there, need solution in LTMinigames
-    public static IMinigameInstance getCurrentMinigame() {
-    	return MinigameManager.getInstance().getCurrentMinigame();
+    public static Optional<IMinigameInstance> getCurrentMinigame() {
+    	return Optional.ofNullable(MinigameManager.getInstance().getCurrentMinigame());
     }
 
     public static Optional<WeatherEventsMinigameBehavior> getWeatherBehavior() {
-    	return getCurrentMinigame().getDefinition().getBehavior(MinigameBehaviorTypes.WEATHER_EVENTS.get());
+    	return getCurrentMinigame()
+    			.map(IMinigameInstance::getDefinition)
+    			.flatMap(m -> m.getBehavior(MinigameBehaviorTypes.WEATHER_EVENTS.get()));
     }
 
     public static boolean currentMinigameHasWeather() {
@@ -390,7 +391,8 @@ public class WeatherUtil {
     }
     
     public static boolean isMinigameWorld(World world) {
-    	IMinigameInstance minigame = getCurrentMinigame();
-    	return minigame != null && minigame.getWorld() == world;
+    	return getCurrentMinigame()
+    			.map(m -> m.getWorld() == world)
+    			.orElse(false);
     }
 }
