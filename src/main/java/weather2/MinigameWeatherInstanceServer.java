@@ -24,6 +24,11 @@ public class MinigameWeatherInstanceServer extends MinigameWeatherInstance {
     public MinigameWeatherInstanceServer() {
         super();
     }
+    
+    @Override
+    public void onStart(IMinigameInstance minigame) {
+    	
+    }
 
     public void tick(IMinigameInstance minigame) {
         super.tick(minigame);

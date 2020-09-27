@@ -86,6 +86,11 @@ public class MinigameWeatherInstance implements IMinigameWeatherInstance {
     public MinigameWeatherInstance() {
 
     }
+    
+    @Override
+    public void onStart(IMinigameInstance minigame) {
+
+    }
 
     @Override
 	public void tick(IMinigameInstance minigameDefinition) {

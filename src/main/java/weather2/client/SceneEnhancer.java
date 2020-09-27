@@ -256,7 +256,7 @@ public class SceneEnhancer implements Runnable {
 			throwable.printStackTrace();
 		}*/
 
-		if (client.world != null && client.player != null && WeatherUtil.isMinigameWorld(client.world)) {
+		if (client.world != null && client.player != null && ClientTickHandler.minigameWeatherInstance.isMinigameActive()) {
 			profileSurroundings();
 			tryAmbientSounds();
 		}
