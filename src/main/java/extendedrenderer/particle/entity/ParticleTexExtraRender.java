@@ -3,14 +3,10 @@ package extendedrenderer.particle.entity;
 import com.mojang.blaze3d.vertex.IVertexBuilder;
 
 import CoroUtil.util.CoroUtilParticle;
-import extendedrenderer.placeholders.Quaternion;
-import extendedrenderer.placeholders.Vector4f;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Quaternion;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.Entity;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.Vec3d;
@@ -80,22 +76,37 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	@Override
 	public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
 		//override rotations
-		if (!facePlayer) {
+        Vec3d vec3d = renderInfo.getProjectedView();
+        Quaternion quaternion;
+        if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
+           quaternion = renderInfo.getRotation();
+        } else {
+           // override rotations
+           quaternion = new Quaternion(0, 0, 0, 1);
+           quaternion.multiply(Vector3f.YP.rotationDegrees(this.rotationYaw));
+           quaternion.multiply(Vector3f.XP.rotationDegrees(this.rotationPitch));
+        }
+        
+        float posX = (float)(MathHelper.lerp((double)partialTicks, this.prevPosX, this.posX) - vec3d.getX());
+        float posY = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - vec3d.getY());
+        float posZ = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - vec3d.getZ());
+
+//		if (!facePlayer) {
 			// TODO particle rotations
 //			rotationX = MathHelper.cos(this.rotationYaw * (float)Math.PI / 180.0F);
 //			rotationYZ = MathHelper.sin(this.rotationYaw * (float)Math.PI / 180.0F);
 //	        rotationXY = -rotationYZ * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
 //	        rotationXZ = rotationX * MathHelper.sin(this.rotationPitch * (float)Math.PI / 180.0F);
 //	        rotationZ = MathHelper.cos(this.rotationPitch * (float)Math.PI / 180.0F);
-		} else {
-			if (this.isSlantParticleToWind()) {
+//		} else {
+//			if (this.isSlantParticleToWind()) {
 //				rotationXZ = (float) -this.motionZ;
 //				rotationXY = (float) -this.motionX;
-			}
+//			}
 			//rotationXZ = 6.28F;
 			//rotationXY = 1;
 			//rotationZ -= 1;
-		}
+//		}
 
 
 		float f = this.getMinU();
@@ -198,7 +209,20 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				int what2 = what >> 16 & 65535;
 				int what3 = what & 65535;*/
 
-		        Vector3f[] avec3d = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+//		        Vector3f[] avec3d = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+
+		        Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
+		        vector3f1.transform(quaternion);
+		        Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+		        float scale = this.getScale(partialTicks);
+
+		        
+		        for(int v = 0; v < 4; ++v) {
+		           Vector3f vector3f = avector3f[v];
+		           vector3f.transform(quaternion);
+		           vector3f.mul(scale);
+		           vector3f.add(posX, posY, posZ);
+		        }
 
 		        // TODO particle rotation
 //				Vec3d[] avec3d = new Vec3d[] {
@@ -222,10 +246,10 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 					}
 				}*/
 
-				buffer.pos(xx + avec3d[0].getX(), yy + avec3d[0].getY(), zz + avec3d[0].getZ()).tex(f1, f3).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-				buffer.pos(xx + avec3d[1].getX(), yy + avec3d[1].getY(), zz + avec3d[1].getZ()).tex(f1, f2).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-				buffer.pos(xx + avec3d[2].getX(), yy + avec3d[2].getY(), zz + avec3d[2].getZ()).tex(f, f2).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
-				buffer.pos(xx + avec3d[3].getX(), yy + avec3d[3].getY(), zz + avec3d[3].getZ()).tex(f, f3).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+				buffer.pos(xx + avector3f[0].getX(), yy + avector3f[0].getY(), zz + avector3f[0].getZ()).tex(f1, f3).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+				buffer.pos(xx + avector3f[1].getX(), yy + avector3f[1].getY(), zz + avector3f[1].getZ()).tex(f1, f2).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+				buffer.pos(xx + avector3f[2].getX(), yy + avector3f[2].getY(), zz + avector3f[2].getZ()).tex(f, f2).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
+				buffer.pos(xx + avector3f[3].getX(), yy + avector3f[3].getY(), zz + avector3f[3].getZ()).tex(f, f3).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j, k).endVertex();
 			}
 		} catch (Throwable ex) {
 			ex.printStackTrace();

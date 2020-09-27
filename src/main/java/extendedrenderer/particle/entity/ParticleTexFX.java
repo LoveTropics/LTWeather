@@ -1,8 +1,6 @@
 package extendedrenderer.particle.entity;
 
-import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.entity.Entity;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
@@ -19,7 +17,7 @@ public class ParticleTexFX extends EntityRotFX {
         this.particleGreen = 1.0F;
         this.particleBlue = 1.0F;
         this.particleGravity = 1F;
-        this.particleScale = 1F;
+        this.particleScale = 0.15F;
         this.setMaxAge(100);
         this.setCanCollide(false);
     }

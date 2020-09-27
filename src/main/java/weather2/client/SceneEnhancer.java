@@ -790,7 +790,7 @@ public class SceneEnhancer implements Runnable {
 									//SHADER COMPARE TEST
 									//rain.setFacePlayer(false);
 
-									rain.setScale(3F + (rand.nextFloat() * 3F));
+									rain.setScale(0.2F + (rand.nextFloat() * 0.05F));
 									rain.setMaxAge(15);
 									rain.setGravity(-0.0F);
 									//opted to leave the popin for rain, its not as bad as snow, and using fade in causes less rain visual overall
@@ -850,7 +850,7 @@ public class SceneEnhancer implements Runnable {
 								//pos = world.getPrecipitationHeight(pos).add(0, 1, 0);
 
 								if (canPrecipitateAt(world, pos.up(-scanAheadRange))/*world.isRainingAt(pos)*/) {
-									ParticleTexExtraRender rain = new ParticleTexExtraRender(entP.world,
+									ParticleTexFX rain = new ParticleTexFX(entP.world,
 											pos.getX() + rand.nextFloat(),
 											pos.getY() - 1 + 0.01D,
 											pos.getZ() + rand.nextFloat(),
@@ -870,7 +870,6 @@ public class SceneEnhancer implements Runnable {
 									//rain.setExtraParticlesBaseAmount(5);
 									//rain.setDontRenderUnderTopmostBlock(true);
 									//rain.setSlantParticleToWind(true);
-									rain.noExtraParticles = true;
 
 									boolean upward = rand.nextBoolean();
 
@@ -880,7 +879,7 @@ public class SceneEnhancer implements Runnable {
 									rain.setFacePlayer(false);
 									rain.facePlayerYaw = true;
 
-									rain.setScale(90F + (rand.nextFloat() * 3F));
+									rain.setScale(9F + (rand.nextFloat() * 0.3F));
 									//rain.setScale(25F);
 									rain.setMaxAge(60);
 									rain.setGravity(0.35F);

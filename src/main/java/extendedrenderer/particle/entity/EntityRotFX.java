@@ -527,7 +527,7 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 	
 	@Override
 	public float getScale(float scaleFactor) {
-		return 0.1F;
+		return this.particleScale;
 	}
 	
 	@Override
@@ -554,15 +554,14 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         float f1 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - vec3d.getY());
         float f2 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - vec3d.getZ());
         Quaternion quaternion;
-        if (this.rotationPitch == 0 && this.rotationYaw == 0) {
+        if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
            quaternion = renderInfo.getRotation();
         } else {
-           quaternion = new Quaternion(renderInfo.getRotation());
-           // override rotations
-           float yaw = MathHelper.lerp(partialTicks, this.prevRotationYaw, this.rotationYaw);
-           float pitch = MathHelper.lerp(partialTicks, this.prevRotationPitch, this.rotationPitch);
-           quaternion.multiply(toQuaternionDegrees(yaw, pitch, 0));
-        }
+            // override rotations
+            quaternion = new Quaternion(0, 0, 0, 1);
+            quaternion.multiply(Vector3f.YP.rotationDegrees(this.rotationYaw));
+            quaternion.multiply(Vector3f.XP.rotationDegrees(this.rotationPitch));
+         }
 
         Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
         vector3f1.transform(quaternion);
@@ -586,26 +585,6 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         buffer.pos((double)avector3f[2].getX(), (double)avector3f[2].getY(), (double)avector3f[2].getZ()).tex(f7, f5).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();
         buffer.pos((double)avector3f[3].getX(), (double)avector3f[3].getY(), (double)avector3f[3].getZ()).tex(f7, f6).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();
      
-	}
-	
-	private Quaternion toQuaternionDegrees(float yaw, float pitch, float roll) {
-		return toQuaternionRads((float) Math.toRadians(yaw), (float) Math.toRadians(pitch), (float) Math.toRadians(roll));
-	}
-	
-	private Quaternion toQuaternionRads(float yaw, float pitch, float roll) {
-		// TODO this might be able to be replaced by Quaternion(float, float, float, boolean)
-		float cy = MathHelper.cos(yaw * 0.5f);
-		float sy = MathHelper.sin(yaw * 0.5f);
-		float cp = MathHelper.cos(pitch * 0.5f);
-		float sp = MathHelper.sin(pitch * 0.5f);
-		float cr = MathHelper.cos(roll * 0.5f);
-		float sr = MathHelper.sin(roll * 0.5f);
-
-	    return new Quaternion(
-	    		sr * cp * cy - cr * sp * sy,
-	    		cr * sp * cy + sr * cp * sy,
-	    		cr * cp * sy - sr * sp * cy,
-	    	    cr * cp * cy + sr * sp * sy);
 	}
 
     //TODO: 1.14 uncomment
