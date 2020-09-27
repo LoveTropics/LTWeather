@@ -11,9 +11,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.SpriteTexturedParticle;
 import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.BufferBuilder;
 import net.minecraft.client.renderer.Quaternion;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ReuseableStream;
 import net.minecraft.util.math.BlockPos;
@@ -28,6 +31,26 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 @OnlyIn(Dist.CLIENT)
 public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler, IShaderRenderedEntity
 {
+	protected static final IParticleRenderType SORTED_TRANSLUCENT = new IParticleRenderType() {
+		
+		@Override
+		public void beginRender(BufferBuilder p_217600_1_, TextureManager p_217600_2_) {
+			IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.beginRender(p_217600_1_, p_217600_2_);
+		}
+		
+		@Override
+		public void finishRender(Tessellator p_217599_1_) {
+			ActiveRenderInfo activeInfo = Minecraft.getInstance().getRenderManager().info;
+			Vec3d eye = activeInfo.getProjectedView();
+			p_217599_1_.getBuffer().sortVertexData((float) eye.x, (float) eye.y, (float) eye.z);
+			IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.finishRender(p_217599_1_);
+		}
+
+		@Override
+		public String toString() {
+			return "PARTICLE_SHEET_SORTED_TRANSLUCENT";
+		}
+	};
     public boolean weatherEffect = false;
 
     public float spawnY = -1;
@@ -774,7 +797,7 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
     public IParticleRenderType getRenderType() {
         //TODO: replaces getFXLayer of 5, possibly reimplement extra layers later for clouds etc
         //actually anything > 2 was custom texture sheet, then it just uses higher numbers for diff render orders, higher = later
-        return IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT;
+        return SORTED_TRANSLUCENT;
     }
 
     @Override

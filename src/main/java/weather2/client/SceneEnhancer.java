@@ -701,7 +701,7 @@ public class SceneEnhancer implements Runnable {
 									}
 
 									//rain.setFacePlayer(true);
-									rain.setScale(2F);
+									rain.setScale(2F * 0.15F);
 									rain.isTransparent = true;
 									rain.setGravity(2.5F);
 									//rain.isTransparent = true;
