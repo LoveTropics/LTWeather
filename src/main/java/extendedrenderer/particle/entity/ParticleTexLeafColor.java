@@ -1,5 +1,12 @@
 package extendedrenderer.particle.entity;
 
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
+import org.apache.commons.lang3.ArrayUtils;
+
+import CoroUtil.util.CoroUtilColor;
 import it.unimi.dsi.fastutil.ints.IntArrays;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -11,11 +18,6 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.registries.IRegistryDelegate;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 public class ParticleTexLeafColor extends ParticleTexFX {
     
@@ -31,8 +33,8 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 	}*/
 
 	//only use positives for now
-	public float rotationYawMomentum = 0;
-	public float rotationPitchMomentum = 0;
+	public float rotationYawMomentum;
+	public float rotationPitchMomentum;
 
 	public ParticleTexLeafColor(World worldIn, double posXIn, double posYIn,
 			double posZIn, double mX, double mY, double mZ,
@@ -59,12 +61,12 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 
 		int multiplier = this.colors.getColor(state, this.world, pos, 0);
 
+		colorCache.clear();
 		int[] colors = colorCache.get(state);
 		if (colors == null) {
 
-			colors = IntArrays.EMPTY_ARRAY;
-			//TODO: 1.14 uncomment
-		    //colors = CoroUtilColor.getColors(state);
+//			colors = IntArrays.EMPTY_ARRAY;
+		    colors = CoroUtilColor.getColors(state);
 
 		    if (colors.length == 0) {
 
@@ -127,6 +129,8 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 			if (rotationYawMomentum < 0) {
 				rotationYawMomentum = 0;
 			}
+		} else {
+			rotationYawMomentum += rand.nextDouble() * 30;
 		}
 
 		if (rotationPitchMomentum > 0) {
@@ -138,6 +142,8 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 			if (rotationPitchMomentum < 0) {
 				rotationPitchMomentum = 0;
 			}
+		} else {
+			rotationPitchMomentum += rand.nextDouble() * 30;
 		}
 	}
 

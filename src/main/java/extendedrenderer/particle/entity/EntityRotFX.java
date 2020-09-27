@@ -52,7 +52,9 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
     
     public int debugID = 0;
     
+    public float prevRotationYaw;
     public float rotationYaw;
+    public float prevRotationPitch;
     public float rotationPitch;
     
     public float windWeight = 5;
@@ -214,6 +216,8 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
     @Override
     public void tick() {
     	super.tick();
+    	this.prevRotationPitch = this.rotationPitch;
+    	this.prevRotationYaw = this.rotationYaw;
 
         Entity ent = Minecraft.getInstance().getRenderViewEntity();
 
@@ -555,7 +559,9 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         } else {
            quaternion = new Quaternion(renderInfo.getRotation());
            // override rotations
-           quaternion.multiply(toQuaternionDegrees(this.rotationYaw, this.rotationPitch, 0));
+           float yaw = MathHelper.lerp(partialTicks, this.prevRotationYaw, this.rotationYaw);
+           float pitch = MathHelper.lerp(partialTicks, this.prevRotationPitch, this.rotationPitch);
+           quaternion.multiply(toQuaternionDegrees(yaw, pitch, 0));
         }
 
         Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
