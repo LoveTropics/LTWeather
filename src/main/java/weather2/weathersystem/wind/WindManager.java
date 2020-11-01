@@ -1,24 +1,26 @@
 package weather2.weathersystem.wind;
 
-import java.util.Random;
-
 import CoroUtil.util.CoroUtilEntOrParticle;
+import com.lovetropics.minigames.common.minigames.weather.WeatherController;
+import com.lovetropics.minigames.common.minigames.weather.WeatherControllerManager;
 import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import weather2.Weather;
 import weather2.config.ConfigLTOverrides;
 import weather2.config.ConfigMisc;
 import weather2.config.ConfigWind;
-import weather2.util.WeatherUtil;
 import weather2.util.WeatherUtilEntity;
 import weather2.weathersystem.WeatherManagerBase;
 import weather2.weathersystem.WeatherManagerServer;
 import weather2.weathersystem.storm.StormObject;
+
+import java.util.Random;
 
 public class WindManager {
 
@@ -281,9 +283,9 @@ public class WindManager {
 				}
 
 				if (ConfigLTOverrides.windSpeedOverride) {
-					WeatherUtil.getWeatherBehavior().ifPresent(behavior -> {
-                        windSpeedGlobal = behavior.getMinigameWeatherInstance().getWindSpeed();
-					});
+					ServerWorld world = (ServerWorld) manager.getWorld();
+					WeatherController weatherController = WeatherControllerManager.forWorld(world);
+					windSpeedGlobal = weatherController.getWindSpeed();
 				}
 				
 	            //smooth use

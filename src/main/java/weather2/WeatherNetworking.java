@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 
 public class WeatherNetworking {
 
-    private static final String PROTOCOL_VERSION = Integer.toString(3);
+    private static final String PROTOCOL_VERSION = Integer.toString(4);
     private static short lastID = 0;
     public static final ResourceLocation NETWORK_CHANNEL_ID_MAIN = new ResourceLocation(Weather.MODID, "main");
 
@@ -33,6 +33,8 @@ public class WeatherNetworking {
     public static void register() {
         registerMessage(PacketNBTFromServer.class, PacketNBTFromServer::encode, PacketNBTFromServer::decode, PacketNBTFromServer.Handler::handle);
         registerMessage(PacketNBTFromClient.class, PacketNBTFromClient::encode, PacketNBTFromClient::decode, PacketNBTFromClient.Handler::handle);
+
+        registerMessage(UpdateWeatherPacket.class, UpdateWeatherPacket::encode, UpdateWeatherPacket::decode, UpdateWeatherPacket::handle);
     }
 
     private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> messageConsumer) {

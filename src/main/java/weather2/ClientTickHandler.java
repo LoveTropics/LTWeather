@@ -25,7 +25,6 @@ public class ClientTickHandler
 	public static World lastWorld;
 	
 	public static WeatherManagerClient weatherManager;
-	public static MinigameWeatherInstanceClient minigameWeatherInstance;
 	public static SceneEnhancer sceneEnhancer;
 	//TODO: 1.14 uncomment
 	//public static FoliageEnhancerShader foliageEnhancer;
@@ -126,16 +125,17 @@ public class ClientTickHandler
 			checkClientWeather();
 
 			weatherManager.tick();
-			minigameWeatherInstance.tick(null);
 
 			if (!clientConfigData.Aesthetic_Only_Mode && ConfigMisc.Misc_ForceVanillaCloudsOff && world.getDimension().getType().getId() == 0) {
 				mc.gameSettings.cloudOption = CloudOption.OFF;
 			}
 
+			ClientWeather weather = ClientWeather.get();
+
 			//TODO: split logic up a bit better for this, if this is set to false mid sandstorm, fog is stuck on,
 			// with sandstorms and other things it might not represent the EZ config option
 			// Make sure we're in STT, TODO make this more efficient
-			if (minigameWeatherInstance.isMinigameActive()) {
+			if (weather.hasWeather()) {
 				//weatherManager.tick();
 
 				sceneEnhancer.tickClient();
@@ -257,9 +257,7 @@ public class ClientTickHandler
 			weatherManager = null;
 		}
 
-		if (minigameWeatherInstance != null) {
-			minigameWeatherInstance.reset();
-		}
+		ClientWeather.reset();
 	}
 	
     public static void checkClientWeather() {
@@ -285,8 +283,6 @@ public class ClientTickHandler
 
     	lastWorld = world;
     	weatherManager = new WeatherManagerClient(world.getDimension().getType().getId());
-    	// TODO minigames
-		minigameWeatherInstance = new MinigameWeatherInstanceClient();
 
 		//request a full sync from server
 		CompoundNBT data = new CompoundNBT();

@@ -1,16 +1,5 @@
 package weather2.util;
 
-import java.util.Calendar;
-import java.util.HashMap;
-import java.util.Optional;
-import java.util.function.BiFunction;
-import java.util.function.Function;
-
-import com.lovetropics.minigames.common.minigames.IMinigameInstance;
-import com.lovetropics.minigames.common.minigames.MinigameManager;
-import com.lovetropics.minigames.common.minigames.behaviours.MinigameBehaviorTypes;
-import com.lovetropics.minigames.common.minigames.behaviours.instances.survive_the_tide.WeatherEventsMinigameBehavior;
-
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -28,6 +17,11 @@ import net.minecraft.world.dimension.DimensionType;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
+
+import java.util.Calendar;
+import java.util.HashMap;
+import java.util.function.BiFunction;
+import java.util.function.Function;
 
 public class WeatherUtil {
 
@@ -374,25 +368,5 @@ public class WeatherUtil {
                 return p_217300_2_.apply(p_217300_0_);
             }
         }
-    }
-
-    public static Optional<IMinigameInstance> getCurrentMinigame() {
-    	return Optional.ofNullable(MinigameManager.getInstance().getCurrentMinigame());
-    }
-
-    public static Optional<WeatherEventsMinigameBehavior> getWeatherBehavior() {
-    	return getCurrentMinigame()
-    			.map(IMinigameInstance::getDefinition)
-    			.flatMap(m -> m.getBehavior(MinigameBehaviorTypes.WEATHER_EVENTS.get()));
-    }
-
-    public static boolean currentMinigameHasWeather() {
-    	return getWeatherBehavior().isPresent();
-    }
-    
-    public static boolean isMinigameWorld(World world) {
-    	return getCurrentMinigame()
-    			.map(m -> m.getWorld() == world)
-    			.orElse(false);
     }
 }

@@ -1,27 +1,11 @@
 package weather2.client;
 
-import static CoroUtil.util.CoroUtilMisc.adjVal;
-
-import java.lang.reflect.Field;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
-
-import com.lovetropics.minigames.common.minigames.MinigameManager;
-import com.mojang.blaze3d.platform.GlStateManager;
-
 import CoroUtil.api.weather.IWindHandler;
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.forge.CULog;
-import CoroUtil.util.ChunkCoordinatesBlock;
-import CoroUtil.util.CoroUtilBlock;
-import CoroUtil.util.CoroUtilCompatibility;
-import CoroUtil.util.CoroUtilEntOrParticle;
-import CoroUtil.util.CoroUtilMisc;
-import CoroUtil.util.CoroUtilPhysics;
+import CoroUtil.util.*;
+import com.lovetropics.minigames.common.minigames.weather.RainType;
+import com.mojang.blaze3d.platform.GlStateManager;
 import extendedrenderer.EventHandler;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.behavior.ParticleBehaviorFogGround;
@@ -65,23 +49,23 @@ import net.minecraftforge.client.event.RenderWorldLastEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import weather2.ClientTickHandler;
+import weather2.ClientWeather;
 import weather2.SoundRegistry;
 import weather2.client.entity.particle.ParticleSandstorm;
 import weather2.config.ConfigLTOverrides;
 import weather2.config.ConfigMisc;
 import weather2.config.ConfigParticle;
 import weather2.config.ConfigStorm;
-import weather2.util.WeatherUtil;
-import weather2.util.WeatherUtilBlock;
-import weather2.util.WeatherUtilDim;
-import weather2.util.WeatherUtilEntity;
-import weather2.util.WeatherUtilParticle;
-import weather2.util.WeatherUtilSound;
-import weather2.util.WindReader;
+import weather2.util.*;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.storm.StormObject;
 import weather2.weathersystem.storm.WeatherObjectSandstorm;
 import weather2.weathersystem.wind.WindManager;
+
+import java.lang.reflect.Field;
+import java.util.*;
+
+import static CoroUtil.util.CoroUtilMisc.adjVal;
 
 @OnlyIn(Dist.CLIENT)
 public class SceneEnhancer implements Runnable {
@@ -256,7 +240,7 @@ public class SceneEnhancer implements Runnable {
 			throwable.printStackTrace();
 		}*/
 
-		if (client != null && client.world != null && client.player != null && ClientTickHandler.minigameWeatherInstance != null &&  ClientTickHandler.minigameWeatherInstance.isMinigameActive()) {
+		if (client != null && client.world != null && client.player != null && ClientWeather.get().hasWeather()) {
 			profileSurroundings();
 			tryAmbientSounds();
 		}
@@ -565,8 +549,9 @@ public class SceneEnhancer implements Runnable {
 			WindManager windMan = weatherMan.getWindManager();
 			if (windMan == null) return;
 
+			ClientWeather weather = ClientWeather.get();
 
-			float curPrecipVal = ClientTickHandler.minigameWeatherInstance.getParticleRainfallAmount();
+			float curPrecipVal = weather.getRainAmount();
 			if (ConfigLTOverrides.vanillaRainOverride) {
 				curPrecipVal = getRainStrengthAndControlVisuals(entP);
 			} else {
@@ -807,7 +792,7 @@ public class SceneEnhancer implements Runnable {
 									rain.setMotionX((rand.nextFloat() - 0.5F) * 0.01F);
 									rain.setMotionZ((rand.nextFloat() - 0.5F) * 0.01F);
 
-									if (ClientTickHandler.minigameWeatherInstance.isLastRainWasAcid()) {
+									if (weather.getRainType() == RainType.ACID) {
 										rain.particleRed = acidRainRed;
 										rain.particleGreen = acidRainGreen;
 										rain.particleBlue = acidRainBlue;
@@ -898,7 +883,7 @@ public class SceneEnhancer implements Runnable {
 									rain.setMotionX((rand.nextFloat() - 0.5F) * 0.01F);
 									rain.setMotionZ((rand.nextFloat() - 0.5F) * 0.01F);
 
-									if (ClientTickHandler.minigameWeatherInstance.isLastRainWasAcid()) {
+									if (weather.getRainType() == RainType.ACID) {
 										rain.particleRed = acidRainRed;
 										rain.particleGreen = acidRainGreen;
 										rain.particleBlue = acidRainBlue;
@@ -968,7 +953,7 @@ public class SceneEnhancer implements Runnable {
 					}
 				}
 
-				boolean groundFire = ClientTickHandler.minigameWeatherInstance.isMinigameActive() && ClientTickHandler.minigameWeatherInstance.heatwaveActive();
+				boolean groundFire = ClientWeather.get().isHeatwave();
 				int spawnAreaSize = 40;
 
 				if (groundFire) {
@@ -2000,7 +1985,7 @@ public class SceneEnhancer implements Runnable {
 
     	boolean ltOverride = false;
     	ClientTickHandler.checkClientWeather();
-    	ltOverride = ClientTickHandler.minigameWeatherInstance.isMinigameActive() && ClientTickHandler.minigameWeatherInstance.heatwaveActive();
+    	ltOverride = ClientWeather.get().isHeatwave();
 		//ltOverride = true;
     	if (ltOverride) {
 			scaleIntensityTarget = 0.7F;
@@ -2421,9 +2406,10 @@ public class SceneEnhancer implements Runnable {
 
 		if (!ConfigLTOverrides.vanillaRainOverride) {
 			Minecraft client = Minecraft.getInstance();
-			if (client.world != null && ClientTickHandler.minigameWeatherInstance != null && ClientTickHandler.minigameWeatherInstance.isMinigameActive()) {
+			ClientWeather weather = ClientWeather.get();
+			if (client.world != null && weather.hasWeather()) {
 				ClientTickHandler.checkClientWeather();
-				client.world.setRainStrength(ClientTickHandler.minigameWeatherInstance.getVanillaRainRenderAmount());
+				client.world.setRainStrength(weather.getVanillaRainAmount());
 			}
 			return;
 		}

@@ -60,10 +60,6 @@ public class PacketNBTFromServer {
                             ClientTickHandler.clientConfigData.read(nbt);
                             //ItemPocketSand.particulateFromServer(nbt.getString("playerName"));
                         }
-                    } else if (packetCommand.equals(WeatherNetworking.NBT_PACKET_COMMAND_MINIGAME)) {
-                        ClientTickHandler.checkClientWeather();
-
-                        ClientTickHandler.minigameWeatherInstance.deserializeNBT(nbt.getCompound(WeatherNetworking.NBT_PACKET_DATA_MINIGAME));
                     }
                 } catch (Exception ex) {
                     ex.printStackTrace();

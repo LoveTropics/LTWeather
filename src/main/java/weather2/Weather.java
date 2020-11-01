@@ -1,14 +1,7 @@
 package weather2;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-import com.lovetropics.minigames.common.minigames.behaviours.instances.survive_the_tide.WeatherEventsMinigameBehavior;
-
 import CoroUtil.util.CoroUtilFile;
+import com.lovetropics.minigames.common.minigames.weather.WeatherControllerManager;
 import modconfig.IConfigCategory;
 import net.minecraft.block.Block;
 import net.minecraftforge.common.MinecraftForge;
@@ -23,10 +16,15 @@ import net.minecraftforge.fml.event.server.FMLServerStartedEvent;
 import net.minecraftforge.fml.event.server.FMLServerStartingEvent;
 import net.minecraftforge.fml.event.server.FMLServerStoppedEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import weather2.config.ConfigMisc;
 import weather2.player.PlayerData;
 import weather2.util.WeatherUtilConfig;
 import weather2.weathersystem.WeatherManagerServer;
+
+import java.util.ArrayList;
+import java.util.List;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(Weather.MODID)
@@ -107,9 +105,8 @@ public class Weather
         //SoundRegistry.init();
         WeatherUtilConfig.processLists();
         //TODO: 1.14 need for LT? addMapping(EntityLightningBolt.class, "weather2_lightning_bolt", 2, 512, 5, true);
-        
-        // Inject our weather implementation (temporary?)
-        WeatherEventsMinigameBehavior.WEATHER_IMPL = MinigameWeatherInstanceServer::new;
+
+        WeatherControllerManager.setFactory(ServerWeatherController::new);
     }
 
     @SubscribeEvent
