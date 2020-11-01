@@ -10,12 +10,10 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
-import net.minecraftforge.common.DimensionManager;
 import weather2.client.SceneEnhancer;
 import weather2.config.ConfigFoliage;
 import weather2.config.ConfigMisc;
 import weather2.util.WindReader;
-import weather2.weathersystem.EntityRendererProxyWeather2Mini;
 import weather2.weathersystem.WeatherManagerClient;
 
 import java.lang.reflect.Field;
