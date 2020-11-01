@@ -18,7 +18,6 @@ import weather2.config.ConfigWind;
 import weather2.util.WeatherUtilEntity;
 import weather2.weathersystem.WeatherManagerBase;
 import weather2.weathersystem.WeatherManagerServer;
-import weather2.weathersystem.storm.StormObject;
 
 import java.util.Random;
 
@@ -387,36 +386,9 @@ public class WindManager {
 	@OnlyIn(Dist.CLIENT)
 	public void tickClient() {
 		PlayerEntity entP = Minecraft.getInstance().player;
-
         if (windTimeEvent > 0) {
         	windTimeEvent--;
         }
-		
-		//event data
-		if (entP != null) {
-	        if (manager.getWorld().getGameTime() % 10 == 0) {
-	        	StormObject so = manager.getClosestStorm(new Vec3d(entP.getPosX(), StormObject.layers.get(0), entP.getPosZ()), 256, StormObject.STATE_HIGHWIND);
-
-	        	if (so != null) {
-
-					windOriginEvent = new BlockPos(so.posGround.x, so.posGround.y, so.posGround.z);
-	        		
-	        		setWindTimeEvent(80);
-	        		
-	        		//double stormDist = entP.getDistanceSq(so.posGround.x, so.posGround.y, so.posGround.z);
-	        		
-	        		//player pos aiming at storm
-	        		double var11 = so.posGround.x - entP.getPosX();
-		            double var15 = so.posGround.z - entP.getPosZ();
-		            float yaw = -((float)Math.atan2(var11, var15)) * 180.0F / (float)Math.PI;
-		            
-		            windAngleEvent = yaw;
-		            windSpeedEvent = 2F; //make dynamic?
-		            
-		            //Weather.dbg("!!!!!!!!!!!!!!!!!!!storm event near: " + stormDist);
-	        	}
-	        }
-		}
 	}
 	
 	public CompoundNBT nbtSyncForClient() {
@@ -461,13 +433,7 @@ public class WindManager {
 	public void reset() {
 		manager = null;
 	}
-	
 
-	
-	public void applyWindForceNew(Object ent) {
-		applyWindForceNew(ent, 1F/20F, 0.5F);
-	}
-	
 	/**
 	 * 
 	 * To solve the problem of speed going overkill due to bad formulas
@@ -492,10 +458,6 @@ public class WindManager {
 		
 		CoroUtilEntOrParticle.setMotionX(ent, motion.x);
     	CoroUtilEntOrParticle.setMotionZ(ent, motion.z);
-	}
-	
-	public Vec3d applyWindForceImpl(Vec3d pos, Vec3d motion, float weight) {
-		return applyWindForceImpl(pos, motion, weight, 1F/20F, 0.5F);
 	}
 	
 	/**
@@ -569,50 +531,4 @@ public class WindManager {
         
         return newMotion;
 	}
-
-	public Vec3d getWindForce() {
-		float windSpeed = this.getWindSpeedForPriority();
-		float windAngle = this.getWindAngleForPriority(null);
-		float windX = (float) -Math.sin(Math.toRadians(windAngle)) * windSpeed;
-		float windZ = (float) Math.cos(Math.toRadians(windAngle)) * windSpeed;
-		return new Vec3d(windX, 0, windZ);
-	}
-
-    public void read(CompoundNBT data) {
-        windSpeedGlobal = data.getFloat("windSpeedGlobal");
-        windAngleGlobal = data.getFloat("windAngleGlobal");
-
-        windSpeedGust = data.getFloat("windSpeedGust");
-        windAngleGust = data.getFloat("windAngleGust");
-        windTimeGust = data.getInt("windTimeGust");
-
-		windSpeedEvent = data.getFloat("windSpeedEvent");
-		windAngleEvent = data.getFloat("windAngleEvent");
-		windTimeEvent = data.getInt("windTimeEvent");
-
-        lowWindTimer = data.getInt("lowWindTimer");
-        highWindTimer = data.getInt("highWindTimer");
-
-    }
-
-    public CompoundNBT write(CompoundNBT data) {
-        data.putFloat("windSpeedGlobal", windSpeedGlobal);
-        data.putFloat("windAngleGlobal", windAngleGlobal);
-
-        data.putFloat("windSpeedGust", windSpeedGust);
-        data.putFloat("windAngleGust", windAngleGust);
-        data.putInt("windTimeGust", windTimeGust);
-
-		data.putFloat("windSpeedEvent", windSpeedEvent);
-		data.putFloat("windAngleEvent", windAngleEvent);
-		data.putInt("windTimeEvent", windTimeEvent);
-
-        data.putInt("lowWindTimer", lowWindTimer);
-        data.putInt("highWindTimer", highWindTimer);
-
-
-
-
-        return data;
-    }
 }

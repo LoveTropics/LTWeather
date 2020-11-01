@@ -7,11 +7,7 @@ public class CoroUtilBlock {
 	
 	public static boolean isAir(Block parBlock) {
 		Material mat = parBlock.getDefaultState().getMaterial();
-		if (mat == Material.AIR) {
-			return true;
-		} else {
-			return false;
-		}
+		return mat == Material.AIR;
 	}
 	
 }

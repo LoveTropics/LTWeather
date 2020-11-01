@@ -1,8 +1,5 @@
 package weather2;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
 import CoroUtil.forge.CULog;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
@@ -16,6 +13,9 @@ import weather2.util.WeatherUtilConfig;
 import weather2.weathersystem.WeatherManagerBase;
 import weather2.weathersystem.WeatherManagerServer;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+
 public class ServerTickHandler
 {   
 	//Used for easy iteration, could be replaced
@@ -25,19 +25,16 @@ public class ServerTickHandler
     public static HashMap<Integer, WeatherManagerServer> lookupDimToWeatherMan;
     
 	public static World lastWorld;
-    
-	public static CompoundNBT worldNBT = new CompoundNBT();
-	
+
     static {
     	
-    	listWeatherMans = new ArrayList();
-    	lookupDimToWeatherMan = new HashMap<Integer, WeatherManagerServer>();
+    	listWeatherMans = new ArrayList<>();
+    	lookupDimToWeatherMan = new HashMap<>();
     	
     }
     
     public static void onTickInGame()
     {
-    	
         if (ServerLifecycleHooks.getCurrentServer() == null)
         {
             return;
@@ -47,41 +44,12 @@ public class ServerTickHandler
         
         if (world != null && lastWorld != world) {
         	lastWorld = world;
-        	//((ServerCommandManager)FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(new CommandWaveHeight());
-        	//((ServerCommandManager)FMLCommonHandler.instance().getMinecraftServerInstance().getCommandManager()).registerCommand(new CommandWeather());
         }
-        
-        //regularly save data
-        if (world != null) {
-        	if (world.getGameTime() % ConfigMisc.Misc_AutoDataSaveIntervalInTicks == 0) {
-        		Weather.writeOutData(false);
-        	}
-        }
-        
-        /*World worlds[] = DimensionManager.getWorlds();
-        
-        //add use of CSV of supported dimensions here once feature is added, for now just overworld
-        
-        for (int i = 0; i < worlds.length; i++) {
-			if (!lookupDimToWeatherMan.containsKey(worlds[i].getDimension().getType().getId())) {
-
-				if (WeatherUtilConfig.listDimensionsWeather.contains(worlds[i].getDimension().getType().getId())) {
-					addWorldToWeather(worlds[i].getDimension().getType().getId());
-				}
-			}
-
-			//tick it
-			WeatherManagerServer wms = lookupDimToWeatherMan.get(worlds[i].getDimension().getType().getId());
-			if (wms != null) {
-				lookupDimToWeatherMan.get(worlds[i].getDimension().getType().getId()).tick();
-			}
-        }*/
 
         Iterable<ServerWorld> worlds = WeatherUtil.getWorlds();
 
         for (ServerWorld worldEntry : worlds) {
 			if (!lookupDimToWeatherMan.containsKey(worldEntry.getDimension().getType().getId())) {
-
 				if (true) {// TODO minigames worldEntry.getDimension().getType() == TropicraftWorldUtils.SURVIVE_THE_TIDE_DIMENSION/*WeatherUtilConfig.listDimensionsWeather.contains(worldEntry.getDimension().getType().getId())*/) {
 					addWorldToWeather(worldEntry.getDimension().getType().getId());
 				}
@@ -109,18 +77,6 @@ public class ServerTickHandler
 		if (world.getGameTime() % 200 == 0) {
 			syncServerConfigToClient();
 		}
-        
-        /*boolean testCustomLightning = false;
-        if (testCustomLightning) {
-        	if (world.getGameTime() % 20 == 0) {
-	        	PlayerEntity player = world.getClosestPlayer(0, 0, 0, -1, false);
-	        	if (player != null) {
-	        		EntityLightningBoltCustom lightning = new EntityLightningBoltCustom(world, player.posX, player.posY, player.posZ);
-	        		world.addWeatherEffect(lightning);
-	        		lookupDimToWeatherMan.get(0).syncLightningNew(lightning, true);
-	        	}
-        	}
-        }*/
     }
     
     //must only be used when world is active, soonest allowed is TickType.WORLDLOAD
@@ -130,8 +86,6 @@ public class ServerTickHandler
     	
     	listWeatherMans.add(wm);
     	lookupDimToWeatherMan.put(dim, wm);
-    	
-    	wm.readFromFile();
     }
     
     public static void removeWorldFromWeather(int dim) {
@@ -142,39 +96,16 @@ public class ServerTickHandler
 	    	listWeatherMans.remove(wm);
 	    	lookupDimToWeatherMan.remove(dim);
     	}
-    	
-    	
-    	//wm.readFromFile();
-    	wm.writeToFile();
     }
 
-    public static void playerClientRequestsFullSync(ServerPlayerEntity entP) {
-		WeatherManagerServer wm = lookupDimToWeatherMan.get(entP.world.getDimension().getType().getId());
-		if (wm != null) {
-			wm.playerJoinedWorldSyncFull(entP);
-		}
-	}
-    
-    public static void initialize() {
-    	if (ServerTickHandler.lookupDimToWeatherMan.get(0) == null) {
-    		ServerTickHandler.addWorldToWeather(0);
-    	}
-    	
-    	//redundant
-    	//ServerTickHandler.lookupDimToWeatherMan.get(0).readFromFile();
-    }
-    
     public static void reset() {
 		Weather.dbg("Weather2: ServerTickHandler resetting");
-    	//World worlds[] = DimensionManager.getWorlds();
-    	//for (int i = 0; i < worlds.length; i++) {
-    	for (int i = 0; i < listWeatherMans.size(); i++) {
-    		WeatherManagerBase wm = listWeatherMans.get(i);
-    		int dim = wm.dim;
-    		if (lookupDimToWeatherMan.containsKey(dim)) {
-    			removeWorldFromWeather(dim);
-    		}
-    	}
+		for (WeatherManagerBase wm : listWeatherMans) {
+			int dim = wm.dim;
+			if (lookupDimToWeatherMan.containsKey(dim)) {
+				removeWorldFromWeather(dim);
+			}
+		}
 
     	//should never happen
     	if (listWeatherMans.size() > 0 || lookupDimToWeatherMan.size() > 0) {

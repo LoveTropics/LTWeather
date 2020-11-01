@@ -3,16 +3,6 @@ package weather2.util;
 import java.util.HashMap;
 import java.util.Random;
 
-import net.minecraft.client.Minecraft;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.SoundEvent;
-import net.minecraft.util.math.Vec3d;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.api.distmarker.OnlyIn;
-import weather2.SoundRegistry;
-import weather2.client.sound.MovingSoundStreamingSource;
-import weather2.weathersystem.storm.StormObject;
-
 /**
  * TODO: rewrite this to use a class that contains array of sounds, amount of them, length of them, and the last played time and next random index
  * would help cleanup the weird array use this class does
@@ -79,40 +69,5 @@ public class WeatherUtilSound {
         soundToLength.put("siren_sandstorm_4", 44274);
         soundToLength.put("siren_sandstorm_5_extra", 1282);
     }
-    
-    @OnlyIn(Dist.CLIENT)
-    public static void playNonMovingSound(Vec3d parPos, String var1, float var5, float var6, float parCutOffRange)
-    {
-    	//String prefix = "streaming.";
-    	String affix = ".ogg";
-    	//ResourceLocation res = new ResourceLocation(var1);
-    	SoundEvent event = SoundRegistry.get(var1);
-    	MovingSoundStreamingSource sound = new MovingSoundStreamingSource(parPos, event, SoundCategory.WEATHER, var5, var6, parCutOffRange);
-    	Minecraft.getInstance().getSoundHandler().play(sound);
-    }
-    
-    @OnlyIn(Dist.CLIENT)
-    public static void playMovingSound(StormObject parStorm, String var1, float var5, float var6, float parCutOffRange)
-    {
-    	//String prefix = "streaming.";
-    	String affix = ".ogg";
-    	
-    	//ResourceLocation res = new ResourceLocation(var1);
-    	SoundEvent event = SoundRegistry.get(var1);
-    	
-    	MovingSoundStreamingSource sound = new MovingSoundStreamingSource(parStorm, event, SoundCategory.WEATHER, var5, var6, parCutOffRange);
-    	
-    	Minecraft.getInstance().getSoundHandler().play(sound);
-
-    }
-
-    @OnlyIn(Dist.CLIENT)
-    public static void playPlayerLockedSound(Vec3d parPos, String var1, float var5, float var6)
-    {
-        SoundEvent event = SoundRegistry.get(var1);
-        MovingSoundStreamingSource sound = new MovingSoundStreamingSource(parPos, event, SoundCategory.WEATHER, var5, var6, true);
-        Minecraft.getInstance().getSoundHandler().play(sound);
-    }
-	
     
 }

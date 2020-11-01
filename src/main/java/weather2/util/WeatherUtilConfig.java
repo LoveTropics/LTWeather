@@ -2,7 +2,6 @@ package weather2.util;
 
 import CoroUtil.config.ConfigCoroUtil;
 import CoroUtil.util.CoroUtilFile;
-import modconfig.IConfigCategory;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.nbt.CompressedStreamTools;
 import net.minecraft.nbt.IntNBT;
@@ -10,7 +9,8 @@ import net.minecraftforge.common.DimensionManager;
 import org.apache.commons.lang3.StringUtils;
 import weather2.ServerTickHandler;
 import weather2.Weather;
-import weather2.config.*;
+import weather2.config.ConfigMisc;
+import weather2.config.ConfigParticle;
 
 import java.io.File;
 import java.io.FileInputStream;
@@ -112,19 +112,10 @@ public class WeatherUtilConfig {
 			if (nbtClientData.contains("btn_" + CMD_BTN_PERF_STORM)) {
 				if (LIST_RATES.get(nbtClientData.getInt("btn_" + CMD_BTN_PERF_STORM)).equalsIgnoreCase("high")) {
 					ConfigMisc.Cloud_ParticleSpawnDelay = 0;
-					ConfigStorm.Storm_ParticleSpawnDelay = 1;
-					ConfigParticle.Sandstorm_Particle_Debris_effect_rate = 1;
-					ConfigParticle.Sandstorm_Particle_Dust_effect_rate = 1;
 				} else if (LIST_RATES.get(nbtClientData.getInt("btn_" + CMD_BTN_PERF_STORM)).equalsIgnoreCase("medium")) {
 					ConfigMisc.Cloud_ParticleSpawnDelay = 2;
-					ConfigStorm.Storm_ParticleSpawnDelay = 3;
-					ConfigParticle.Sandstorm_Particle_Debris_effect_rate = 0.6D;
-					ConfigParticle.Sandstorm_Particle_Dust_effect_rate = 0.6D;
 				} else if (LIST_RATES.get(nbtClientData.getInt("btn_" + CMD_BTN_PERF_STORM)).equalsIgnoreCase("low")) {
 					ConfigMisc.Cloud_ParticleSpawnDelay = 5;
-					ConfigStorm.Storm_ParticleSpawnDelay = 5;
-					ConfigParticle.Sandstorm_Particle_Debris_effect_rate = 0.3D;
-					ConfigParticle.Sandstorm_Particle_Dust_effect_rate = 0.3D;
 				}
 			}
 			
@@ -248,93 +239,20 @@ public class WeatherUtilConfig {
 					ConfigMisc.lockServerWeatherMode = -1;
 				}
 			}
-			
-			if (nbtServerData.contains("btn_" + CMD_BTN_COMP_SNOWFALLBLOCKS)) {
-				boolean val = nbtServerData.getInt("btn_" + CMD_BTN_COMP_SNOWFALLBLOCKS) == 1;
-				ConfigSnow.Snow_PerformSnowfall = val;
-				//ConfigSnow.Snow_ExtraPileUp = val;
-			}
-			
-			if (nbtServerData.contains("btn_" + CMD_BTN_PREF_RATEOFSTORM)) {
-				int numDays = nbtServerData.getInt("btn_" + CMD_BTN_PREF_RATEOFSTORM);
-				if (numDays == 0) {
-					ConfigStorm.Player_Storm_Deadly_TimeBetweenInTicks = 12000;
-					ConfigStorm.Server_Storm_Deadly_TimeBetweenInTicks = 12000;
-				} else if (numDays == 11) {
-					//potentially remove the 'never' clause from here in favor of the dimension specific disabling of 'storms' which is already used in code
-					//for now consider this a second layer of rules to the storm creation process, probably not a user friendly idea
-					ConfigStorm.Player_Storm_Deadly_TimeBetweenInTicks = -1;
-					ConfigStorm.Server_Storm_Deadly_TimeBetweenInTicks = -1;
-				} else {
-					ConfigStorm.Player_Storm_Deadly_TimeBetweenInTicks = 24000*numDays;
-					ConfigStorm.Server_Storm_Deadly_TimeBetweenInTicks = 24000*numDays;
-				}
-				
-			}
-			
-			if (nbtServerData.contains("btn_" + CMD_BTN_PREF_CHANCEOFSTORM)) {
-				if (LIST_RATES2.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_CHANCEOFSTORM)).equalsIgnoreCase("high")) {
-					ConfigStorm.Player_Storm_Deadly_OddsTo1 = 30;
-					ConfigStorm.Server_Storm_Deadly_OddsTo1 = 30;
-				} else if (LIST_RATES2.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_CHANCEOFSTORM)).equalsIgnoreCase("medium")) {
-					ConfigStorm.Player_Storm_Deadly_OddsTo1 = 45;
-					ConfigStorm.Server_Storm_Deadly_OddsTo1 = 45;
-				} else if (LIST_RATES2.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_CHANCEOFSTORM)).equalsIgnoreCase("low")) {
-					ConfigStorm.Player_Storm_Deadly_OddsTo1 = 60;
-					ConfigStorm.Server_Storm_Deadly_OddsTo1 = 60;
-				}
-			}
-			
-			if (nbtServerData.contains("btn_" + CMD_BTN_PREF_CHANCEOFRAIN)) {
-				if (LIST_RATES2.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_CHANCEOFRAIN)).equalsIgnoreCase("high")) {
-					ConfigStorm.Storm_Rain_OddsTo1 = 150;
-					ConfigStorm.Storm_Rain_Overcast_OddsTo1 = ConfigStorm.Storm_Rain_OddsTo1 / 3;
-				} else if (LIST_RATES2.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_CHANCEOFRAIN)).equalsIgnoreCase("medium")) {
-					ConfigStorm.Storm_Rain_OddsTo1 = 300;
-					ConfigStorm.Storm_Rain_Overcast_OddsTo1 = ConfigStorm.Storm_Rain_OddsTo1 / 3;
-				} else if (LIST_RATES2.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_CHANCEOFRAIN)).equalsIgnoreCase("low")) {
-					ConfigStorm.Storm_Rain_OddsTo1 = 450;
-					ConfigStorm.Storm_Rain_Overcast_OddsTo1 = ConfigStorm.Storm_Rain_OddsTo1 / 3;
-				} else if (LIST_RATES2.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_CHANCEOFRAIN)).equalsIgnoreCase("none")) {
-					ConfigStorm.Storm_Rain_OddsTo1 = -1;
-					ConfigStorm.Storm_Rain_Overcast_OddsTo1 = -1;
-				}
-			}
-			
-			if (nbtServerData.contains("btn_" + CMD_BTN_PREF_BLOCKDESTRUCTION)) {
-				ConfigTornado.Storm_Tornado_grabBlocks = LIST_TOGGLE.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_BLOCKDESTRUCTION)).equalsIgnoreCase("on");
-			}
-			
-			if (nbtServerData.contains("btn_" + CMD_BTN_PREF_TORNADOANDCYCLONES)) {
-				ConfigTornado.Storm_NoTornadosOrCyclones = LIST_TOGGLE.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_TORNADOANDCYCLONES)).equalsIgnoreCase("off");
-			}
 
-			if (nbtServerData.contains("btn_" + CMD_BTN_PREF_SANDSTORMS)) {
-				ConfigSand.Storm_NoSandstorms = LIST_TOGGLE.get(nbtServerData.getInt("btn_" + CMD_BTN_PREF_SANDSTORMS)).equalsIgnoreCase("off");
-			}
-
-			if (nbtServerData.contains("btn_" + CMD_BTN_PREF_GLOBALRATE)) {
-				ConfigStorm.Server_Storm_Deadly_UseGlobalRate = nbtServerData.getInt("btn_" + CMD_BTN_PREF_GLOBALRATE) == 0;
-				ConfigSand.Sandstorm_UseGlobalServerRate = nbtServerData.getInt("btn_" + CMD_BTN_PREF_GLOBALRATE) == 0;
-
-				//System.out.println("ConfigStorm.Server_Storm_Deadly_UseGlobalRate: " + ConfigStorm.Server_Storm_Deadly_UseGlobalRate);
-			}
-			
 			CompoundNBT nbtDims = nbtServerData.getCompound("dimData");
 			//Iterator it = nbtDims.getTags().iterator();
 			
 			Weather.dbg("before: " + listDimensionsWeather);
-			
-			Iterator it = nbtDims.keySet().iterator();
-			while (it.hasNext()) {
-			 	String tagName = (String) it.next();
-			 	IntNBT entry = (IntNBT) nbtDims.get(tagName);
+
+			for (String tagName : nbtDims.keySet()) {
+				IntNBT entry = (IntNBT) nbtDims.get(tagName);
 				String[] vals = tagName.split("_");
 				//if weather
 				if (vals[2].equals("0")) {
 					int dimID = Integer.parseInt(vals[1]);
 					if (entry.getInt() == 0) {
-						//if off			
+						//if off
 						if (listDimensionsWeather.contains(dimID)) {
 							listDimensionsWeather.remove(dimID);
 						}
@@ -343,11 +261,11 @@ public class WeatherUtilConfig {
 						if (!listDimensionsWeather.contains(dimID)) {
 							listDimensionsWeather.add(dimID);
 						}
-					}					
+					}
 				} else if (vals[2].equals("1")) {
 					int dimID = Integer.parseInt(vals[1]);
 					if (entry.getInt() == 0) {
-						//if off			
+						//if off
 						if (listDimensionsClouds.contains(dimID)) {
 							listDimensionsClouds.remove(dimID);
 						}
@@ -356,11 +274,11 @@ public class WeatherUtilConfig {
 						if (!listDimensionsClouds.contains(dimID)) {
 							listDimensionsClouds.add(dimID);
 						}
-					}					
+					}
 				} else if (vals[2].equals("2")) {
 					int dimID = Integer.parseInt(vals[1]);
 					if (entry.getInt() == 0) {
-						//if off			
+						//if off
 						if (listDimensionsStorms.contains(dimID)) {
 							listDimensionsStorms.remove(dimID);
 						}
@@ -369,11 +287,11 @@ public class WeatherUtilConfig {
 						if (!listDimensionsStorms.contains(dimID)) {
 							listDimensionsStorms.add(dimID);
 						}
-					}					
+					}
 				}/* else if (vals[2].equals("3")) {
 					int dimID = Integer.parseInt(vals[1]);
 					if (tag.data == 0) {
-						//if off			
+						//if off
 						if (listDimensionsWindEffects.contains(dimID)) {
 							listDimensionsWindEffects.remove(dimID);
 						}
@@ -382,7 +300,7 @@ public class WeatherUtilConfig {
 						if (!listDimensionsWindEffects.contains(dimID)) {
 							listDimensionsWindEffects.add(dimID);
 						}
-					}					
+					}
 				}*/
 				Weather.dbg("dim: " + vals[1] + " - setting ID: " + vals[2] + " - data: " + entry.getInt());
 			}
@@ -393,14 +311,6 @@ public class WeatherUtilConfig {
 			
 		} catch (Exception ex) {
 			ex.printStackTrace();
-		}
-
-		for (IConfigCategory config : Weather.listConfigs) {
-			//refresh configmods caches and data
-			//TODO: 1.14 uncomment
-			//ConfigMod.configLookup.get(config.getRegistryName()).writeConfigFile(true);
-			//not needed
-			//ConfigMod.populateData(config.getRegistryName());
 		}
 
 		ServerTickHandler.syncServerConfigToClient();

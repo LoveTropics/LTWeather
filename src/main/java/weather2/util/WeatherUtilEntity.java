@@ -12,12 +12,7 @@ import net.minecraft.entity.passive.SquidEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.item.Items;
-import net.minecraft.util.Direction;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.BlockRayTraceResult;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.RayTraceResult;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.*;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.thread.EffectiveSide;
@@ -180,72 +175,6 @@ public class WeatherUtilEntity {
     	return obj instanceof EntityRotFX;
     }
     
-	/*public static boolean canPushEntity(Entity ent)
-    {
-    	
-    	//weather2: shouldnt be needed since its particles only now, ish
-    	//if (!WeatherUtil.canUseWindOn(ent)) return false;
-    	
-    	WindManager windMan = ClientTickHandler.weatherManager.windMan;
-    	
-        double speed = 10.0D;
-        int startX = (int)(ent.posX - speed * (double)(-MathHelper.sin(windMan.getWindAngleForPriority(null) / 180.0F * (float)Math.PI) * MathHelper.cos(0F*//*weatherMan.wind.yDirection*//* / 180.0F * (float)Math.PI)));
-        int startZ = (int)(ent.posZ - speed * (double)(MathHelper.cos(windMan.getWindAngleForPriority(null) / 180.0F * (float)Math.PI) * MathHelper.cos(0F*//*weatherMan.wind.yDirection*//* / 180.0F * (float)Math.PI)));
-
-        if (ent instanceof PlayerEntity)
-        {
-            boolean bool = true;
-        }
-
-        return ent.world.rayTraceBlocks((new Vec3(ent.posX, ent.posY + (double)ent.getEyeHeight(), ent.posZ)).toMCVec(), (new Vec3(startX, ent.posY + (double)ent.getEyeHeight(), startZ)).toMCVec()) == null;
-        //return true;
-    }*/
-	
-	public static boolean isEntityOutside(Entity parEnt) {
-		return isEntityOutside(parEnt, false);
-	}
-	
-	public static boolean isEntityOutside(Entity parEnt, boolean cheapCheck) {
-		return isPosOutside(parEnt.world, parEnt.getPositionVec(), cheapCheck);
-	}
-	
-	public static boolean isPosOutside(World parWorld, Vec3d parPos) {
-		return isPosOutside(parWorld, parPos, false);
-	}
-	
-	public static boolean isPosOutside(World parWorld, Vec3d parPos, boolean cheapCheck) {
-		int rangeCheck = 5;
-		int yOffset = 1;
-		
-		if (WeatherUtilBlock.getPrecipitationHeightSafe(parWorld, new BlockPos(parPos)).getY() < parPos.y + 1) return true;
-		
-		if (cheapCheck) return false;
-		
-		Vec3d vecTry = new Vec3d(parPos.x + Direction.NORTH.getXOffset()*rangeCheck, parPos.y+yOffset, parPos.z + Direction.NORTH.getZOffset()*rangeCheck);
-		if (checkVecOutside(parWorld, parPos, vecTry)) return true;
-		
-		vecTry = new Vec3d(parPos.x + Direction.SOUTH.getXOffset()*rangeCheck, parPos.y+yOffset, parPos.z + Direction.SOUTH.getZOffset()*rangeCheck);
-		if (checkVecOutside(parWorld, parPos, vecTry)) return true;
-		
-		vecTry = new Vec3d(parPos.x + Direction.EAST.getXOffset()*rangeCheck, parPos.y+yOffset, parPos.z + Direction.EAST.getZOffset()*rangeCheck);
-		if (checkVecOutside(parWorld, parPos, vecTry)) return true;
-		
-		vecTry = new Vec3d(parPos.x + Direction.WEST.getXOffset()*rangeCheck, parPos.y+yOffset, parPos.z + Direction.WEST.getZOffset()*rangeCheck);
-		if (checkVecOutside(parWorld, parPos, vecTry)) return true;
-		
-		return false;
-	}
-	
-	public static boolean checkVecOutside(World parWorld, Vec3d parPos, Vec3d parCheckPos) {
-		//boolean dirNorth = parWorld.rayTraceBlocks(parPos.toMCVec(), parCheckPos.toMCVec()) == null;
-        BlockRayTraceResult blockraytraceresult = WeatherUtil.rayTraceBlocks(parWorld, new RayTraceContextNoEntity(parPos, parCheckPos,
-                RayTraceContextNoEntity.BlockMode.COLLIDER, RayTraceContextNoEntity.FluidMode.NONE));
-		if (blockraytraceresult.getType() == RayTraceResult.Type.MISS) {
-			if (WeatherUtilBlock.getPrecipitationHeightSafe(parWorld, new BlockPos(MathHelper.floor(parCheckPos.x), 0, MathHelper.floor(parCheckPos.z))).getY() < parCheckPos.y) return true;
-		}
-		return false;
-	}
-
     public static double getDistanceSqEntToPos(Entity ent, BlockPos pos) {
     	return ent.getPositionVec().squareDistanceTo(new Vec3d(pos));
     }
