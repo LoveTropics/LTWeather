@@ -94,7 +94,7 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    implementation fg.deobf("com.lovetropics.minigames:LTMinigames:${ltminigames_version}:all")
+    implementation fg.deobf("com.lovetropics.minigames:LTMinigames:${ltminigames_version}")
 }
 
 jar {
