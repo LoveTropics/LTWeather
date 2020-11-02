@@ -1,7 +1,6 @@
 package extendedrenderer.particle.entity;
 
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-import extendedrenderer.particle.behavior.ParticleBehaviors;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.SpriteTexturedParticle;
@@ -52,8 +51,6 @@ public class EntityRotFX extends SpriteTexturedParticle
     public int particleTextureIndexInt = 0;
     
     public float brightness = 0.7F;
-    
-    public ParticleBehaviors pb = null; //designed to be a reference to the central objects particle behavior
     
     public boolean callUpdateSuper = true;
     public boolean callUpdatePB = true;
@@ -224,7 +221,6 @@ public class EntityRotFX extends SpriteTexturedParticle
     
     @Override
     public void setExpired() {
-    	if (pb != null) pb.particles.remove(this);
     	super.setExpired();
     }
     

@@ -6,8 +6,6 @@ import CoroUtil.util.CoroUtilEntOrParticle;
 import CoroUtil.util.CoroUtilMisc;
 import com.lovetropics.minigames.common.minigames.weather.RainType;
 import extendedrenderer.particle.ParticleRegistry;
-import extendedrenderer.particle.behavior.ParticleBehaviorSandstorm;
-import extendedrenderer.particle.behavior.ParticleBehaviors;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.particle.entity.ParticleTexExtraRender;
 import extendedrenderer.particle.entity.ParticleTexFX;
@@ -53,9 +51,6 @@ public class SceneEnhancer implements Runnable {
 	//this is for the thread we make
 	public World lastWorldDetected = null;
 
-	//used for acting on fire/smoke
-	public static ParticleBehaviors pm;
-	
 	public static List<Particle> spawnQueueNormal = new ArrayList<>();
     public static List<Particle> spawnQueue = new ArrayList<>();
     
@@ -64,25 +59,17 @@ public class SceneEnhancer implements Runnable {
     public static long lastTickAmbient;
     public static long lastTickAmbientThreaded;
     
-    //consider caching somehow without desyncing or overflowing
-    //WE USE 0 TO MARK WATER, 1 TO MARK LEAVES
     public static ArrayList<ChunkCoordinatesBlock> soundLocations = new ArrayList<>();
     public static HashMap<ChunkCoordinatesBlock, Long> soundTimeLocations = new HashMap<>();
     
-    public static Block SOUNDMARKER_WATER = Blocks.WATER;
-    /*public static Block SOUNDMARKER_LEAVES = Blocks.LEAVES;*/
     public static List<Block> LEAVES_BLOCKS = new ArrayList<>();
 
-    public static ParticleBehaviorSandstorm particleBehavior;
-
-	private static List<BlockPos> listPosRandom = new ArrayList<>();
+	private static final List<BlockPos> listPosRandom = new ArrayList<>();
 
 	public static float heatwaveIntensity;
 	public static float heatwaveIntensityTarget;
 
 	public SceneEnhancer() {
-		pm = new ParticleBehaviors(null);
-
 		listPosRandom.clear();
 		listPosRandom.add(new BlockPos(0, -1, 0));
 		listPosRandom.add(new BlockPos(1, 0, 0));
@@ -121,11 +108,6 @@ public class SceneEnhancer implements Runnable {
 
 			tryWind(client.world);
 			tickHeatwave();
-
-			if (particleBehavior == null) {
-				particleBehavior = new ParticleBehaviorSandstorm(null);
-			}
-			particleBehavior.tickUpdateList();
 		}
 	}
 	
