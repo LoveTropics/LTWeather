@@ -1,5 +1,14 @@
 package weather2.util;
 
+import net.minecraft.client.Minecraft;
+import net.minecraft.util.SoundCategory;
+import net.minecraft.util.SoundEvent;
+import net.minecraft.util.math.Vec3d;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.api.distmarker.OnlyIn;
+import weather2.SoundRegistry;
+import weather2.client.MovingSoundStreamingSource;
+
 import java.util.HashMap;
 import java.util.Random;
 
@@ -69,5 +78,13 @@ public class WeatherUtilSound {
         soundToLength.put("siren_sandstorm_4", 44274);
         soundToLength.put("siren_sandstorm_5_extra", 1282);
     }
-    
+
+    @OnlyIn(Dist.CLIENT)
+    public static void playPlayerLockedSound(Vec3d parPos, String var1, float var5, float var6)
+    {
+        SoundEvent event = SoundRegistry.get(var1);
+        MovingSoundStreamingSource sound = new MovingSoundStreamingSource(parPos, event, SoundCategory.WEATHER, var5, var6, true);
+        Minecraft.getInstance().getSoundHandler().play(sound);
+    }
+
 }

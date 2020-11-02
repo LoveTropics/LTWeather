@@ -1,24 +1,26 @@
 package weather2;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.settings.CloudOption;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
+import net.minecraftforge.api.distmarker.Dist;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import weather2.client.SceneEnhancer;
-import weather2.config.ConfigMisc;
 import weather2.util.WindReader;
 import weather2.weathersystem.WeatherManagerClient;
 
+@Mod.EventBusSubscriber(modid = Weather.MODID, value = Dist.CLIENT)
 public class ClientTickHandler
 {
+	public static final ClientTickHandler INSTANCE = new ClientTickHandler();
+
 	public static World lastWorld;
 	
 	public static WeatherManagerClient weatherManager;
 	public static SceneEnhancer sceneEnhancer;
 
-	public static ClientConfigData clientConfigData;
-	
 	public float smoothAngle = 0;
 
 	public float smoothAngleRotationalVelAccel = 0;
@@ -27,19 +29,23 @@ public class ClientTickHandler
 
 	public int prevDir = 0;
 
-	public ClientTickHandler() {
+	private ClientTickHandler() {
 		//this constructor gets called multiple times when created from proxy, this prevents multiple inits
 		if (sceneEnhancer == null) {
 			sceneEnhancer = new SceneEnhancer();
 			(new Thread(sceneEnhancer, "Weather2 Scene Enhancer")).start();
 		}
-		clientConfigData = new ClientConfigData();
+	}
+
+	@SubscribeEvent
+	public static void tick(TickEvent.ClientTickEvent event) {
+		if (event.phase == TickEvent.Phase.START) {
+			INSTANCE.onTickInGame();
+		}
 	}
 
     public void onTickInGame()
     {
-		if (ConfigMisc.Client_PotatoPC_Mode) return;
-
         Minecraft mc = Minecraft.getInstance();
         World world = mc.world;
 
@@ -47,10 +53,6 @@ public class ClientTickHandler
 			checkClientWeather();
 
 			weatherManager.tick();
-
-			if (!clientConfigData.Aesthetic_Only_Mode && ConfigMisc.Misc_ForceVanillaCloudsOff && world.getDimension().getType().getId() == 0) {
-				mc.gameSettings.cloudOption = CloudOption.OFF;
-			}
 
 			ClientWeather weather = ClientWeather.get();
 
@@ -62,8 +64,8 @@ public class ClientTickHandler
 			}
 
 			//TODO: evaluate if best here
-			float windDir = WindReader.getWindAngle(world, null);
-			float windSpeed = WindReader.getWindSpeed(world, null);
+			float windDir = WindReader.getWindAngle(world);
+			float windSpeed = WindReader.getWindSpeed(world);
 
 			//windDir = 0;
 
@@ -145,12 +147,5 @@ public class ClientTickHandler
 
     	lastWorld = world;
     	weatherManager = new WeatherManagerClient(world.getDimension().getType().getId());
-
-		//request a full sync from server
-		CompoundNBT data = new CompoundNBT();
-		data.putString("command", "syncFull");
-		data.putString("packetCommand", "WeatherData");
-		//Weather.eventChannel.sendToServer(PacketHelper.getNBTPacket(data, Weather.eventChannelName));
-		WeatherNetworking.HANDLER.sendToServer(new PacketNBTFromClient(data));
     }
 }

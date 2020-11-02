@@ -17,12 +17,6 @@ public class WeatherNetworking {
     private static short lastID = 0;
     public static final ResourceLocation NETWORK_CHANNEL_ID_MAIN = new ResourceLocation(Weather.MODID, "main");
 
-    public static String NBT_PACKET_COMMAND_MINIGAME = "MinigameCommand";
-    public static String NBT_PACKET_DATA_MINIGAME = "MinigameData";
-
-    public static String NBT_PACKET_COMMAND_CRAWL = "CrawlCommand";
-    public static String NBT_PACKET_DATA_CRAWL = "CrawlData";
-
     public static final SimpleChannel HANDLER = NetworkRegistry.ChannelBuilder
             .named(NETWORK_CHANNEL_ID_MAIN)
             .clientAcceptedVersions(PROTOCOL_VERSION::equals)
@@ -31,9 +25,6 @@ public class WeatherNetworking {
             .simpleChannel();
 
     public static void register() {
-        registerMessage(PacketNBTFromServer.class, PacketNBTFromServer::encode, PacketNBTFromServer::decode, PacketNBTFromServer.Handler::handle);
-        registerMessage(PacketNBTFromClient.class, PacketNBTFromClient::encode, PacketNBTFromClient::decode, PacketNBTFromClient.Handler::handle);
-
         registerMessage(UpdateWeatherPacket.class, UpdateWeatherPacket::encode, UpdateWeatherPacket::decode, UpdateWeatherPacket::handle);
     }
 

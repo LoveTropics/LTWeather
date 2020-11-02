@@ -11,14 +11,6 @@ public class WeatherManagerBase {
 	
 	//wind
 	public WindManager windMan;
-	
-	//for client only
-	public boolean isVanillaRainActiveOnServer = false;
-	public boolean isVanillaThunderActiveOnServer = false;
-	public int vanillaRainTimeOnServer = 0;
-
-	//0 = none, 1 = usual max overcast
-	public float cloudIntensity = 1F;
 
 	public WeatherManagerBase(int parDim) {
 		dim = parDim;

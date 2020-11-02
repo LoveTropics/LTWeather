@@ -1,21 +1,19 @@
 package weather2;
 
-import CoroUtil.forge.CULog;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.server.ServerLifecycleHooks;
-import weather2.config.ConfigMisc;
 import weather2.util.WeatherUtil;
-import weather2.util.WeatherUtilConfig;
 import weather2.weathersystem.WeatherManagerBase;
 import weather2.weathersystem.WeatherManagerServer;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 
+@Mod.EventBusSubscriber(modid = Weather.MODID)
 public class ServerTickHandler
 {   
 	//Used for easy iteration, could be replaced
@@ -32,50 +30,35 @@ public class ServerTickHandler
     	lookupDimToWeatherMan = new HashMap<>();
     	
     }
-    
-    public static void onTickInGame()
-    {
-        if (ServerLifecycleHooks.getCurrentServer() == null)
-        {
-            return;
-        }
 
-        World world = WeatherUtil.getWorld(0);
-        
-        if (world != null && lastWorld != world) {
-        	lastWorld = world;
-        }
+	@SubscribeEvent
+	public static void tickServer(TickEvent.ServerTickEvent event) {
+		if (event.phase == TickEvent.Phase.START) {
+			if (ServerLifecycleHooks.getCurrentServer() == null) {
+				return;
+			}
 
-        Iterable<ServerWorld> worlds = WeatherUtil.getWorlds();
+			World world = WeatherUtil.getWorld(0);
 
-        for (ServerWorld worldEntry : worlds) {
-			if (!lookupDimToWeatherMan.containsKey(worldEntry.getDimension().getType().getId())) {
-				if (true) {// TODO minigames worldEntry.getDimension().getType() == TropicraftWorldUtils.SURVIVE_THE_TIDE_DIMENSION/*WeatherUtilConfig.listDimensionsWeather.contains(worldEntry.getDimension().getType().getId())*/) {
-					addWorldToWeather(worldEntry.getDimension().getType().getId());
+			if (world != null && lastWorld != world) {
+				lastWorld = world;
+			}
+
+			Iterable<ServerWorld> worlds = WeatherUtil.getWorlds();
+
+			for (ServerWorld worldEntry : worlds) {
+				if (!lookupDimToWeatherMan.containsKey(worldEntry.getDimension().getType().getId())) {
+					if (true) {// TODO minigames worldEntry.getDimension().getType() == TropicraftWorldUtils.SURVIVE_THE_TIDE_DIMENSION/*WeatherUtilConfig.listDimensionsWeather.contains(worldEntry.getDimension().getType().getId())*/) {
+						addWorldToWeather(worldEntry.getDimension().getType().getId());
+					}
+				}
+
+				//tick it
+				WeatherManagerServer wms = lookupDimToWeatherMan.get(worldEntry.getDimension().getType().getId());
+				if (wms != null) {
+					lookupDimToWeatherMan.get(worldEntry.getDimension().getType().getId()).tick();
 				}
 			}
-
-			//tick it
-			WeatherManagerServer wms = lookupDimToWeatherMan.get(worldEntry.getDimension().getType().getId());
-			if (wms != null) {
-				lookupDimToWeatherMan.get(worldEntry.getDimension().getType().getId()).tick();
-			}
-		}
-
-        if (ConfigMisc.Aesthetic_Only_Mode) {
-        	if (!ConfigMisc.overcastMode) {
-        		ConfigMisc.overcastMode = true;
-				CULog.dbg("detected Aesthetic_Only_Mode on, setting overcast mode on");
-				WeatherUtilConfig.setOvercastModeServerSide(ConfigMisc.overcastMode);
-				//TODO: 1.14 uncomment
-				//ConfigMod.forceSaveAllFilesFromRuntimeSettings();
-				syncServerConfigToClient();
-			}
-		}
-
-        //TODO: only sync when things change? is now sent via PlayerLoggedInEvent at least
-		if (world.getGameTime() % 200 == 0) {
-			syncServerConfigToClient();
 		}
     }
     
@@ -118,30 +101,4 @@ public class ServerTickHandler
     public static WeatherManagerServer getWeatherSystemForDim(int dimID) {
     	return lookupDimToWeatherMan.get(dimID);
     }
-
-	public static void syncServerConfigToClient() {
-		//packets
-		CompoundNBT data = new CompoundNBT();
-		data.putString("packetCommand", "ClientConfigData");
-		data.putString("command", "syncUpdate");
-		//data.put("data", parManager.nbtSyncForClient());
-
-		ClientConfigData.write(data);
-
-		//Weather.eventChannel.sendToAll(PacketHelper.getNBTPacket(data, Weather.eventChannelName));
-		WeatherNetworking.HANDLER.send(PacketDistributor.ALL.noArg(), new PacketNBTFromServer(data));
-	}
-
-	public static void syncServerConfigToClientPlayer(ServerPlayerEntity player) {
-		//packets
-		CompoundNBT data = new CompoundNBT();
-		data.putString("packetCommand", "ClientConfigData");
-		data.putString("command", "syncUpdate");
-		//data.put("data", parManager.nbtSyncForClient());
-
-		ClientConfigData.write(data);
-
-		//Weather.eventChannel.sendTo(PacketHelper.getNBTPacket(data, Weather.eventChannelName), player);
-		WeatherNetworking.HANDLER.send(PacketDistributor.ALL.noArg(), new PacketNBTFromServer(data));
-	}
 }

@@ -1,20 +1,11 @@
 package extendedrenderer.particle.entity;
 
-import java.util.stream.Stream;
-
 import com.mojang.blaze3d.vertex.IVertexBuilder;
-
-import CoroUtil.api.weather.IWindHandler;
 import extendedrenderer.particle.behavior.ParticleBehaviors;
-import extendedrenderer.shader.IShaderRenderedEntity;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Quaternion;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.Vector3f;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.entity.Entity;
@@ -28,8 +19,10 @@ import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
+import java.util.stream.Stream;
+
 @OnlyIn(Dist.CLIENT)
-public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler, IShaderRenderedEntity
+public class EntityRotFX extends SpriteTexturedParticle
 {
 	protected static final IParticleRenderType SORTED_TRANSLUCENT = new IParticleRenderType() {
 		
@@ -81,7 +74,6 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
     public float rotationPitch;
     
     public float windWeight = 5;
-    public int particleDecayExtra = 0;
     public boolean isTransparent = true;
     
     public boolean killOnCollide = false;
@@ -419,7 +411,6 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
     	particleScale = parScale;
     }
 
-    @Override
     public Vector3f getPosition() {
         return new Vector3f((float)posX, (float)posY, (float)posZ);
     }
@@ -434,7 +425,6 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
         return this.rotationPrev;
     }*/
 
-    @Override
     public float getScale() {
     	return particleScale;
     }
@@ -666,16 +656,6 @@ public class EntityRotFX extends SpriteTexturedParticle implements IWindHandler,
 
         mesh.curBufferPos++;
     }*/
-
-	@Override
-	public float getWindWeight() {
-		return windWeight;
-	}
-
-	@Override
-	public int getParticleDecayExtra() {
-		return particleDecayExtra;
-	}
 
 	//TODO: 1.14 now sets depth buffer use in IParticleRenderType types
     /*@Override

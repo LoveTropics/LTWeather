@@ -3,15 +3,6 @@ loaderVersion="[25,)" #mandatory (24 is current forge version)
 issueTrackerURL="https://github.com/LoveTropics/LTWeather/issues"
 
 [[mods]]
-modId="coroutil"
-version="1.0"
-displayName="coroutil"
-authors="Corosus"
-description='''
-
-'''
-
-[[mods]]
 modId="weather2"
 version="1.0"
 displayName="Weather2"
