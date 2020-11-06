@@ -56,7 +56,11 @@ public class ServerTickHandler
 				//tick it
 				WeatherManagerServer wms = lookupDimToWeatherMan.get(worldEntry.getDimension().getType().getId());
 				if (wms != null) {
-					lookupDimToWeatherMan.get(worldEntry.getDimension().getType().getId()).tick();
+					int dimension = worldEntry.getDimension().getType().getId();
+					WeatherManagerServer manager = lookupDimToWeatherMan.get(dimension);
+					if (!manager.tick()) {
+						removeWorldFromWeather(dimension);
+					}
 				}
 			}
 		}

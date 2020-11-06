@@ -3,6 +3,8 @@ package weather2.weathersystem;
 import net.minecraft.world.World;
 import weather2.weathersystem.wind.WindManager;
 
+import javax.annotation.Nullable;
+
 public class WeatherManagerBase {
 
 	//shared stuff, stormfront list
@@ -20,16 +22,19 @@ public class WeatherManagerBase {
 	public void reset() {
 		windMan.reset();
 	}
-	
+
+	@Nullable
 	public World getWorld() {
 		return null;
 	}
 	
-	public void tick() {
+	public boolean tick() {
 		World world = getWorld();
 		if (world != null) {
 			windMan.tick();
+			return true;
 		}
+		return false;
 	}
 
 	public WindManager getWindManager() {

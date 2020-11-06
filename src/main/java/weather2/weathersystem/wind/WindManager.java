@@ -4,6 +4,7 @@ import CoroUtil.util.CoroUtilEntOrParticle;
 import com.lovetropics.minigames.common.minigames.weather.WeatherController;
 import com.lovetropics.minigames.common.minigames.weather.WeatherControllerManager;
 import net.minecraft.util.math.Vec3d;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import weather2.ClientWeather;
 import weather2.util.WeatherUtilEntity;
@@ -54,14 +55,18 @@ public class WindManager {
 	}
 
 	public void tick() {
+		World world = manager.getWorld();
+		if (world == null) {
+			return;
+		}
+
 		Random rand = new Random();
 
 		// TODO: better merge this logic
-		if (manager.getWorld().isRemote) {
+		if (world.isRemote) {
 			windSpeedGlobal = ClientWeather.get().getWindSpeed();
 		} else {
-			ServerWorld world = (ServerWorld) manager.getWorld();
-			WeatherController weatherController = WeatherControllerManager.forWorld(world);
+			WeatherController weatherController = WeatherControllerManager.forWorld((ServerWorld) world);
 			windSpeedGlobal = weatherController.getWindSpeed();
 		}
 

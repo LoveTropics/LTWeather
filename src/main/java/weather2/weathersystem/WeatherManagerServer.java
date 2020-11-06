@@ -10,6 +10,6 @@ public class WeatherManagerServer extends WeatherManagerBase {
 
 	@Override
 	public World getWorld() {
-		return WeatherUtil.getWorld(dim);
+		return WeatherUtil.getWorldOrNull(dim);
 	}
 }
