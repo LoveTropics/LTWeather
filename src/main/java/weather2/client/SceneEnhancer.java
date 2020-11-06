@@ -94,7 +94,7 @@ public class SceneEnhancer implements Runnable {
 
 	//run from client side _client_ thread
 	public void tickClient() {
-		if (!WeatherUtil.isPaused()) {
+		if (!WeatherUtil.isClientPaused()) {
 			tryParticleSpawning();
 			tickParticlePrecipitation();
 			trySoundPlaying();

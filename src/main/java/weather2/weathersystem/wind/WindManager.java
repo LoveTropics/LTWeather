@@ -8,12 +8,12 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import weather2.ClientWeather;
 import weather2.util.WeatherUtilEntity;
-import weather2.weathersystem.WeatherManagerBase;
+import weather2.weathersystem.WeatherManager;
 
 import java.util.Random;
 
 public class WindManager {
-	public WeatherManagerBase manager;
+	public WeatherManager manager;
 	
 	//global
 	public float windAngleGlobal = 0;
@@ -26,7 +26,7 @@ public class WindManager {
 	public int windGustEventTimeRand = 60;
 	public float chanceOfWindGustEvent = 0.5F;
 	
-	public WindManager(WeatherManagerBase parManager) {
+	public WindManager(WeatherManager parManager) {
 		manager = parManager;
 		
 		Random rand = new Random();
@@ -54,12 +54,7 @@ public class WindManager {
 		windTimeGust = time;
 	}
 
-	public void tick() {
-		World world = manager.getWorld();
-		if (world == null) {
-			return;
-		}
-
+	public void tick(World world) {
 		Random rand = new Random();
 
 		// TODO: better merge this logic

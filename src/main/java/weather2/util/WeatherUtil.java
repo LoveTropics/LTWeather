@@ -10,28 +10,12 @@ import javax.annotation.Nullable;
 
 public class WeatherUtil {
 
-    public static boolean isPaused() {
+    public static boolean isClientPaused() {
 		return Minecraft.getInstance().isGamePaused();
 	}
-    public static ServerWorld getWorld(int dimID) {
-        return getWorld(DimensionType.getById(dimID));
-    }
-
-    public static ServerWorld getWorld(DimensionType dimensionType) {
-        return DimensionManager.getWorld(ServerLifecycleHooks.getCurrentServer(), dimensionType, true, true);
-    }
-
-    @Nullable
-    public static ServerWorld getWorldOrNull(int dimID) {
-        return getWorldOrNull(DimensionType.getById(dimID));
-    }
 
     @Nullable
     public static ServerWorld getWorldOrNull(DimensionType dimensionType) {
         return DimensionManager.getWorld(ServerLifecycleHooks.getCurrentServer(), dimensionType, false, false);
-    }
-
-    public static Iterable<ServerWorld> getWorlds() {
-        return ServerLifecycleHooks.getCurrentServer().getWorlds();
     }
 }
