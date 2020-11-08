@@ -97,10 +97,6 @@ public class WindManager {
 		}
 	}
 
-	public void reset() {
-		manager = null;
-	}
-
 	/**
 	 * 
 	 * To solve the problem of speed going overkill due to bad formulas

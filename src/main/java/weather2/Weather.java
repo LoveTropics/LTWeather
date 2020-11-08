@@ -50,12 +50,7 @@ public class Weather
 
     @SubscribeEvent
     public void serverStop(FMLServerStoppedEvent event) {
-        resetStates();
         initProperNeededForWorld = true;
-    }
-
-    public static void resetStates() {
-        ServerTickHandler.reset();
     }
 
     public static void dbg(Object obj) {

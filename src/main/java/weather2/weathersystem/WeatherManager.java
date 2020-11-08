@@ -12,10 +12,6 @@ public abstract class WeatherManager {
 		this.dimension = dimension;
 	}
 
-	public void reset() {
-		wind.reset();
-	}
-
 	public abstract World getWorld();
 
 	public void tick() {

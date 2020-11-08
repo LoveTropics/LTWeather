@@ -115,12 +115,7 @@ public class ClientTickHandler
     }
 
     public static void resetClientWeather() {
-		if (weatherManager != null) {
-			Weather.dbg("Weather2: Detected old WeatherManagerClient with unloaded world, clearing its data");
-			weatherManager.reset();
-			weatherManager = null;
-		}
-
+		weatherManager = null;
 		ClientWeather.reset();
 	}
 	
@@ -137,12 +132,6 @@ public class ClientTickHandler
     }
     
     public static void init(World world) {
-		//this is generally triggered when they teleport to another dimension
-		if (weatherManager != null) {
-			Weather.dbg("Weather2: Detected old WeatherManagerClient with active world, clearing its data");
-			weatherManager.reset();
-		}
-
 		Weather.dbg("Weather2: Initializing WeatherManagerClient for client world and requesting full sync");
 
     	lastWorld = world;

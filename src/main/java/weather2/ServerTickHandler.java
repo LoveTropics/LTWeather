@@ -42,10 +42,6 @@ public class ServerTickHandler {
 		}
 	}
 
-	public static void reset() {
-		MANAGERS.clear();
-	}
-
 	public static WeatherManagerServer getWeatherManagerFor(DimensionType dimension) {
 		return MANAGERS.get(dimension);
 	}
