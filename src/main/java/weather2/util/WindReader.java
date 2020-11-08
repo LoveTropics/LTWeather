@@ -10,19 +10,19 @@ import weather2.weathersystem.WeatherManager;
 public class WindReader {
 	public static float getWindAngle(World world) {
 		WeatherManager weather = getWeatherManagerFor(world);
-		return weather != null ? weather.windMan.getWindAngle() : 0;
+		return weather != null ? weather.wind.getWindAngle() : 0;
 	}
 	
 	public static float getWindSpeed(World world) {
 		WeatherManager weather = getWeatherManagerFor(world);
-		return weather != null ? weather.windMan.getWindSpeed() : 0;
+		return weather != null ? weather.wind.getWindSpeed() : 0;
 	}
 
 	private static WeatherManager getWeatherManagerFor(World world) {
 		if (world.isRemote) {
 			return getWeatherManagerClient();
 		} else {
-			return ServerTickHandler.getWeatherSystemForDim((world.getDimension().getType()));
+			return ServerTickHandler.getWeatherManagerFor((world.getDimension().getType()));
 		}
 	}
 

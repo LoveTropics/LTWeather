@@ -4,35 +4,25 @@ import net.minecraft.world.World;
 import net.minecraft.world.dimension.DimensionType;
 import weather2.weathersystem.wind.WindManager;
 
-import javax.annotation.Nullable;
-
 public abstract class WeatherManager {
 	public final DimensionType dimension;
-	public final WindManager windMan = new WindManager(this);
+	public final WindManager wind = new WindManager(this);
 
 	public WeatherManager(DimensionType dimension) {
 		this.dimension = dimension;
 	}
 
 	public void reset() {
-		windMan.reset();
+		wind.reset();
 	}
 
-	@Nullable
-	public World getWorld() {
-		return null;
-	}
-	
-	public boolean tick() {
-		World world = getWorld();
-		if (world != null) {
-			windMan.tick(world);
-			return true;
-		}
-		return false;
+	public abstract World getWorld();
+
+	public void tick() {
+		wind.tick(getWorld());
 	}
 
 	public WindManager getWindManager() {
-		return this.windMan;
+		return this.wind;
 	}
 }

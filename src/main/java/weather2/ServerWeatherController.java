@@ -9,6 +9,7 @@ import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
 
+// TODO: Consolidate with WeatherManager
 @Mod.EventBusSubscriber(modid = Weather.MODID)
 public final class ServerWeatherController implements WeatherController {
 	public static final int UPDATE_INTERVAL = 20;

@@ -94,7 +94,7 @@ public class SceneEnhancer implements Runnable {
 
 	//run from client side _client_ thread
 	public void tickClient() {
-		if (!WeatherUtil.isClientPaused()) {
+		if (!Minecraft.getInstance().isGamePaused()) {
 			tryParticleSpawning();
 			tickParticlePrecipitation();
 			trySoundPlaying();
@@ -762,7 +762,7 @@ public class SceneEnhancer implements Runnable {
     	PlayerEntity player = Minecraft.getInstance().player;
         WeatherManagerClient manager = ClientTickHandler.weatherManager;
     	
-        if (worldRef == null || player == null || manager == null || manager.windMan == null)
+        if (worldRef == null || player == null || manager == null || manager.wind == null)
         {
         	try {
         		Thread.sleep(1000L);
@@ -788,7 +788,7 @@ public class SceneEnhancer implements Runnable {
         int curY = (int)player.getPosY();
         int curZ = (int)player.getPosZ();
 
-        float windStr = manager.windMan.getWindSpeed();
+        float windStr = manager.wind.getWindSpeed();
 
         //Wind requiring code goes below
         int spawnRate = (int)(30 / (windStr + 0.001));

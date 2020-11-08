@@ -1,16 +1,18 @@
 package weather2.weathersystem;
 
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
-import weather2.util.WeatherUtil;
+import net.minecraft.world.server.ServerWorld;
 
 public class WeatherManagerServer extends WeatherManager {
-	public WeatherManagerServer(DimensionType dimension) {
-		super(dimension);
+	private final ServerWorld world;
+
+	public WeatherManagerServer(ServerWorld world) {
+		super(world.getDimension().getType());
+		this.world = world;
 	}
 
 	@Override
 	public World getWorld() {
-		return WeatherUtil.getWorldOrNull(dimension);
+		return world;
 	}
 }
