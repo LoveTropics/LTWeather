@@ -1,19 +1,15 @@
 package CoroUtil.util;
 
-import java.awt.image.BufferedImage;
-
 import CoroUtil.repack.de.androidpit.colorthief.ColorThief;
 import it.unimi.dsi.fastutil.ints.IntArrays;
 import net.minecraft.block.BlockState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.model.IBakedModel;
-import net.minecraft.client.renderer.texture.AtlasTexture;
 import net.minecraft.client.renderer.texture.MissingTextureSprite;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
-import net.minecraft.util.math.BlockPos;
-import net.minecraftforge.client.model.ModelDataManager;
 import net.minecraftforge.client.model.data.EmptyModelData;
-import net.minecraftforge.client.model.data.IModelData;
+
+import java.awt.image.BufferedImage;
 
 public class CoroUtilColor {
     
@@ -46,7 +42,12 @@ public class CoroUtilColor {
         for (int i = 0; i < frames; i++) {
         	for (int x = 0; x < width; x++) {
         		for (int y = 0; y < height; y++) {
-                    img.setRGB(x, y + (i * height), sprite.getPixelRGBA(i, x, y));
+                    int abgr = sprite.getPixelRGBA(i, x, y);
+                    int red = abgr & 0xFF;
+                    int green = (abgr >> 8) & 0xFF;
+                    int blue = (abgr >> 16) & 0xFF;
+                    int alpha = (abgr >> 24) & 0xFF;
+                    img.setRGB(x, y + (i * height), (alpha << 24) | (red << 16) | (green << 8) | blue);
         		}
         	}
         }
