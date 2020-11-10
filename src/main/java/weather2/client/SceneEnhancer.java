@@ -95,10 +95,6 @@ public class SceneEnhancer implements Runnable {
 	//run from client side _client_ thread
 	public void tickClient() {
 		if (!Minecraft.getInstance().isGamePaused()) {
-			tryParticleSpawning();
-			tickParticlePrecipitation();
-			trySoundPlaying();
-
 			Minecraft client = Minecraft.getInstance();
 
 			if (client.world != null && lastWorldDetected != client.world) {
@@ -106,8 +102,17 @@ public class SceneEnhancer implements Runnable {
 				reset();
 			}
 
-			tryWind(client.world);
-			tickHeatwave();
+			ClientTickHandler.checkClientWeather();
+			ClientWeather weather = ClientWeather.get();
+
+			if (weather.hasWeather()) {
+				tryParticleSpawning();
+				tickParticlePrecipitation();
+				trySoundPlaying();
+				tryWind(client.world);
+			}
+
+			tickHeatwave(weather);
 		}
 	}
 	
@@ -266,11 +271,10 @@ public class SceneEnhancer implements Runnable {
 		//WeatherUtilSound.getSoundSystem();
 	}
 
-	public static void tickHeatwave() {
+	private static void tickHeatwave(ClientWeather weather) {
 		Minecraft client = Minecraft.getInstance();
 
-		ClientTickHandler.checkClientWeather();
-		if (ClientWeather.get().isHeatwave()) {
+		if (weather.isHeatwave()) {
 			heatwaveIntensityTarget = 0.7F;
 		} else {
 			heatwaveIntensityTarget = 0.0F;

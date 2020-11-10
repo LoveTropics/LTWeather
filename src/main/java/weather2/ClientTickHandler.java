@@ -53,15 +53,7 @@ public class ClientTickHandler
 			checkClientWeather();
 
 			weatherManager.tick();
-
-			ClientWeather weather = ClientWeather.get();
-
-			//TODO: split logic up a bit better for this, if this is set to false mid sandstorm, fog is stuck on,
-			// with sandstorms and other things it might not represent the EZ config option
-			// Make sure we're in STT, TODO make this more efficient
-			if (weather.hasWeather()) {
-				sceneEnhancer.tickClient();
-			}
+			sceneEnhancer.tickClient();
 
 			//TODO: evaluate if best here
 			float windDir = WindReader.getWindAngle(world);

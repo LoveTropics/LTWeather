@@ -74,7 +74,6 @@ public final class ClientWeather {
 		return this.state.rainType;
 	}
 
-	// TODO: unused?
 	public float getWindSpeed() {
 		return this.state.windSpeed;
 	}
