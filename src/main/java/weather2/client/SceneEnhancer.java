@@ -1042,7 +1042,9 @@ public class SceneEnhancer implements Runnable {
     public static void renderTick(TickEvent.RenderTickEvent event) {
 		Minecraft client = Minecraft.getInstance();
 		ClientWeather weather = ClientWeather.get();
-		if (client.world != null && weather.hasWeather()) {
+		//commented out hasWeather here for LT2020 because it was false before the transition was fully done, resulting in a tiny bit of rain that never goes away unless heatwave is active
+		//quick fix instead of redesigning code, hopefully doesnt have side effects, this just constantly sets the rain amounts anyways
+		if (client.world != null/* && weather.hasWeather()*/) {
 			ClientTickHandler.checkClientWeather();
 			client.world.setRainStrength(weather.getVanillaRainAmount());
 		}
