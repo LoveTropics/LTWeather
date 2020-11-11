@@ -18,11 +18,13 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.particle.Particle;
 import net.minecraft.client.particle.UnderwaterParticle;
+import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.client.settings.ParticleStatus;
 import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.particles.ParticleTypes;
+import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
@@ -37,6 +39,7 @@ import net.minecraftforge.event.TickEvent;
 import weather2.ClientTickHandler;
 import weather2.ClientWeather;
 import weather2.SoundRegistry;
+import weather2.Weather;
 import weather2.util.*;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
@@ -68,6 +71,9 @@ public class SceneEnhancer implements Runnable {
 
 	public static float heatwaveIntensity;
 	public static float heatwaveIntensityTarget;
+
+	public static final ResourceLocation RAIN_TEXTURES_GREEN = new ResourceLocation(Weather.MODID, "textures/environment/rain_green.png");
+	public static final ResourceLocation RAIN_TEXTURES = new ResourceLocation("textures/environment/rain.png");
 
 	public SceneEnhancer() {
 		listPosRandom.clear();
@@ -111,6 +117,8 @@ public class SceneEnhancer implements Runnable {
 				trySoundPlaying();
 				tryWind(client.world);
 			}
+
+			tickMisc();
 
 			tickHeatwave(weather);
 		}
@@ -310,6 +318,21 @@ public class SceneEnhancer implements Runnable {
 		}
 
 		return false;
+	}
+
+	public void tickMisc() {
+
+		ClientWeather weather = ClientWeather.get();
+		if (weather.getRainType() == RainType.ACID) {
+			if (WorldRenderer.RAIN_TEXTURES != RAIN_TEXTURES_GREEN) {
+				WorldRenderer.RAIN_TEXTURES = RAIN_TEXTURES_GREEN;
+			}
+		} else {
+			if (WorldRenderer.RAIN_TEXTURES != RAIN_TEXTURES) {
+				WorldRenderer.RAIN_TEXTURES = RAIN_TEXTURES;
+			}
+		}
+
 	}
 
 	public void tickParticlePrecipitation() {
