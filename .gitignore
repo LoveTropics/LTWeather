@@ -1,3 +1,5 @@
+src/main/resources/data/lt20/**
+
 # eclipse
 bin
 *.launch
