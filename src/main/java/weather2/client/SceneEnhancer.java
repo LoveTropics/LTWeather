@@ -1049,8 +1049,8 @@ public class SceneEnhancer implements Runnable {
 			client.world.setRainStrength(weather.getVanillaRainAmount());
 		}
 
-		if (!(client.worldRenderer instanceof WorldRendererOverride)) {
+		/*if (!(client.worldRenderer instanceof WorldRendererOverride)) {
 			client.worldRenderer = new WorldRendererOverride(client, client.getRenderTypeBuffers());
-		}
+		}*/
 	}
 }
