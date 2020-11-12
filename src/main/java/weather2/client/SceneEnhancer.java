@@ -474,9 +474,9 @@ public class SceneEnhancer implements Runnable {
 
 					//TODO: make ground splash and downfall use spawnNeed var style design
 
-					float acidRainRed = 0.7F;
+					float acidRainRed = 0.5F;
 					float acidRainGreen = 1F;
-					float acidRainBlue = 0.7F;
+					float acidRainBlue = 0.5F;
 
 					float vanillaRainRed = 0.7F;
 					float vanillaRainGreen = 0.7F;
@@ -1047,6 +1047,10 @@ public class SceneEnhancer implements Runnable {
 		if (client.world != null/* && weather.hasWeather()*/) {
 			ClientTickHandler.checkClientWeather();
 			client.world.setRainStrength(weather.getVanillaRainAmount());
+		}
+
+		if (!(client.worldRenderer instanceof WorldRendererOverride)) {
+			client.worldRenderer = new WorldRendererOverride(client, client.getRenderTypeBuffers());
 		}
 	}
 }

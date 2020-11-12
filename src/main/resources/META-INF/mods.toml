@@ -6,6 +6,7 @@ issueTrackerURL="https://github.com/LoveTropics/LTWeather/issues"
 modId="weather2"
 version="${file.jarVersion}"
 displayName="Weather2"
+logoFile="itcrowd.png"
 authors="Corosus"
 description='''
 
