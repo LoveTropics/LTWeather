@@ -1,10 +1,18 @@
 package weather2.client;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Queue;
+import java.util.Random;
+
+import com.lovetropics.minigames.common.minigames.weather.RainType;
+
 import CoroUtil.util.ChunkCoordinatesBlock;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilEntOrParticle;
 import CoroUtil.util.CoroUtilMisc;
-import com.lovetropics.minigames.common.minigames.weather.RainType;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.particle.entity.ParticleTexExtraRender;
@@ -40,11 +48,14 @@ import weather2.ClientTickHandler;
 import weather2.ClientWeather;
 import weather2.SoundRegistry;
 import weather2.Weather;
-import weather2.util.*;
+import weather2.util.WeatherUtilBlock;
+import weather2.util.WeatherUtilDim;
+import weather2.util.WeatherUtilEntity;
+import weather2.util.WeatherUtilParticle;
+import weather2.util.WeatherUtilSound;
+import weather2.util.WindReader;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
-
-import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
 public class SceneEnhancer implements Runnable {
@@ -1048,9 +1059,5 @@ public class SceneEnhancer implements Runnable {
 			ClientTickHandler.checkClientWeather();
 			client.world.setRainStrength(weather.getVanillaRainAmount());
 		}
-
-		/*if (!(client.worldRenderer instanceof WorldRendererOverride)) {
-			client.worldRenderer = new WorldRendererOverride(client, client.getRenderTypeBuffers());
-		}*/
 	}
 }
