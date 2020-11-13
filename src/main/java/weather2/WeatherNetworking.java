@@ -2,11 +2,13 @@ package weather2;
 
 import net.minecraft.network.PacketBuffer;
 import net.minecraft.util.ResourceLocation;
+import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.NetworkRegistry;
 import net.minecraftforge.fml.network.simple.SimpleChannel;
 
 import net.minecraftforge.fml.network.NetworkEvent.Context;
 
+import java.util.Optional;
 import java.util.function.BiConsumer;
 import java.util.function.Function;
 import java.util.function.Supplier;
@@ -25,11 +27,11 @@ public class WeatherNetworking {
             .simpleChannel();
 
     public static void register() {
-        registerMessage(UpdateWeatherPacket.class, UpdateWeatherPacket::encode, UpdateWeatherPacket::decode, UpdateWeatherPacket::handle);
+        registerMessage(UpdateWeatherPacket.class, UpdateWeatherPacket::encode, UpdateWeatherPacket::decode, UpdateWeatherPacket::handle, NetworkDirection.PLAY_TO_CLIENT);
     }
 
-    private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> messageConsumer) {
-        HANDLER.registerMessage(lastID, messageType, encoder, decoder, messageConsumer);
+    private static <MSG> void registerMessage(Class<MSG> messageType, BiConsumer<MSG, PacketBuffer> encoder, Function<PacketBuffer, MSG> decoder, BiConsumer<MSG, Supplier<Context>> messageConsumer, NetworkDirection networkDirection) {
+        HANDLER.registerMessage(lastID, messageType, encoder, decoder, messageConsumer, Optional.ofNullable(networkDirection));
         lastID++;
         if (lastID > 0xFF)
             throw new RuntimeException("Too many messages!");
