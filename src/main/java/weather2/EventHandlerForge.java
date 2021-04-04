@@ -81,7 +81,7 @@ public class EventHandlerForge {
 
 		Entity ent = event.getEntity();
 		if (!ent.world.isRemote || (ent instanceof PlayerEntity && ((PlayerEntity) ent).isUser())) {
-			WindManager windMan = ServerTickHandler.getWeatherManagerFor(ent.world.getDimension().getType()).wind;
+			WindManager windMan = ServerTickHandler.getWeatherManagerFor(ent.world.getDimensionKey()).wind;
 			windMan.applyWindForceNew(ent, 1F / 20F, 0.5F);
 		}
 	}

@@ -1,10 +1,11 @@
 package weather2;
 
-import com.lovetropics.minigames.common.minigames.weather.RainType;
-import com.lovetropics.minigames.common.minigames.weather.WeatherController;
-import com.lovetropics.minigames.common.minigames.weather.WeatherState;
+import com.lovetropics.minigames.common.core.game.weather.RainType;
+import com.lovetropics.minigames.common.core.game.weather.WeatherController;
+import com.lovetropics.minigames.common.core.game.weather.WeatherState;
 import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.util.RegistryKey;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
@@ -22,7 +23,7 @@ public final class ServerWeatherController implements WeatherController {
 	private final WeatherState state = new WeatherState();
 
 	ServerWeatherController(ServerWorld world) {
-		DimensionType dimension = world.getDimension().getType();
+		RegistryKey<World> dimension = world.getDimensionKey();
 		this.packetTarget = PacketDistributor.DIMENSION.with(() -> dimension);
 	}
 

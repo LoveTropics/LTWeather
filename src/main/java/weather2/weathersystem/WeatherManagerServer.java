@@ -7,7 +7,7 @@ public class WeatherManagerServer extends WeatherManager {
 	private final ServerWorld world;
 
 	public WeatherManagerServer(ServerWorld world) {
-		super(world.getDimension().getType());
+		super(world.getDimensionKey());
 		this.world = world;
 	}
 

@@ -1,11 +1,5 @@
 package extendedrenderer.particle.entity;
 
-import java.lang.reflect.Field;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-
-import org.apache.commons.lang3.ArrayUtils;
-
 import CoroUtil.util.CoroUtilColor;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
@@ -13,10 +7,15 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.color.BlockColors;
 import net.minecraft.client.renderer.color.IBlockColor;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.registries.IRegistryDelegate;
+import org.apache.commons.lang3.ArrayUtils;
+
+import java.lang.reflect.Field;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class ParticleTexLeafColor extends ParticleTexFX {
     
@@ -35,9 +34,9 @@ public class ParticleTexLeafColor extends ParticleTexFX {
 	public float rotationYawMomentum;
 	public float rotationPitchMomentum;
 
-	public ParticleTexLeafColor(World worldIn, double posXIn, double posYIn,
-			double posZIn, double mX, double mY, double mZ,
-			TextureAtlasSprite par8Item) {
+	public ParticleTexLeafColor(ClientWorld worldIn, double posXIn, double posYIn,
+								double posZIn, double mX, double mY, double mZ,
+								TextureAtlasSprite par8Item) {
 		super(worldIn, posXIn, posYIn, posZIn, mX, mY, mZ, par8Item);
 		
 		if (colors == null) {

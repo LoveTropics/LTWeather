@@ -22,7 +22,7 @@ public class WindReader {
 		if (world.isRemote) {
 			return getWeatherManagerClient();
 		} else {
-			return ServerTickHandler.getWeatherManagerFor((world.getDimension().getType()));
+			return ServerTickHandler.getWeatherManagerFor((world.getDimensionKey()));
 		}
 	}
 

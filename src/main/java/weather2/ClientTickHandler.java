@@ -127,6 +127,6 @@ public class ClientTickHandler
 		Weather.dbg("Weather2: Initializing WeatherManagerClient for client world and requesting full sync");
 
     	lastWorld = world;
-    	weatherManager = new WeatherManagerClient(world.getDimension().getType());
+    	weatherManager = new WeatherManagerClient(world.getDimensionKey());
     }
 }

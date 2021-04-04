@@ -1,18 +1,10 @@
 package weather2.client;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Queue;
-import java.util.Random;
-
-import com.lovetropics.minigames.common.minigames.weather.RainType;
-
 import CoroUtil.util.ChunkCoordinatesBlock;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilEntOrParticle;
 import CoroUtil.util.CoroUtilMisc;
+import com.lovetropics.minigames.common.core.game.weather.RainType;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.entity.EntityRotFX;
 import extendedrenderer.particle.entity.ParticleTexExtraRender;
@@ -36,8 +28,8 @@ import net.minecraft.util.ResourceLocation;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3i;
 import net.minecraft.util.math.shapes.VoxelShape;
+import net.minecraft.util.math.vector.Vector3i;
 import net.minecraft.world.World;
 import net.minecraft.world.biome.Biome;
 import net.minecraft.world.gen.Heightmap;
@@ -48,14 +40,11 @@ import weather2.ClientTickHandler;
 import weather2.ClientWeather;
 import weather2.SoundRegistry;
 import weather2.Weather;
-import weather2.util.WeatherUtilBlock;
-import weather2.util.WeatherUtilDim;
-import weather2.util.WeatherUtilEntity;
-import weather2.util.WeatherUtilParticle;
-import weather2.util.WeatherUtilSound;
-import weather2.util.WindReader;
+import weather2.util.*;
 import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
+
+import java.util.*;
 
 @OnlyIn(Dist.CLIENT)
 public class SceneEnhancer implements Runnable {
@@ -63,7 +52,7 @@ public class SceneEnhancer implements Runnable {
 	private static final double PRECIPITATION_PARTICLE_EFFECT_RATE = 0.7;
 
 	//this is for the thread we make
-	public World lastWorldDetected = null;
+	public ClientWorld lastWorldDetected = null;
 
 	public static List<Particle> spawnQueueNormal = new ArrayList<>();
     public static List<Particle> spawnQueue = new ArrayList<>();
@@ -175,7 +164,7 @@ public class SceneEnhancer implements Runnable {
 	
 	                    Block block = getBlock(worldRef, cCor.getX(), cCor.getY(), cCor.getZ());//Block.blocksList[id];
 	                    
-	                    if (block == null || (block.getMaterial(block.getDefaultState()) != Material.WATER && block.getMaterial(block.getDefaultState()) != Material.LEAVES)) {
+	                    if (block == null || (block.getDefaultState().getMaterial() != Material.WATER && block.getDefaultState().getMaterial() != Material.LEAVES)) {
 	                    	soundLocations.remove(i);
 	                		soundTimeLocations.remove(cCor);
 	                    } else {
@@ -255,10 +244,10 @@ public class SceneEnhancer implements Runnable {
                         Block block = getBlock(worldRef, xx, yy, zz);
                         
                         if (block != null) {
-                        	if (((block.getMaterial(block.getDefaultState()) == Material.LEAVES))) {
+                        	if (((block.getDefaultState().getMaterial() == Material.LEAVES))) {
                             	boolean proxFail = false;
 								for (ChunkCoordinatesBlock soundLocation : soundLocations) {
-									if (Math.sqrt(soundLocation.distanceSq(new Vec3i(xx, yy, zz))) < 15) {
+									if (Math.sqrt(soundLocation.distanceSq(new Vector3i(xx, yy, zz))) < 15) {
 										proxFail = true;
 										break;
 									}
@@ -282,8 +271,6 @@ public class SceneEnhancer implements Runnable {
 			ExtendedRenderer.rotEffRenderer.clear();
         }*/
 
-		((ClientWorld)lastWorldDetected).globalEntities.clear();
-		
 		if (WeatherUtilParticle.fxLayers == null) {
 			WeatherUtilParticle.getFXLayers();
 		}
@@ -320,7 +307,7 @@ public class SceneEnhancer implements Runnable {
 		{
 			String soundStr = sound[WeatherUtilSound.snd_rand[arrIndex]];
 
-			WeatherUtilSound.playPlayerLockedSound(source.getPositionVector(), new StringBuilder().append("streaming." + soundStr).toString(), vol, 1.0F);
+			WeatherUtilSound.playPlayerLockedSound(source.getPositionVec(), new StringBuilder().append("streaming." + soundStr).toString(), vol, 1.0F);
 
 			int length = WeatherUtilSound.soundToLength.get(soundStr);
 			//-500L, for blending
@@ -440,7 +427,7 @@ public class SceneEnhancer implements Runnable {
 							//EntityRenderer.addRainParticles doesnt actually use isRainingAt,
 							//switching to match what that method does to improve consistancy and tough as nails compat
 							if (canPrecipitateAt(world, pos)/*world.isRainingAt(pos)*/) {
-								ParticleTexExtraRender rain = new ParticleTexExtraRender(entP.world,
+								ParticleTexExtraRender rain = new ParticleTexExtraRender((ClientWorld) entP.world,
 										pos.getX(),
 										pos.getY(),
 										pos.getZ(),
@@ -526,7 +513,7 @@ public class SceneEnhancer implements Runnable {
 									pos = pos.add(0,1,0);
 								}
 
-								ParticleTexFX rain = new ParticleTexFX(entP.world,
+								ParticleTexFX rain = new ParticleTexFX((ClientWorld) entP.world,
 										pos.getX() + rand.nextFloat(),
 										pos.getY() + 0.01D + maxY,
 										pos.getZ() + rand.nextFloat(),
@@ -609,7 +596,7 @@ public class SceneEnhancer implements Runnable {
 							//pos = world.getPrecipitationHeight(pos).add(0, 1, 0);
 
 							if (canPrecipitateAt(world, pos.up(-scanAheadRange))/*world.isRainingAt(pos)*/) {
-								ParticleTexFX rain = new ParticleTexFX(entP.world,
+								ParticleTexFX rain = new ParticleTexFX((ClientWorld) entP.world,
 										pos.getX() + rand.nextFloat(),
 										pos.getY() - 1 + 0.01D,
 										pos.getZ() + rand.nextFloat(),
@@ -689,7 +676,7 @@ public class SceneEnhancer implements Runnable {
 									entP.getPosZ() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2));
 
 							if (canPrecipitateAt(world, pos)) {
-								ParticleTexExtraRender snow = new ParticleTexExtraRender(entP.world, pos.getX(), pos.getY(), pos.getZ(),
+								ParticleTexExtraRender snow = new ParticleTexExtraRender((ClientWorld) entP.world, pos.getX(), pos.getY(), pos.getZ(),
 										0D, 0D, 0D, ParticleRegistry.snow);
 
 								snow.setCanCollide(false);
@@ -796,7 +783,7 @@ public class SceneEnhancer implements Runnable {
         //tryClouds();
         
     	Minecraft client = Minecraft.getInstance();
-    	World worldRef = lastWorldDetected;
+    	ClientWorld worldRef = lastWorldDetected;
     	PlayerEntity player = Minecraft.getInstance().player;
         WeatherManagerClient manager = ClientTickHandler.weatherManager;
     	
@@ -872,9 +859,9 @@ public class SceneEnhancer implements Runnable {
                             //if (block != null && block.getMaterial() == Material.leaves)
 
 					/*block.getMaterial() == Material.fire*/
-					if (block != null && (block.getMaterial(block.getDefaultState()) == Material.LEAVES
-									|| block.getMaterial(block.getDefaultState()) == Material.TALL_PLANTS ||
-							block.getMaterial(block.getDefaultState()) == Material.PLANTS))
+					if (block != null && (block.getDefaultState().getMaterial() == Material.LEAVES
+									|| block.getDefaultState().getMaterial() == Material.TALL_PLANTS ||
+							block.getDefaultState().getMaterial() == Material.PLANTS))
                             {
                             	
                             	lastTickFoundBlocks++;

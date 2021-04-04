@@ -4,15 +4,20 @@ import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.particle.IParticleRenderType;
 import net.minecraft.client.particle.SpriteTexturedParticle;
-import net.minecraft.client.renderer.*;
+import net.minecraft.client.renderer.ActiveRenderInfo;
+import net.minecraft.client.renderer.BufferBuilder;
+import net.minecraft.client.renderer.Tessellator;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.renderer.texture.TextureManager;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.entity.Entity;
 import net.minecraft.util.ReuseableStream;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
 import net.minecraft.util.math.shapes.ISelectionContext;
+import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.World;
 import net.minecraft.world.gen.Heightmap;
 import net.minecraftforge.api.distmarker.Dist;
@@ -33,7 +38,7 @@ public class EntityRotFX extends SpriteTexturedParticle
 		@Override
 		public void finishRender(Tessellator p_217599_1_) {
 			ActiveRenderInfo activeInfo = Minecraft.getInstance().getRenderManager().info;
-			Vec3d eye = activeInfo.getProjectedView();
+			Vector3d eye = activeInfo.getProjectedView();
 			p_217599_1_.getBuffer().sortVertexData((float) eye.x, (float) eye.y, (float) eye.z);
 			IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.finishRender(p_217599_1_);
 		}
@@ -142,7 +147,7 @@ public class EntityRotFX extends SpriteTexturedParticle
     //used for translational rotation around a point
     public Vector3f rotationAround = new Vector3f();
 
-    public EntityRotFX(World par1World, double par2, double par4, double par6, double par8, double par10, double par12)
+    public EntityRotFX(ClientWorld par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
         super(par1World, par2, par4, par6, par8, par10, par12);
         setSize(0.3F, 0.3F);
@@ -425,8 +430,8 @@ public class EntityRotFX extends SpriteTexturedParticle
     	return particleScale;
     }
 
-    public Vec3d getPos() {
-        return new Vec3d(posX, posY, posZ);
+    public Vector3d getPos() {
+        return new Vector3d(posX, posY, posZ);
     }
 
 	public double getPosX() {
@@ -553,10 +558,10 @@ public class EntityRotFX extends SpriteTexturedParticle
 //
 //        particleScale *= 10F;
 
-        Vec3d vec3d = renderInfo.getProjectedView();
-        float f = (float)(MathHelper.lerp((double)partialTicks, this.prevPosX, this.posX) - vec3d.getX());
-        float f1 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - vec3d.getY());
-        float f2 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - vec3d.getZ());
+        Vector3d Vector3d = renderInfo.getProjectedView();
+        float f = (float)(MathHelper.lerp((double)partialTicks, this.prevPosX, this.posX) - Vector3d.getX());
+        float f1 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - Vector3d.getY());
+        float f2 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - Vector3d.getZ());
         Quaternion quaternion;
         if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
            quaternion = renderInfo.getRotation();
@@ -670,10 +675,10 @@ public class EntityRotFX extends SpriteTexturedParticle
         double yy = y;
         double zz = z;
         if (this.canCollide && (x != 0.0D || y != 0.0D || z != 0.0D)) {
-            Vec3d vec3d = Entity.collideBoundingBoxHeuristically((Entity)null, new Vec3d(x, y, z), this.getBoundingBox(), this.world, ISelectionContext.dummy(), new ReuseableStream<>(Stream.empty()));
-            x = vec3d.x;
-            y = vec3d.y;
-            z = vec3d.z;
+            Vector3d Vector3d = Entity.collideBoundingBoxHeuristically((Entity)null, new Vector3d(x, y, z), this.getBoundingBox(), this.world, ISelectionContext.dummy(), new ReuseableStream<>(Stream.empty()));
+            x = Vector3d.x;
+            y = Vector3d.y;
+            z = Vector3d.z;
         }
 
         if (x != 0.0D || y != 0.0D || z != 0.0D) {

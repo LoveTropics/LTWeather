@@ -1,8 +1,9 @@
 package weather2;
 
 import it.unimi.dsi.fastutil.objects.Reference2ObjectOpenHashMap;
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.IWorld;
-import net.minecraft.world.dimension.DimensionType;
+import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -14,22 +15,24 @@ import java.util.Map;
 
 @Mod.EventBusSubscriber(modid = Weather.MODID)
 public class ServerTickHandler {
-	private static final Map<DimensionType, WeatherManagerServer> MANAGERS = new Reference2ObjectOpenHashMap<>();
+	private static final Map<RegistryKey<World>, WeatherManagerServer> MANAGERS = new Reference2ObjectOpenHashMap<>();
 
 	@SubscribeEvent
 	public static void onWorldLoad(WorldEvent.Load event) {
 		IWorld world = event.getWorld();
-		if (!world.isRemote()) {
-			DimensionType dimension = world.getDimension().getType();
-			MANAGERS.put(dimension, new WeatherManagerServer((ServerWorld) world));
+		if (!world.isRemote() && world instanceof ServerWorld) {
+			ServerWorld serverWorld = (ServerWorld) world;
+			RegistryKey<World> dimension = serverWorld.getDimensionKey();
+			MANAGERS.put(dimension, new WeatherManagerServer(serverWorld));
 		}
 	}
 
 	@SubscribeEvent
 	public static void onWorldUnload(WorldEvent.Unload event) {
 		IWorld world = event.getWorld();
-		if (!world.isRemote()) {
-			MANAGERS.remove(world.getDimension().getType());
+		if (!world.isRemote() && world instanceof ServerWorld) {
+			ServerWorld serverWorld = (ServerWorld) world;
+			MANAGERS.remove(serverWorld.getDimensionKey());
 		}
 	}
 
@@ -42,7 +45,7 @@ public class ServerTickHandler {
 		}
 	}
 
-	public static WeatherManagerServer getWeatherManagerFor(DimensionType dimension) {
+	public static WeatherManagerServer getWeatherManagerFor(RegistryKey<World> dimension) {
 		return MANAGERS.get(dimension);
 	}
 }

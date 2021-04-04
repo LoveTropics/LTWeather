@@ -11,7 +11,7 @@ import net.minecraft.entity.passive.SquidEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.projectile.FishingBobberEntity;
 import net.minecraft.util.math.BlockPos;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.fml.common.thread.EffectiveSide;
@@ -45,7 +45,7 @@ public class WeatherUtilEntity {
         {
         	LivingEntity livingEnt = (LivingEntity) entity1;
         	int airTime = livingEnt.getPersistentData().getInt("timeInAir");
-        	if (livingEnt.onGround || livingEnt.handleWaterMovement())
+        	if (livingEnt.isOnGround() || livingEnt.isInWater())
             {
                 airTime = 0;
             }
@@ -59,7 +59,7 @@ public class WeatherUtilEntity {
 				if (((PlayerEntity) entity1).abilities.isCreativeMode) return 99999999F;
 				return 5.0F + airTime / 400.0F;
 			} else {
-				return 500.0F + (livingEnt.onGround ? 2.0F : 0.0F) + (airTime / 400.0F);
+				return 500.0F + (livingEnt.isOnGround() ? 2.0F : 0.0F) + (airTime / 400.0F);
 			}
         }
 
@@ -89,6 +89,6 @@ public class WeatherUtilEntity {
     }
     
     public static double getDistanceSqEntToPos(Entity ent, BlockPos pos) {
-    	return ent.getPositionVec().squareDistanceTo(new Vec3d(pos));
+    	return ent.getPositionVec().squareDistanceTo(Vector3d.copyCentered(pos));
     }
 }

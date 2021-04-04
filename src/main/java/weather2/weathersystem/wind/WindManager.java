@@ -1,9 +1,9 @@
 package weather2.weathersystem.wind;
 
 import CoroUtil.util.CoroUtilEntOrParticle;
-import com.lovetropics.minigames.common.minigames.weather.WeatherController;
-import com.lovetropics.minigames.common.minigames.weather.WeatherControllerManager;
-import net.minecraft.util.math.Vec3d;
+import com.lovetropics.minigames.common.core.game.weather.WeatherController;
+import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
+import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import weather2.ClientWeather;
@@ -110,7 +110,7 @@ public class WindManager {
 	 * - profit
 	 */
 	public void applyWindForceNew(Object ent, float multiplier, float maxSpeed) {
-		Vec3d motion = applyWindForceImpl(new Vec3d(CoroUtilEntOrParticle.getMotionX(ent), CoroUtilEntOrParticle.getMotionY(ent), CoroUtilEntOrParticle.getMotionZ(ent)),
+		Vector3d motion = applyWindForceImpl(new Vector3d(CoroUtilEntOrParticle.getMotionX(ent), CoroUtilEntOrParticle.getMotionY(ent), CoroUtilEntOrParticle.getMotionZ(ent)),
 				WeatherUtilEntity.getWeight(ent), multiplier, maxSpeed);
 		
 		CoroUtilEntOrParticle.setMotionX(ent, motion.x);
@@ -120,7 +120,7 @@ public class WindManager {
 	/**
 	 * Handle generic uses of wind force, for stuff like weather objects that arent entities or paticles
 	 */
-	public Vec3d applyWindForceImpl(Vec3d motion, float weight, float multiplier, float maxSpeed) {
+	public Vector3d applyWindForceImpl(Vector3d motion, float weight, float multiplier, float maxSpeed) {
 		float windSpeed = getWindSpeed();
     	float windAngle = getWindAngle();
 
@@ -147,11 +147,11 @@ public class WindManager {
     	vecZ *= multiplier;
     	
     	//copy over existing motion data
-    	Vec3d newMotion = motion;
+    	Vector3d newMotion = motion;
     	
     	double speedCheck = (Math.abs(vecX) + Math.abs(vecZ)) / 2D;
         if (speedCheck < maxSpeed) {
-        	newMotion = new Vec3d(objX - vecX, motion.y, objZ - vecZ);
+        	newMotion = new Vector3d(objX - vecX, motion.y, objZ - vecZ);
         }
         
         return newMotion;

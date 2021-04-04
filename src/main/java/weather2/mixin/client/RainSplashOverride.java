@@ -1,15 +1,13 @@
 package weather2.mixin.client;
 
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.injection.At;
-import org.spongepowered.asm.mixin.injection.ModifyArg;
-
-import com.lovetropics.minigames.common.minigames.weather.RainType;
-
+import com.lovetropics.minigames.common.core.game.weather.RainType;
 import extendedrenderer.ParticleRegistry2ElectricBubbleoo;
 import net.minecraft.client.renderer.WorldRenderer;
 import net.minecraft.particles.IParticleData;
 import net.minecraft.particles.ParticleTypes;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.injection.At;
+import org.spongepowered.asm.mixin.injection.ModifyArg;
 import weather2.ClientWeather;
 
 @Mixin(WorldRenderer.class)

@@ -1,7 +1,7 @@
 package weather2;
 
-import com.lovetropics.minigames.common.minigames.weather.RainType;
-import com.lovetropics.minigames.common.minigames.weather.WeatherState;
+import com.lovetropics.minigames.common.core.game.weather.RainType;
+import com.lovetropics.minigames.common.core.game.weather.WeatherState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;

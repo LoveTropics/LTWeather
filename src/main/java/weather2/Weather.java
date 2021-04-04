@@ -1,6 +1,6 @@
 package weather2;
 
-import com.lovetropics.minigames.common.minigames.weather.WeatherControllerManager;
+import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;

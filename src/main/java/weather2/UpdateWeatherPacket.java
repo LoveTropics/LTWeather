@@ -1,6 +1,6 @@
 package weather2;
 
-import com.lovetropics.minigames.common.minigames.weather.WeatherState;
+import com.lovetropics.minigames.common.core.game.weather.WeatherState;
 import net.minecraft.network.PacketBuffer;
 import net.minecraftforge.fml.network.NetworkEvent;
 

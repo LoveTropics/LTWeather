@@ -1,14 +1,14 @@
 package weather2.weathersystem;
 
+import net.minecraft.util.RegistryKey;
 import net.minecraft.world.World;
-import net.minecraft.world.dimension.DimensionType;
 import weather2.weathersystem.wind.WindManager;
 
 public abstract class WeatherManager {
-	public final DimensionType dimension;
+	public final RegistryKey<World> dimension;
 	public final WindManager wind = new WindManager(this);
 
-	public WeatherManager(DimensionType dimension) {
+	public WeatherManager(RegistryKey<World> dimension) {
 		this.dimension = dimension;
 	}
 

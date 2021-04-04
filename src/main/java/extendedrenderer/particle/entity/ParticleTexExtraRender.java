@@ -1,16 +1,15 @@
 package extendedrenderer.particle.entity;
 
-import com.mojang.blaze3d.vertex.IVertexBuilder;
-
 import CoroUtil.util.CoroUtilParticle;
+import com.mojang.blaze3d.vertex.IVertexBuilder;
 import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.Quaternion;
-import net.minecraft.client.renderer.Vector3f;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
-import net.minecraft.world.World;
+import net.minecraft.util.math.vector.Quaternion;
+import net.minecraft.util.math.vector.Vector3d;
+import net.minecraft.util.math.vector.Vector3f;
 import net.minecraft.world.gen.Heightmap;
 
 public class ParticleTexExtraRender extends ParticleTexFX {
@@ -23,15 +22,15 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 
 	//public float[] cachedLight;
 	
-	public ParticleTexExtraRender(World worldIn, double posXIn, double posYIn,
-			double posZIn, double mX, double mY, double mZ,
-			TextureAtlasSprite par8Item) {
+	public ParticleTexExtraRender(ClientWorld worldIn, double posXIn, double posYIn,
+								  double posZIn, double mX, double mY, double mZ,
+								  TextureAtlasSprite par8Item) {
 		super(worldIn, posXIn, posYIn, posZIn, mX, mY, mZ, par8Item);
 
 		/*cachedLight = new float[CoroUtilParticle.rainPositions.length];
 		if (worldObj.getGameTime() % 5 == 0) {
 			for (int i = 0; i < cachedLight.length; i++) {
-				Vec3 vec = CoroUtilParticle.rainPositions[i];
+				Vector3 vec = CoroUtilParticle.rainPositions[i];
 				cachedLight[i] = getBrightnessNonLightmap(new BlockPos(posX+vec.xCoord, posY+vec.yCoord, posZ+vec.zCoord), 1F);
 			}
 		}*/
@@ -76,7 +75,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 	@Override
 	public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
 		//override rotations
-        Vec3d vec3d = renderInfo.getProjectedView();
+        Vector3d Vector3d = renderInfo.getProjectedView();
         Quaternion quaternion;
         if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
            quaternion = renderInfo.getRotation();
@@ -87,9 +86,9 @@ public class ParticleTexExtraRender extends ParticleTexFX {
            quaternion.multiply(Vector3f.XP.rotationDegrees(this.rotationPitch));
         }
         
-        float posX = (float)(MathHelper.lerp((double)partialTicks, this.prevPosX, this.posX) - vec3d.getX());
-        float posY = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - vec3d.getY());
-        float posZ = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - vec3d.getZ());
+        float posX = (float)(MathHelper.lerp((double)partialTicks, this.prevPosX, this.posX) - Vector3d.getX());
+        float posY = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - Vector3d.getY());
+        float posZ = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - Vector3d.getZ());
 
 //		if (!facePlayer) {
 			// TODO particle rotations
@@ -209,7 +208,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				int what2 = what >> 16 & 65535;
 				int what3 = what & 65535;*/
 
-//		        Vector3f[] avec3d = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
+//		        Vector3f[] aVector3d = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
 
 		        Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
 		        vector3f1.transform(quaternion);
@@ -225,11 +224,11 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 		        }
 
 		        // TODO particle rotation
-//				Vec3d[] avec3d = new Vec3d[] {
-//						new Vec3d((double)(-rotationX * scale1 - rotationXY * scale1), (double)(-rotationZ * scale1), (double)(-rotationYZ * scale1 - rotationXZ * scale1)),
-//						new Vec3d((double)(-rotationX * scale2 + rotationXY * scale2), (double)(rotationZ * scale2), (double)(-rotationYZ * scale2 + rotationXZ * scale2)),
-//						new Vec3d((double)(rotationX * scale3 + rotationXY * scale3), (double)(rotationZ * scale3), (double)(rotationYZ * scale3 + rotationXZ * scale3)),
-//						new Vec3d((double)(rotationX * scale4 - rotationXY * scale4), (double)(-rotationZ * scale4), (double)(rotationYZ * scale4 - rotationXZ * scale4))};
+//				Vector3d[] aVector3d = new Vector3d[] {
+//						new Vector3d((double)(-rotationX * scale1 - rotationXY * scale1), (double)(-rotationZ * scale1), (double)(-rotationYZ * scale1 - rotationXZ * scale1)),
+//						new Vector3d((double)(-rotationX * scale2 + rotationXY * scale2), (double)(rotationZ * scale2), (double)(-rotationYZ * scale2 + rotationXZ * scale2)),
+//						new Vector3d((double)(rotationX * scale3 + rotationXY * scale3), (double)(rotationZ * scale3), (double)(rotationYZ * scale3 + rotationXZ * scale3)),
+//						new Vector3d((double)(rotationX * scale4 - rotationXY * scale4), (double)(-rotationZ * scale4), (double)(rotationYZ * scale4 - rotationXZ * scale4))};
 
 				/*if (this.field_190014_F != 0.0F)
 				{
@@ -238,11 +237,11 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 					float f10 = MathHelper.sin(f8 * 0.5F) * (float)field_190016_K.xCoord;
 					float f11 = MathHelper.sin(f8 * 0.5F) * (float)field_190016_K.yCoord;
 					float f12 = MathHelper.sin(f8 * 0.5F) * (float)field_190016_K.zCoord;
-					Vec3d vec3d = new Vec3d((double)f10, (double)f11, (double)f12);
+					Vector3d Vector3d = new Vector3d((double)f10, (double)f11, (double)f12);
 
 					for (int l = 0; l < 4; ++l)
 					{
-						avec3d[l] = vec3d.scale(2.0D * avec3d[l].dotProduct(vec3d)).add(avec3d[l].scale((double)(f9 * f9) - vec3d.dotProduct(vec3d))).add(vec3d.crossProduct(avec3d[l]).scale((double)(2.0F * f9)));
+						aVector3d[l] = Vector3d.scale(2.0D * aVector3d[l].dotProduct(Vector3d)).add(aVector3d[l].scale((double)(f9 * f9) - Vector3d.dotProduct(Vector3d))).add(Vector3d.crossProduct(aVector3d[l]).scale((double)(2.0F * f9)));
 					}
 				}*/
 

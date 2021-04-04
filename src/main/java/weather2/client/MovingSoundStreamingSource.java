@@ -6,15 +6,15 @@ import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.SoundCategory;
 import net.minecraft.util.SoundEvent;
 import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.Vec3d;
+import net.minecraft.util.math.vector.Vector3d;
 
 public class MovingSoundStreamingSource extends TickableSound {
 
 	public float cutOffRange = 128;
-	public Vec3d realSource = null;
+	public Vector3d realSource = null;
 	public boolean lockToPlayer = false;
 
-	public MovingSoundStreamingSource(Vec3d parPos, SoundEvent event, SoundCategory category, float parVolume, float parPitch, boolean lockToPlayer) {
+	public MovingSoundStreamingSource(Vector3d parPos, SoundEvent event, SoundCategory category, float parVolume, float parPitch, boolean lockToPlayer) {
 		super(event, category);
 		this.repeat = false;
 		this.volume = parVolume;
@@ -27,7 +27,7 @@ public class MovingSoundStreamingSource extends TickableSound {
 	}
 
 	//constructor for non moving sounds
-	public MovingSoundStreamingSource(Vec3d parPos, SoundEvent event, SoundCategory category, float parVolume, float parPitch, float parCutOffRange)
+	public MovingSoundStreamingSource(Vector3d parPos, SoundEvent event, SoundCategory category, float parVolume, float parPitch, float parCutOffRange)
 	{
 		super(event, category);
 		this.repeat = false;
@@ -64,7 +64,7 @@ public class MovingSoundStreamingSource extends TickableSound {
 
 	}
 
-	public double getDistanceFrom(Vec3d source, Vec3d targ)
+	public double getDistanceFrom(Vector3d source, Vector3d targ)
 	{
 		return source.subtract(targ).length();
 	}
