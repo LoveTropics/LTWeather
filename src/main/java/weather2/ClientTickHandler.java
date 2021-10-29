@@ -1,15 +1,23 @@
 package weather2;
 
+import extendedrenderer.ParticleManagerExtended;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.screen.ConfirmBackupScreen;
+import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import weather2.client.SceneEnhancer;
+import weather2.util.WeatherUtil;
 import weather2.util.WindReader;
 import weather2.weathersystem.WeatherManagerClient;
+
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 
 @Mod.EventBusSubscriber(modid = Weather.MODID, value = Dist.CLIENT)
 public class ClientTickHandler
@@ -28,6 +36,8 @@ public class ClientTickHandler
 	public float smoothAngleAdj = 0.1F;
 
 	public int prevDir = 0;
+
+	private static ParticleManagerExtended particleManagerExtended;
 
 	private ClientTickHandler() {
 		//this constructor gets called multiple times when created from proxy, this prevents multiple inits
@@ -49,11 +59,21 @@ public class ClientTickHandler
         Minecraft mc = Minecraft.getInstance();
         World world = mc.world;
 
+		//System.out.println(mc.currentScreen);
+
+		if (mc.currentScreen instanceof ConfirmBackupScreen) {
+
+		}
+
 		if (world != null) {
 			checkClientWeather();
 
 			weatherManager.tick();
 			sceneEnhancer.tickClient();
+
+			if (!WeatherUtil.isPausedForClient()) {
+				particleManagerExtended().tick();
+			}
 
 			//TODO: evaluate if best here
 			float windDir = WindReader.getWindAngle(world);
@@ -110,7 +130,7 @@ public class ClientTickHandler
 		weatherManager = null;
 		ClientWeather.reset();
 	}
-	
+
     public static void checkClientWeather() {
 
     	try {
@@ -122,11 +142,20 @@ public class ClientTickHandler
     		Weather.dbg("Weather2: Warning, client received packet before it was ready to use, and failed to init client weather due to null world");
     	}
     }
-    
+
     public static void init(World world) {
 		Weather.dbg("Weather2: Initializing WeatherManagerClient for client world and requesting full sync");
 
     	lastWorld = world;
     	weatherManager = new WeatherManagerClient(world.getDimensionKey());
+
+    	Minecraft mc = Minecraft.getInstance();
+
+    	particleManagerExtended = new ParticleManagerExtended(mc.world, mc.textureManager);
+		//((IReloadableResourceManager)mc.getResourceManager()).addReloadListener(particleManagerExtended);
     }
+
+	public static ParticleManagerExtended particleManagerExtended() {
+		return particleManagerExtended;
+	}
 }

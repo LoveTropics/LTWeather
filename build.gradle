@@ -105,7 +105,7 @@ dependencies {
 
     // TODO: update when published
     implementation fg.deobf("com.lovetropics.minigames:LTMinigames:${ltminigames_version}")
-    implementation fg.deobf('net.tropicraft:Tropicraft:9.0.0-beta+custom')
+    implementation fg.deobf('net.tropicraft:Tropicraft:9.1.0-alpha+custom')
 
     // Annotation Processors
     annotationProcessor 'org.spongepowered:mixin:0.8:processor'

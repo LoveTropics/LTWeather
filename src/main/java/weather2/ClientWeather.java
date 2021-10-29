@@ -2,11 +2,13 @@ package weather2;
 
 import com.lovetropics.minigames.common.core.game.weather.RainType;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
+import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import weather2.client.SceneEnhancer;
 
 @Mod.EventBusSubscriber(modid = Weather.MODID, value = Dist.CLIENT)
 public final class ClientWeather {
@@ -45,14 +47,17 @@ public final class ClientWeather {
 	}
 
 	public void onUpdateWeather(WeatherState state) {
-		this.lerpTicks = LERP_TICKS;
+		this.lerpTicks = LERP_TICKS * 20;
 		this.lerpState = state;
 	}
 
 	public void tick() {
+		this.state.rainType = this.lerpState.rainType;
+		this.state.heatwave = this.lerpState.heatwave;
+		this.state.sandstorm = this.lerpState.sandstorm;
+		this.state.snowstorm = this.lerpState.snowstorm;
+
 		if (this.lerpTicks <= 0) {
-			this.state.rainType = this.lerpState.rainType;
-			this.state.heatwave = this.lerpState.heatwave;
 			return;
 		}
 
@@ -82,7 +87,16 @@ public final class ClientWeather {
 		return this.state.heatwave;
 	}
 
+	public boolean isSandstorm() {
+		return this.state.sandstorm;
+	}
+
+	public boolean isSnowstorm() {
+		return this.state.snowstorm;
+	}
+
 	public boolean hasWeather() {
+		if (SceneEnhancer.FORCE_ON_DEBUG_TESTING) return true;
 		return this.state.hasWeather();
 	}
 }

@@ -21,6 +21,7 @@ public class RainSplashOverride {
 					ordinal = 0),
 			index = 0)
 	public IParticleData getParticle(IParticleData particleData) {
+		//System.out.println("wat");
         if (ClientWeather.get().getRainType() == RainType.ACID) {
             return ParticleRegistry2ElectricBubbleoo.ACIDRAIN_SPLASH;
         } else {
