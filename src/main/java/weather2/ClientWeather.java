@@ -47,7 +47,7 @@ public final class ClientWeather {
 	}
 
 	public void onUpdateWeather(WeatherState state) {
-		this.lerpTicks = LERP_TICKS * 20;
+		this.lerpTicks = LERP_TICKS * 10;
 		this.lerpState = state;
 	}
 
