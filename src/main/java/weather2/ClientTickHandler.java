@@ -3,6 +3,7 @@ package weather2;
 import extendedrenderer.ParticleManagerExtended;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screen.ConfirmBackupScreen;
+import net.minecraft.client.world.ClientWorld;
 import net.minecraft.resources.IReloadableResourceManager;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.world.World;
@@ -151,7 +152,11 @@ public class ClientTickHandler
 
     	Minecraft mc = Minecraft.getInstance();
 
-    	particleManagerExtended = new ParticleManagerExtended(mc.world, mc.textureManager);
+		if (particleManagerExtended == null) {
+			particleManagerExtended = new ParticleManagerExtended(mc.world, mc.textureManager);
+		} else {
+			particleManagerExtended.clearEffects((ClientWorld) world);
+		}
 		//((IReloadableResourceManager)mc.getResourceManager()).addReloadListener(particleManagerExtended);
     }
 
