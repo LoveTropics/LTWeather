@@ -89,9 +89,19 @@ public class WindManager {
 		// TODO: better merge this logic
 		if (world.isRemote) {
 			windSpeedGlobal = ClientWeather.get().getWindSpeed();
+			if (windSpeedGlobal == 0) {
+				chanceOfWindGustEvent = 0;
+			} else {
+				chanceOfWindGustEvent = 0.5F;
+			}
 		} else {
 			WeatherController weatherController = WeatherControllerManager.forWorld((ServerWorld) world);
 			windSpeedGlobal = weatherController.getWindSpeed();
+			if (windSpeedGlobal == 0) {
+				chanceOfWindGustEvent = 0;
+			} else {
+				chanceOfWindGustEvent = 0.5F;
+			}
 		}
 
 		if (windTimeGust > 0) {
