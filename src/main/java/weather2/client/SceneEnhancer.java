@@ -126,8 +126,9 @@ public class SceneEnhancer implements Runnable {
 			ClientTickHandler.checkClientWeather();
 			ClientWeather weather = ClientWeather.get();
 
+			tryParticleSpawning();
+
 			if (weather.hasWeather()) {
-				tryParticleSpawning();
 				tickParticlePrecipitation();
 				trySoundPlaying();
 				tryWind(client.world);
@@ -154,9 +155,11 @@ public class SceneEnhancer implements Runnable {
 	public void tickClientThreaded() {
 		Minecraft client = Minecraft.getInstance();
 
-		if (client != null && client.world != null && client.player != null && ClientWeather.get().hasWeather()) {
+		if (client != null && client.world != null && client.player != null) {
 			profileSurroundings();
-			tryAmbientSounds();
+			if (ClientWeather.get().hasWeather()) {
+				tryAmbientSounds();
+			}
 		}
 	}
 

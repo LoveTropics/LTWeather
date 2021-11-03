@@ -55,7 +55,7 @@ public class FogAdjuster {
         if (spectator) {
             distAmp = 4F;
         }
-        fogHeatwave = new FogProfile(new Vector3f(0.5F, 0.2F, 0.1F), 0, 75 * distAmp, GlStateManager.FogMode.LINEAR);
+        fogHeatwave = new FogProfile(new Vector3f(0.5F, 0.2F, 0.1F), 0, 75, GlStateManager.FogMode.LINEAR);
         fogSandstorm = new FogProfile(new Vector3f(0.7F, 0.5F, 0.2F), 0, 18 * distAmp, GlStateManager.FogMode.LINEAR);
         fogSnowstorm = new FogProfile(new Vector3f(0.7F, 0.7F, 0.7F), 0, 20 * distAmp, GlStateManager.FogMode.LINEAR);
         fogVanilla = new FogProfile(new Vector3f(-1F, -1F, -1F), -1, -1, GlStateManager.FogMode.LINEAR);
