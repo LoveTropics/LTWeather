@@ -2,37 +2,32 @@ package weather2.weathersystem;
 
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
+import com.lovetropics.minigames.common.core.game.weather.StormState;
 import com.lovetropics.minigames.common.core.game.weather.WeatherController;
 import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
 import net.minecraft.block.Blocks;
-import net.minecraft.client.Minecraft;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.particles.ParticleTypes;
-import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
-import net.minecraft.world.biome.Biome;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.server.ChunkHolder;
 import net.minecraft.world.server.ChunkManager;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
-import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
-import weather2.*;
-import weather2.config.ConfigSand;
-import weather2.util.CachedNBTTagCompound;
+import weather2.PacketNBTFromServer;
+import weather2.WeatherBlocks;
+import weather2.WeatherNetworking;
 import weather2.util.WeatherUtilBlock;
 import weather2.weathersystem.storm.WeatherObject;
-import weather2.weathersystem.storm.WeatherObjectSandstorm;
 import weather2.weathersystem.wind.WindManager;
 
-import javax.annotation.Nullable;
-import java.util.*;
+import java.util.Collections;
+import java.util.List;
+import java.util.Optional;
+import java.util.Random;
 
 public class WeatherManagerServer extends WeatherManager {
 	private final ServerWorld world;
@@ -53,10 +48,12 @@ public class WeatherManagerServer extends WeatherManager {
 
 		WeatherController controller = WeatherControllerManager.forWorld(world);
 		if (controller != null) {
-			if (controller.isSnowstorm()) {
-				tickSnowstorm();
-			} else if (controller.isSandstorm()) {
-				tickSandstorm();
+			StormState snowstorm = controller.getSnowstorm();
+			StormState sandstorm = controller.getSandstorm();
+			if (snowstorm != null) {
+				tickSnowstorm(snowstorm);
+			} else if (sandstorm != null) {
+				tickSandstorm(sandstorm);
 			}
 		}
 
@@ -70,17 +67,15 @@ public class WeatherManagerServer extends WeatherManager {
 		}
 	}
 
-	public void tickSnowstorm() {
+	public void tickSnowstorm(StormState snowstorm) {
 
 		World world = getWorld();
 		WindManager windMan = getWindManager();
 		Random rand = world.rand;
-		WeatherController controller = WeatherControllerManager.forWorld((ServerWorld) world);
-		if (controller == null) return;
 
 		float angle = windMan.getWindAngle();
 
-		int delay = controller.getConfig().getSnowstormBuildupTickRate();
+		int delay = snowstorm.getBuildupTickRate();
 
 		if (world.getGameTime() % delay == 0) {
 			//TODO: switch to AT when not using borked dev env
@@ -96,7 +91,7 @@ public class WeatherManagerServer extends WeatherManager {
 						BlockPos blockPos = new BlockPos((optional.get().getPos().x * 16) + rand.nextInt(16), 0, (optional.get().getPos().z * 16) + rand.nextInt(16));
 						int y = WeatherUtilBlock.getPrecipitationHeightSafe(world, blockPos).getY();
 						Vector3d pos = new Vector3d(blockPos.getX(), y, blockPos.getZ());
-						int maxBlockStackingAllowed = controller.getConfig().getSnowstormMaxStackable();
+						int maxBlockStackingAllowed = snowstorm.getMaxStackable();
 						WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, Blocks.SNOW, maxBlockStackingAllowed);
 					}
 				}
@@ -104,17 +99,15 @@ public class WeatherManagerServer extends WeatherManager {
 		}
 	}
 
-	public void tickSandstorm() {
+	public void tickSandstorm(StormState sandstorm) {
 
 		World world = getWorld();
 		WindManager windMan = getWindManager();
 		Random rand = world.rand;
-		WeatherController controller = WeatherControllerManager.forWorld((ServerWorld) world);
-		if (controller == null) return;
 
 		float angle = windMan.getWindAngle();
 
-		int delay = controller.getConfig().getSandstormBuildupTickRate();
+		int delay = sandstorm.getBuildupTickRate();
 
 		if (world.getGameTime() % delay == 0) {
 			//TODO: switch to AT when not using borked dev env
@@ -130,7 +123,7 @@ public class WeatherManagerServer extends WeatherManager {
 						BlockPos blockPos = new BlockPos((optional.get().getPos().x * 16) + rand.nextInt(16), 0, (optional.get().getPos().z * 16) + rand.nextInt(16));
 						int y = WeatherUtilBlock.getPrecipitationHeightSafe(world, blockPos).getY();
 						Vector3d pos = new Vector3d(blockPos.getX(), y, blockPos.getZ());
-						int maxBlockStackingAllowed = controller.getConfig().getSandstormMaxStackable();
+						int maxBlockStackingAllowed = sandstorm.getMaxStackable();
 						WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, WeatherBlocks.blockSandLayer, maxBlockStackingAllowed);
 					}
 				}

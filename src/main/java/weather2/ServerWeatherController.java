@@ -1,7 +1,7 @@
 package weather2;
 
-import com.lovetropics.minigames.common.content.survive_the_tide.SurviveTheTideWeatherConfig;
 import com.lovetropics.minigames.common.core.game.weather.RainType;
+import com.lovetropics.minigames.common.core.game.weather.StormState;
 import com.lovetropics.minigames.common.core.game.weather.WeatherController;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
 import net.minecraft.entity.player.ServerPlayerEntity;
@@ -10,6 +10,8 @@ import net.minecraft.world.World;
 import net.minecraft.world.server.ServerWorld;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.network.PacketDistributor;
+
+import javax.annotation.Nullable;
 
 // TODO: Consolidate with WeatherManager
 @Mod.EventBusSubscriber(modid = Weather.MODID)
@@ -22,8 +24,6 @@ public final class ServerWeatherController implements WeatherController {
 	private boolean dirty;
 
 	private final WeatherState state = new WeatherState();
-
-	private SurviveTheTideWeatherConfig config;
 
 	ServerWeatherController(ServerWorld world) {
 		RegistryKey<World> dimension = world.getDimensionKey();
@@ -69,17 +69,29 @@ public final class ServerWeatherController implements WeatherController {
 	}
 
 	@Override
-	public void setSandstorm(boolean sandstorm) {
-		if (sandstorm != this.state.sandstorm) {
-			this.state.sandstorm = sandstorm;
+	public void setSandstorm(int buildupTickRate, int maxStackable) {
+		this.state.sandstorm = new StormState(buildupTickRate, maxStackable);
+		this.dirty = true;
+	}
+
+	@Override
+	public void clearSandstorm() {
+		if (this.state.sandstorm != null) {
+			this.state.sandstorm = null;
 			this.dirty = true;
 		}
 	}
 
 	@Override
-	public void setSnowstorm(boolean snowstorm) {
-		if (snowstorm != this.state.snowstorm) {
-			this.state.snowstorm = snowstorm;
+	public void setSnowstorm(int buildupTickRate, int maxStackable) {
+		this.state.snowstorm = new StormState(buildupTickRate, maxStackable);
+		this.dirty = true;
+	}
+
+	@Override
+	public void clearSnowstorm() {
+		if (this.state.snowstorm != null) {
+			this.state.snowstorm = null;
 			this.dirty = true;
 		}
 	}
@@ -104,23 +116,15 @@ public final class ServerWeatherController implements WeatherController {
 		return this.state.heatwave;
 	}
 
+	@Nullable
 	@Override
-	public boolean isSandstorm() {
+	public StormState getSandstorm() {
 		return this.state.sandstorm;
 	}
 
+	@Nullable
 	@Override
-	public boolean isSnowstorm() {
+	public StormState getSnowstorm() {
 		return this.state.snowstorm;
-	}
-
-	@Override
-	public void setConfig(SurviveTheTideWeatherConfig config) {
-		this.config = config;
-	}
-
-	@Override
-	public SurviveTheTideWeatherConfig getConfig() {
-		return config;
 	}
 }

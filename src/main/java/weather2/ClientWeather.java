@@ -2,7 +2,6 @@ package weather2;
 
 import com.lovetropics.minigames.common.core.game.weather.RainType;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
-import net.minecraft.client.Minecraft;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.world.WorldEvent;
@@ -89,11 +88,11 @@ public final class ClientWeather {
 	}
 
 	public boolean isSandstorm() {
-		return this.state.sandstorm;
+		return this.state.sandstorm != null;
 	}
 
 	public boolean isSnowstorm() {
-		return this.state.snowstorm;
+		return this.state.snowstorm != null;
 	}
 
 	public boolean hasWeather() {
