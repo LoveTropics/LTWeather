@@ -49,6 +49,7 @@ public final class ClientWeather {
 	public void onUpdateWeather(WeatherState state) {
 		this.lerpTicks = LERP_TICKS * 10;
 		this.lerpState = state;
+		//System.out.println("state.rainAmount: " + state.rainAmount);
 	}
 
 	public void tick() {

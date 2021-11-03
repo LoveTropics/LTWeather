@@ -90,6 +90,12 @@ sourceSets.main.resources {
     srcDir 'src/generated/resources'
 }
 
+configurations {
+    shade
+    shadelib
+    implementation.extendsFrom shadelib
+}
+
 repositories {
     mavenLocal()
     maven {
@@ -106,6 +112,15 @@ dependencies {
     // TODO: update when published
     implementation fg.deobf("com.lovetropics.minigames:LTMinigames:${ltminigames_version}")
     implementation fg.deobf('net.tropicraft:Tropicraft:9.1.0-alpha+custom')
+
+    // Shaded deps
+    def registrate = "com.tterrag.registrate:Registrate:MC1.16.2-${registrate_version}"
+    implementation fg.deobf(registrate)
+    shade registrate
+
+    def ltlib = "com.lovetropics.lib:LTLib:${ltlib_version}"
+    implementation fg.deobf(ltlib)
+    shade ltlib
 
     // Annotation Processors
     annotationProcessor 'org.spongepowered:mixin:0.8:processor'

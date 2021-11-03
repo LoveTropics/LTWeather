@@ -7,6 +7,7 @@ public class ConfigSand {
 	public static int Sandstorm_OddsTo1 = 30;
 	public static int Sandstorm_TimeBetweenInTicks = 20*60*20*3;
 
+	//tick delay
     public static int Sandstorm_Sand_Buildup_TickRate = 40;
 
     public static int Sandstorm_Sand_Buildup_LoopAmountBase = 800;

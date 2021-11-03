@@ -1,30 +1,41 @@
 package weather2.weathersystem;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import com.lovetropics.minigames.common.core.game.weather.WeatherController;
+import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
+import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import net.minecraft.block.Blocks;
+import net.minecraft.client.Minecraft;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.nbt.CompoundNBT;
+import net.minecraft.particles.ParticleTypes;
+import net.minecraft.particles.RedstoneParticleData;
 import net.minecraft.util.math.BlockPos;
 import net.minecraft.util.math.vector.Vector3d;
 import net.minecraft.world.World;
+import net.minecraft.world.biome.Biome;
+import net.minecraft.world.chunk.Chunk;
+import net.minecraft.world.server.ChunkHolder;
+import net.minecraft.world.server.ChunkManager;
 import net.minecraft.world.server.ServerWorld;
+import net.minecraftforge.fml.common.ObfuscationReflectionHelper;
 import net.minecraftforge.fml.network.NetworkDirection;
 import net.minecraftforge.fml.network.PacketDistributor;
-import weather2.PacketNBTFromServer;
-import weather2.Weather;
-import weather2.WeatherNetworking;
+import weather2.*;
+import weather2.config.ConfigSand;
 import weather2.util.CachedNBTTagCompound;
 import weather2.util.WeatherUtilBlock;
 import weather2.weathersystem.storm.WeatherObject;
 import weather2.weathersystem.storm.WeatherObjectSandstorm;
+import weather2.weathersystem.wind.WindManager;
 
 import javax.annotation.Nullable;
-import java.util.Iterator;
+import java.util.*;
 
 public class WeatherManagerServer extends WeatherManager {
 	private final ServerWorld world;
-
-	//TEMP
-	public WeatherObjectSandstorm sandstorm = null;
 
 	public WeatherManagerServer(ServerWorld world) {
 		super(world.getDimensionKey());
@@ -39,70 +50,92 @@ public class WeatherManagerServer extends WeatherManager {
 	@Override
 	public void tick() {
 		super.tick();
-	}
 
-	public WeatherObjectSandstorm spawnSandStorm(BlockPos pos) {
-		WeatherObjectSandstorm sandstorm = new WeatherObjectSandstorm(this);
-
-		sandstorm.initFirstTime();
-		BlockPos posSpawn = new BlockPos(WeatherUtilBlock.getPrecipitationHeightSafe(world, pos)).add(0, 1, 0);
-		sandstorm.initSandstormSpawn(new Vector3d(posSpawn.getX(), posSpawn.getY(), posSpawn.getZ()));
-		addStormObject(sandstorm);
-		syncStormNew(sandstorm, null);
-		return sandstorm;
-	}
-
-	public void syncStormNew(WeatherObject parStorm, @Nullable ServerPlayerEntity entP) {
-		CompoundNBT data = new CompoundNBT();
-		data.putString("packetCommand", "WeatherData");
-		data.putString("command", "syncStormNew");
-
-		CachedNBTTagCompound cache = parStorm.getNbtCache();
-		cache.setUpdateForced(true);
-		parStorm.nbtSyncForClient();
-		cache.setUpdateForced(false);
-		data.put("data", cache.getNewNBT());
-
-		if (entP == null) {
-			//Weather.eventChannel.sendToDimension(PacketHelper.getNBTPacket(data, Weather.eventChannelName), getWorld().getDimension().getMinecartType().getId());
-			WeatherNetworking.HANDLER.send(PacketDistributor.DIMENSION.with(() -> getWorld().getDimensionKey()), new PacketNBTFromServer(data));
-		} else {
-			//Weather.eventChannel.sendTo(PacketHelper.getNBTPacket(data, Weather.eventChannelName), entP);
-			//WeatherNetworking.HANDLER.send(PacketDistributor.DIMENSION.with(() -> getWorld().getDimension().getType()), new PacketNBTFromServer(data));
-			WeatherNetworking.HANDLER.sendTo(new PacketNBTFromServer(data), entP.connection.netManager, NetworkDirection.PLAY_TO_CLIENT);
-		}
-		//PacketDispatcher.sendPacketToAllAround(parStorm.pos.xCoord, parStorm.pos.yCoord, parStorm.pos.zCoord, syncRange, getWorld().provider.dimensionId, WeatherPacketHelper.createPacketForServerToClientSerialization("WeatherData", data));
-	}
-
-	public void syncStormUpdate(WeatherObject parStorm) {
-		//packets
-		CompoundNBT data = new CompoundNBT();
-		data.putString("packetCommand", "WeatherData");
-		data.putString("command", "syncStormUpdate");
-		parStorm.getNbtCache().setNewNBT(new CompoundNBT());
-		parStorm.nbtSyncForClient();
-		data.put("data", parStorm.getNbtCache().getNewNBT());
-		boolean testNetworkData = false;
-		if (testNetworkData) {
-			System.out.println("sending to client: " + parStorm.getNbtCache().getNewNBT().keySet().size());
-			/*if (parStorm instanceof StormObject) {
-				System.out.println("Real: " + ((StormObject) parStorm).levelCurIntensityStage);
-				if (parStorm.getNbtCache().getNewNBT().contains("levelCurIntensityStage")) {
-					System.out.println(" vs " + parStorm.getNbtCache().getNewNBT().getInt("levelCurIntensityStage"));
-				} else {
-					System.out.println("no key!");
-				}
-			}*/
-
-			Iterator iterator = parStorm.getNbtCache().getNewNBT().keySet().iterator();
-			String keys = "";
-			while (iterator.hasNext()) {
-				keys = keys.concat((String) iterator.next() + "; ");
+		WeatherController controller = WeatherControllerManager.forWorld(world);
+		if (controller != null) {
+			if (controller.isSnowstorm()) {
+				tickSnowstorm();
+			} else if (controller.isSandstorm()) {
+				tickSandstorm();
 			}
-			System.out.println("sending    " + keys);
 		}
-		//Weather.eventChannel.sendToDimension(PacketHelper.getNBTPacket(data, Weather.eventChannelName), getWorld().getDimension().getType().getId());
-		WeatherNetworking.HANDLER.send(PacketDistributor.DIMENSION.with(() -> getWorld().getDimensionKey()), new PacketNBTFromServer(data));
+
+		if (world != null) {
+			WindManager windMan = getWindManager();
+
+			//sync wind
+			if (world.getGameTime() % 60 == 0) {
+				syncWindUpdate(windMan);
+			}
+		}
+	}
+
+	public void tickSnowstorm() {
+
+		World world = getWorld();
+		WindManager windMan = getWindManager();
+		Random rand = world.rand;
+		WeatherController controller = WeatherControllerManager.forWorld((ServerWorld) world);
+		if (controller == null) return;
+
+		float angle = windMan.getWindAngle();
+
+		int delay = controller.getConfig().getSnowstormBuildupTickRate();
+
+		if (world.getGameTime() % delay == 0) {
+			//TODO: switch to AT when not using borked dev env
+			Long2ObjectLinkedOpenHashMap<ChunkHolder> loadedChunksImmutable = ObfuscationReflectionHelper.getPrivateValue(ChunkManager.class, ((ServerWorld) world).getChunkProvider().chunkManager, "immutableLoadedChunks");
+
+			//List<ChunkHolder> list = Lists.newArrayList(((ServerWorld)world).getChunkProvider().chunkManager.getLoadedChunksIterable());
+			List<ChunkHolder> list = Lists.newArrayList(Iterables.unmodifiableIterable(loadedChunksImmutable.values()));
+			Collections.shuffle(list);
+			list.forEach((p_241099_7_) -> {
+				Optional<Chunk> optional = p_241099_7_.getTickingFuture().getNow(ChunkHolder.UNLOADED_CHUNK).left();
+				if (optional.isPresent()) {
+					for (int i = 0; i < 10; i++) {
+						BlockPos blockPos = new BlockPos((optional.get().getPos().x * 16) + rand.nextInt(16), 0, (optional.get().getPos().z * 16) + rand.nextInt(16));
+						int y = WeatherUtilBlock.getPrecipitationHeightSafe(world, blockPos).getY();
+						Vector3d pos = new Vector3d(blockPos.getX(), y, blockPos.getZ());
+						int maxBlockStackingAllowed = controller.getConfig().getSnowstormMaxStackable();
+						WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, Blocks.SNOW, maxBlockStackingAllowed);
+					}
+				}
+			});
+		}
+	}
+
+	public void tickSandstorm() {
+
+		World world = getWorld();
+		WindManager windMan = getWindManager();
+		Random rand = world.rand;
+		WeatherController controller = WeatherControllerManager.forWorld((ServerWorld) world);
+		if (controller == null) return;
+
+		float angle = windMan.getWindAngle();
+
+		int delay = controller.getConfig().getSandstormBuildupTickRate();
+
+		if (world.getGameTime() % delay == 0) {
+			//TODO: switch to AT when not using borked dev env
+			Long2ObjectLinkedOpenHashMap<ChunkHolder> loadedChunksImmutable = ObfuscationReflectionHelper.getPrivateValue(ChunkManager.class, ((ServerWorld) world).getChunkProvider().chunkManager, "immutableLoadedChunks");
+
+			//List<ChunkHolder> list = Lists.newArrayList(((ServerWorld)world).getChunkProvider().chunkManager.getLoadedChunksIterable());
+			List<ChunkHolder> list = Lists.newArrayList(Iterables.unmodifiableIterable(loadedChunksImmutable.values()));
+			Collections.shuffle(list);
+			list.forEach((p_241099_7_) -> {
+				Optional<Chunk> optional = p_241099_7_.getTickingFuture().getNow(ChunkHolder.UNLOADED_CHUNK).left();
+				if (optional.isPresent()) {
+					for (int i = 0; i < 10; i++) {
+						BlockPos blockPos = new BlockPos((optional.get().getPos().x * 16) + rand.nextInt(16), 0, (optional.get().getPos().z * 16) + rand.nextInt(16));
+						int y = WeatherUtilBlock.getPrecipitationHeightSafe(world, blockPos).getY();
+						Vector3d pos = new Vector3d(blockPos.getX(), y, blockPos.getZ());
+						int maxBlockStackingAllowed = controller.getConfig().getSandstormMaxStackable();
+						WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, WeatherBlocks.blockSandLayer, maxBlockStackingAllowed);
+					}
+				}
+			});
+		}
 	}
 
 	public void syncStormRemove(WeatherObject parStorm) {
@@ -119,15 +152,12 @@ public class WeatherManagerServer extends WeatherManager {
 		WeatherNetworking.HANDLER.send(PacketDistributor.DIMENSION.with(() -> getWorld().getDimensionKey()), new PacketNBTFromServer(data));
 	}
 
-	public void playerJoinedWorldSyncFull(ServerPlayerEntity entP) {
-		Weather.dbg("Weather2: playerJoinedWorldSyncFull for dim: " + world.getDimensionKey());
-		World world = getWorld();
-		if (world != null) {
-			Weather.dbg("Weather2: playerJoinedWorldSyncFull, sending " + getStormObjects().size() + " weather objects to: " + entP.getName() + ", dim: " + world.getDimensionKey());
-			//sync storms
-			for (int i = 0; i < getStormObjects().size(); i++) {
-				syncStormNew(getStormObjects().get(i), entP);
-			}
-		}
+	public void syncWindUpdate(WindManager parManager) {
+		//packets
+		CompoundNBT data = new CompoundNBT();
+		data.putString("packetCommand", "WeatherData");
+		data.putString("command", "syncWindUpdate");
+		data.put("data", parManager.nbtSyncForClient());
+		WeatherNetworking.HANDLER.send(PacketDistributor.DIMENSION.with(() -> getWorld().getDimensionKey()), new PacketNBTFromServer(data));
 	}
 }

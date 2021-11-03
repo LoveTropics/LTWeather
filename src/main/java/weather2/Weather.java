@@ -1,9 +1,7 @@
 package weather2;
 
 import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
-import net.minecraft.resources.IResourceManagerReloadListener;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.AddReloadListenerEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.DeferredWorkQueue;
@@ -35,6 +33,7 @@ public class Weather
         modBus.addListener(this::clientSetup);
 
         MinecraftForge.EVENT_BUS.register(this);
+        modBus.register(WeatherBlocks.class);
 
         MinecraftForge.EVENT_BUS.register(new EventHandlerForge());
     }

@@ -1,5 +1,6 @@
 package weather2;
 
+import com.lovetropics.minigames.common.content.survive_the_tide.SurviveTheTideWeatherConfig;
 import com.lovetropics.minigames.common.core.game.weather.RainType;
 import com.lovetropics.minigames.common.core.game.weather.WeatherController;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
@@ -21,6 +22,8 @@ public final class ServerWeatherController implements WeatherController {
 	private boolean dirty;
 
 	private final WeatherState state = new WeatherState();
+
+	private SurviveTheTideWeatherConfig config;
 
 	ServerWeatherController(ServerWorld world) {
 		RegistryKey<World> dimension = world.getDimensionKey();
@@ -109,5 +112,15 @@ public final class ServerWeatherController implements WeatherController {
 	@Override
 	public boolean isSnowstorm() {
 		return this.state.snowstorm;
+	}
+
+	@Override
+	public void setConfig(SurviveTheTideWeatherConfig config) {
+		this.config = config;
+	}
+
+	@Override
+	public SurviveTheTideWeatherConfig getConfig() {
+		return config;
 	}
 }

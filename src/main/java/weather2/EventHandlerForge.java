@@ -16,6 +16,8 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import weather2.client.SceneEnhancer;
+import weather2.util.WeatherUtilEntity;
+import weather2.weathersystem.WeatherManagerClient;
 import weather2.weathersystem.wind.WindManager;
 
 @Mod.EventBusSubscriber(modid = Weather.MODID, bus = Mod.EventBusSubscriber.Bus.MOD)
@@ -49,13 +51,58 @@ public class EventHandlerForge {
 
 	@SubscribeEvent
 	public void onEntityLivingUpdate(LivingEvent.LivingUpdateEvent event) {
-		// TODO: fix wind movement
-		if (true) return;
+		Entity ent = event.getEntity();
+		if (ent.world.isRemote && (ent instanceof PlayerEntity && ((PlayerEntity) ent).isUser())) {
+			onClientPlayerUpdate(event);
+		}
+	}
+
+	@SubscribeEvent
+	@OnlyIn(Dist.CLIENT)
+	public void onClientPlayerUpdate(LivingEvent.LivingUpdateEvent event) {
 
 		Entity ent = event.getEntity();
-		if (!ent.world.isRemote || (ent instanceof PlayerEntity && ((PlayerEntity) ent).isUser())) {
-			WindManager windMan = ServerTickHandler.getWeatherManagerFor(ent.world.getDimensionKey()).wind;
-			windMan.applyWindForceNew(ent, 1F / 20F, 0.5F);
+		WeatherManagerClient weatherMan = ClientTickHandler.weatherManager;
+		if (weatherMan == null) return;
+		WindManager windMan = weatherMan.getWindManager();
+		if (windMan == null) return;
+
+		ClientWeather weather = ClientWeather.get();
+		if (weather.isSnowstorm() || weather.isSandstorm()) {
+			if (ent.isOnGround() && !ent.isSpectator() && !WeatherUtilEntity.isPlayerSheltered(ent)/* && ent.world.getGameTime() % 20 == 0*/) {
+
+				float playerSpeed = (float) Math.sqrt(ent.getMotion().x * ent.getMotion().x + ent.getMotion().z * ent.getMotion().z);
+
+				if (playerSpeed > 0.02F && playerSpeed < 0.3F) {
+
+					//System.out.println("playerSpeed: " + playerSpeed);
+
+					/**
+					 * Calculate the players angle from motion, compare it against wind
+					 * under 90 means theyre moving with the wind, above 90 means against the wind, 90 means perpendicular to it
+					 * scale wind assistance / resistance to wind based on dist from 0 to 90 or 90 to 180
+					 */
+
+					float playerAngle = -(float) (Math.toDegrees(Math.atan2(ent.getMotion().x, ent.getMotion().z)));
+					int phi = (int) (Math.abs(windMan.getWindAngle() - playerAngle) % 360);
+					float diffAngle = phi > 180 ? 360 - phi : phi;
+					//System.out.println("diffAngle: " + diffAngle);
+					if (diffAngle < 90) {
+						float assistRate = 1F - (diffAngle / 90F);
+						float assist = 1F + (0.12F * assistRate);
+						//System.out.println("assist: " + assist);
+						ent.setMotion(ent.getMotion().x * assist, ent.getMotion().y, ent.getMotion().z * assist);
+					} else if (diffAngle >= 90) {
+						float dampenRate = ((diffAngle - 90F) / 90F);
+						float dampen = 1F - (0.12F * dampenRate);
+						//System.out.println("dampen: " + dampen);
+						if (dampen != 0) {
+							ent.setMotion(ent.getMotion().x * dampen, ent.getMotion().y, ent.getMotion().z * dampen);
+						}
+					}
+				}
+			}
 		}
+
 	}
 }

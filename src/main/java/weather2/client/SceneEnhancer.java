@@ -88,6 +88,8 @@ public class SceneEnhancer implements Runnable {
 
 	private static FogAdjuster fogAdjuster;
 
+	public static boolean isPlayerOutside = true;
+
 	public SceneEnhancer() {
 		listPosRandom.clear();
 		listPosRandom.add(new BlockPos(0, -1, 0));
@@ -129,19 +131,22 @@ public class SceneEnhancer implements Runnable {
 				tickParticlePrecipitation();
 				trySoundPlaying();
 				tryWind(client.world);
+				tickSandstorm();
 			}
 
 			tickMisc();
 
 			getFogAdjuster().tickGame(weather);
-			tickHeatwave(weather);
+			//tickHeatwave(weather);
 
 			if (particleBehavior == null) {
 				particleBehavior = new ParticleBehaviorSandstorm(null);
 			}
 			particleBehavior.tickUpdateList();
 
-			tickSandstorm();
+			if (client.player != null && client.world != null && client.world.getGameTime() % 10 == 0) {
+				isPlayerOutside = WeatherUtilEntity.isEntityOutside(client.player);
+			}
 		}
 	}
 
@@ -419,7 +424,7 @@ public class SceneEnhancer implements Runnable {
 
 				//particleAmp = 1;
 				//if (curPrecipVal != 0 && curPrecipVal != 0.5F) {
-					Weather.dbg("curPrecipVal:" + curPrecipVal + " - " + weather.getRainType());
+					//Weather.dbg("curPrecipVal:" + curPrecipVal + " - " + weather.getRainType());
 				//}
 
 				int spawnCount;
@@ -726,55 +731,139 @@ public class SceneEnhancer implements Runnable {
 					}
 				//snow
 				} else {
-					//Weather.dbg("rate: " + curPrecipVal * 5F * ConfigMisc.Particle_Precipitation_effect_rate);
 
-					spawnCount = 0;
-					//less for snow, since it falls slower so more is on screen longer
-					spawnNeed = (int)(curPrecipVal * 40F * PRECIPITATION_PARTICLE_EFFECT_RATE * particleAmp);
 
-					int spawnAreaSize = 50;
+				}
+			}
 
-					if (spawnNeed > 0) {
-						for (int i = 0; i < safetyCutout/*curPrecipVal * 20F * PRECIPITATION_PARTICLE_EFFECT_RATE*/; i++) {
-							BlockPos pos = new BlockPos(
-									entP.getPosX() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2),
-									entP.getPosY() - 5 + rand.nextInt(25),
-									entP.getPosZ() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2));
+			//Weather.dbg("rate: " + curPrecipVal * 5F * ConfigMisc.Particle_Precipitation_effect_rate);
+			if (weather.isSnowstorm()) {
+				int spawnCount = 0;
+				//less for snow, since it falls slower so more is on screen longer
+				int spawnNeed = (int) (0.5F * 100F * PRECIPITATION_PARTICLE_EFFECT_RATE * particleAmp);
+				int safetyCutout = 60;
+				int spawnAreaSize = 20;
+				double closeDistCutoff = 7D;
+				float yetAnotherRateNumber = 120 * fogAdjuster.getLerpAmount();
+				boolean farSpawn = Minecraft.getInstance().player.isSpectator() || !isPlayerOutside;
+				if (farSpawn) {
+					safetyCutout = 20;
+					spawnAreaSize = 100;
+					yetAnotherRateNumber = 40;
+				}
 
-							if (canPrecipitateAt(world, pos)) {
-								ParticleTexExtraRender snow = new ParticleTexExtraRender((ClientWorld) entP.world, pos.getX(), pos.getY(), pos.getZ(),
-										0D, 0D, 0D, ParticleRegistry.snow);
+				if (spawnNeed > 0) {
 
-								snow.setCanCollide(false);
-								snow.setKillWhenUnderTopmostBlock(true);
-								snow.setTicksFadeOutMaxOnDeath(5);
-								snow.setDontRenderUnderTopmostBlock(true);
-								snow.setExtraParticlesBaseAmount(10);
-								snow.killWhenFarFromCameraAtLeast = 20;
+					if (adjustedRate == 2F) {
+						adjustedRate = 1F;
+					}
 
-								snow.setMotionY(-0.1D);
-								snow.setScale(0.3F);
-								snow.setGravity(0.1F);
-								snow.windWeight = 0.2F;
-								snow.setMaxAge(40);
-								snow.setFacePlayer(false);
-								snow.setTicksFadeInMax(5);
-								snow.setAlphaF(0);
-								snow.setTicksFadeOutMax(5);
-								//snow.setCanCollide(true);
-								//snow.setKillOnCollide(true);
-								snow.rotationYaw = snow.getWorld().rand.nextInt(360) - 180F;
-								snow.spawnAsWeatherEffect();
+					//snow
+					for (int i = 0; i < safetyCutout * adjustedRate/*curPrecipVal * 20F * PRECIPITATION_PARTICLE_EFFECT_RATE*/; i++) {
+						BlockPos pos = new BlockPos(
+								entP.getPosX() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2),
+								entP.getPosY() - 5 + rand.nextInt(10),
+								entP.getPosZ() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2));
 
-								spawnCount++;
-								if (spawnCount >= spawnNeed) {
-									break;
-								}
+						if (WeatherUtilEntity.getDistanceSqEntToPos(entP, pos) < closeDistCutoff * closeDistCutoff) continue;
+
+						if (canPrecipitateAt(world, pos)) {
+							ParticleTexExtraRender snow = new ParticleTexExtraRender((ClientWorld) entP.world, pos.getX(), pos.getY(), pos.getZ(),
+									0D, 0D, 0D, ParticleRegistry.snow);
+
+							snow.setCanCollide(false);
+							//snow.setKillWhenUnderTopmostBlock(true);
+							snow.setTicksFadeOutMaxOnDeath(5);
+							//snow.setDontRenderUnderTopmostBlock(true);
+							snow.setExtraParticlesBaseAmount(10);
+							snow.killWhenFarFromCameraAtLeast = 20;
+
+							//snow.setMotionY(-0.1D);
+							//snow.setScale(0.3F);
+							snow.setScale(1.0F * 0.15F);
+							snow.setGravity(0.1F);
+							snow.windWeight = 0.2F;
+							snow.setMaxAge(40);
+							snow.setFacePlayer(false);
+							snow.setTicksFadeInMax(5);
+							snow.setAlphaF(0);
+							snow.setTicksFadeOutMax(5);
+							//snow.setCanCollide(true);
+							//snow.setKillOnCollide(true);
+							snow.rotationYaw = snow.getWorld().rand.nextInt(360) - 180F;
+							snow.spawnAsWeatherEffect();
+
+							spawnCount++;
+							if (spawnCount >= spawnNeed) {
+								break;
 							}
+						}
+
+					}
+
+					float adjustAmountSmooth = 0;
+					if (weather.isSnowstorm()) {
+						adjustAmountSmooth = 1;
+					}
+
+					double sandstormParticleRateDebris = ConfigSand.Sandstorm_Particle_Debris_effect_rate;
+					double sandstormParticleRateDust = ConfigSand.Sandstorm_Particle_Dust_effect_rate;
+
+					Vector3d windForce = windMan.getWindForce();
+
+					Minecraft client = Minecraft.getInstance();
+					PlayerEntity player = client.player;
+					float adjustAmountSmooth75 = (adjustAmountSmooth * 8F) - 7F;
+
+
+					//extra dust
+					for (int i = 0; i < (adjustedRate * yetAnotherRateNumber * adjustAmountSmooth75 * sandstormParticleRateDust)/*adjustAmountSmooth * 20F * ConfigMisc.Particle_Precipitation_effect_rate*/; i++) {
+
+						BlockPos pos = new BlockPos(
+								player.getPosX() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2),
+								player.getPosY() - 2 + rand.nextInt(10),
+								player.getPosZ() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2));
+
+						if (WeatherUtilEntity.getDistanceSqEntToPos(entP, pos) < closeDistCutoff * closeDistCutoff) continue;
+
+						if (canPrecipitateAt(world, pos)) {
+							TextureAtlasSprite sprite = ParticleRegistry.cloud256;
+
+							ParticleSandstorm part = new ParticleSandstorm(world, pos.getX(),
+									pos.getY(),
+									pos.getZ(),
+									0, 0, 0, sprite);
+							particleBehavior.initParticle(part);
+
+							part.setMotionX(windForce.x);
+							part.setMotionZ(windForce.z);
+
+							part.setFacePlayer(false);
+							part.isTransparent = true;
+							part.rotationYaw = (float)rand.nextInt(360);
+							part.rotationPitch = (float)rand.nextInt(360);
+							part.setMaxAge(farSpawn ? 30 : 10);
+							part.setGravity(0.09F);
+							part.setAlphaF(0F);
+							float brightnessMulti = 1F - (rand.nextFloat() * 0.4F);
+							part.setColor(1F * brightnessMulti, 1F * brightnessMulti, 1F * brightnessMulti);
+							part.setScale(40 * 0.15F);
+							part.setScale(30 * 0.15F);
+							part.aboveGroundHeight = 0.2D;
+
+							part.setKillOnCollide(true);
+
+							part.windWeight = 1F;
+
+							windMan.applyWindForceNew(part, 1F / 5F, 0.5F);
+
+							particleBehavior.particles.add(part);
+							//ClientTickHandler.weatherManager.addWeatheredParticle(part);
+							part.spawnAsWeatherEffect();
+
 
 						}
 					}
-
 				}
 			}
 
@@ -837,7 +926,8 @@ public class SceneEnhancer implements Runnable {
 				}
 			}
     	} catch (Exception ex) {
-    		ex.printStackTrace();
+    		//CMEs occur, its fine
+    		//ex.printStackTrace();
     	}
 
         spawnQueue.clear();
@@ -1130,14 +1220,16 @@ public class SceneEnhancer implements Runnable {
 		ClientTickHandler.checkClientWeather();
 		ClientWeather weather = ClientWeather.get();
 
+		boolean farSpawn = Minecraft.getInstance().player.isSpectator() || !isPlayerOutside;
+
 		//TODO: temp, rewire this
 		float adjustAmountSmooth = 0;
 		if (weather.isSandstorm()) {
-			adjustAmountSmooth = 1;
+			adjustAmountSmooth = 1 * fogAdjuster.getLerpAmount();
 		}
 
 		//enhance the scene further with particles around player, check for sandstorm to account for pocket sand modifying adjustAmountTarget
-		if (adjustAmountSmooth > 0.75F/* && sandstorm != null*/) {
+		if (adjustAmountSmooth > 0.25F/* && sandstorm != null*/) {
 
 			Vector3d windForce = windMan.getWindForce();
 
@@ -1148,6 +1240,10 @@ public class SceneEnhancer implements Runnable {
 			double sandstormParticleRateDust = ConfigSand.Sandstorm_Particle_Dust_effect_rate;
 
 			float adjustAmountSmooth75 = (adjustAmountSmooth * 8F) - 7F;
+
+			if (farSpawn) {
+				adjustAmountSmooth75 *= 0.1F;
+			}
 
 			//extra dust
 			for (int i = 0; i < ((float)30 * adjustAmountSmooth75 * sandstormParticleRateDust)/*adjustAmountSmooth * 20F * ConfigMisc.Particle_Precipitation_effect_rate*/; i++) {

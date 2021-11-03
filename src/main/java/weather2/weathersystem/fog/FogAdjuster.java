@@ -3,13 +3,16 @@ package weather2.weathersystem.fog;
 import CoroUtil.util.CoroUtilMisc;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.FogRenderer;
+import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.util.math.MathHelper;
 import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.client.event.EntityViewRenderEvent;
 import weather2.ClientTickHandler;
 import weather2.ClientWeather;
 import weather2.client.SceneEnhancer;
+import weather2.util.WeatherUtilEntity;
 
 public class FogAdjuster {
 
@@ -25,6 +28,9 @@ public class FogAdjuster {
 
     private float lerpAmount = 0;
 
+    //reinit fog values when changes
+    private boolean useFarFog = false;
+
     /**
      *
      * should also tick the intensity value, smoothly, make sure to use partialTicks for everything
@@ -38,20 +44,39 @@ public class FogAdjuster {
 
 
     public FogAdjuster() {
-        initProfiles();
-    }
-
-    public void initProfiles() {
-        fogHeatwave = new FogProfile(new Vector3f(0.5F, 0.2F, 0.1F), 0, 75, GlStateManager.FogMode.LINEAR);
-        fogSandstorm = new FogProfile(new Vector3f(0.7F, 0.5F, 0.2F), 0, 12, GlStateManager.FogMode.LINEAR);
-        fogSnowstorm = new FogProfile(new Vector3f(0.7F, 0.7F, 0.7F), 0, 7, GlStateManager.FogMode.LINEAR);
-        fogVanilla = new FogProfile(new Vector3f(0.3F, 0.3F, 1F), 0, 7, GlStateManager.FogMode.LINEAR);
+        initProfiles(false);
         prevProfile = fogVanilla;
         activeProfile = fogVanilla;
     }
 
+    public void initProfiles(boolean spectator) {
+
+        float distAmp = 1F;
+        if (spectator) {
+            distAmp = 4F;
+        }
+        fogHeatwave = new FogProfile(new Vector3f(0.5F, 0.2F, 0.1F), 0, 75 * distAmp, GlStateManager.FogMode.LINEAR);
+        fogSandstorm = new FogProfile(new Vector3f(0.7F, 0.5F, 0.2F), 0, 18 * distAmp, GlStateManager.FogMode.LINEAR);
+        fogSnowstorm = new FogProfile(new Vector3f(0.7F, 0.7F, 0.7F), 0, 20 * distAmp, GlStateManager.FogMode.LINEAR);
+        fogVanilla = new FogProfile(new Vector3f(-1F, -1F, -1F), -1, -1, GlStateManager.FogMode.LINEAR);
+    }
+
     public void tickGame(ClientWeather weather) {
         updateWeatherState();
+
+        //only adjust when the active transition is complete
+        if (lerpAmount == 0 || lerpAmount == 1) {
+            PlayerEntity player = Minecraft.getInstance().player;
+            boolean playerOutside = SceneEnhancer.isPlayerOutside;
+            boolean setFogFar = !playerOutside || player.isSpectator();
+            if (player != null) {
+                if ((setFogFar && !useFarFog) || !setFogFar && useFarFog) {
+                    initProfiles(setFogFar);
+                    //System.out.println("set to far mode?: " + setFogFar);
+                }
+                useFarFog = setFogFar;
+            }
+        }
 
         lerpAmount = CoroUtilMisc.adjVal(lerpAmount, 1F, 0.01F);
 
@@ -126,6 +151,10 @@ public class FogAdjuster {
         prevProfile = activeProfile;
         activeProfile = fogVanilla;
         lerpAmount = 0;
+    }
+
+    public float getLerpAmount() {
+        return lerpAmount;
     }
 
     public boolean isFogOverriding() {

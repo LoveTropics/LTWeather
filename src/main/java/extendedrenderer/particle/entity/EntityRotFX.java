@@ -536,7 +536,7 @@ public class EntityRotFX extends SpriteTexturedParticle
 	}
 	
 	public boolean isCollided() {
-		return this.onGround;
+		return this.onGround || isCollidedHorizontally;
 	}
 	
 	public double getDistance(double x, double y, double z)

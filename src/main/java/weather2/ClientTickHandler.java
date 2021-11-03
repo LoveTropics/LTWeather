@@ -152,11 +152,12 @@ public class ClientTickHandler
 
     	Minecraft mc = Minecraft.getInstance();
 
-		if (particleManagerExtended == null) {
+    	if (particleManagerExtended == null) {
 			particleManagerExtended = new ParticleManagerExtended(mc.world, mc.textureManager);
 		} else {
 			particleManagerExtended.clearEffects((ClientWorld) world);
 		}
+
 		//((IReloadableResourceManager)mc.getResourceManager()).addReloadListener(particleManagerExtended);
     }
 

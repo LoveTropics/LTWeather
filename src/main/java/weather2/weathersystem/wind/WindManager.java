@@ -27,7 +27,7 @@ public class WindManager {
 	public int windGustEventTimeRand = 60;
 	public float chanceOfWindGustEvent = 0.5F;
 
-	public static boolean FORCE_ON_DEBUG_TESTING = true;
+	public static boolean FORCE_ON_DEBUG_TESTING = false;
 	
 	public WindManager(WeatherManager parManager) {
 		manager = parManager;
@@ -123,6 +123,12 @@ public class WindManager {
 			windSpeedGlobal = 0.8F;
 			chanceOfWindGustEvent = 0;
 			chanceOfWindGustEvent = 0.5F;
+		}
+
+		//MORE TEST
+		if (!world.isRemote) {
+			//windAngleGlobal += 0.25F;
+			//chanceOfWindGustEvent = 0;
 		}
 
 		if (windAngleGlobal < -180) {

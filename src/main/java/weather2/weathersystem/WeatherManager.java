@@ -38,26 +38,6 @@ public abstract class WeatherManager {
 					((WeatherManagerServer)this).syncStormRemove(so);
 				} else {
 
-					/*if (getWorld().isRemote && so.ticksSinceLastPacketReceived > 20*60) {
-						Weather.dbg("WARNING!!! - detected no packets received in last 60 seconds for storm ID: " + so.ID + " this is an ongoing bug, force removing storm on client side");
-						removeStormObject(so.ID);
-
-						//if it failed still
-						if (!so.isDead) {
-							for (int ii = 0; ii < listStormObjects.size(); ii++) {
-								StormObject so2 = listStormObjects.get(ii);
-								if (so2 == so) {
-									Weather.dbg("second attempt removal via list iteration");
-									so2.remove();
-									listStormObjects.remove(so2);
-									lookupStormObjectsByID.remove(so2.ID);
-									lookupStormObjectsByLayer.get(so2.layer).remove(so2);
-								}
-							}
-
-						}
-					} else {*/
-
 					if (!so.isDead) {
 						so.tick();
 					} else {
@@ -65,17 +45,9 @@ public abstract class WeatherManager {
 							Weather.dbg("WARNING!!! - detected isDead storm object still in client side list, had to remove storm object with ID " + so.ID + " from client side, wasnt properly isDead via main channels");
 							removeStormObject(so.ID);
 						}
-						//Weather.dbg("client storm is dead and still in list, bug?");
 					}
-
-					//}
 				}
 			}
-
-			//tick volcanos
-			/*for (int i = 0; i < getVolcanoObjects().size(); i++) {
-				getVolcanoObjects().get(i).tick();
-			}*/
 
 			//tick wind
 			wind.tick(getWorld());
