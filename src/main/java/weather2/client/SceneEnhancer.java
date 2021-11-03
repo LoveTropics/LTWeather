@@ -123,10 +123,17 @@ public class SceneEnhancer implements Runnable {
 				reset();
 			}
 
+			WeatherManagerClient weatherMan = ClientTickHandler.weatherManager;
+			if (weatherMan == null) return;
+			WindManager windMan = weatherMan.getWindManager();
+			if (windMan == null) return;
+
 			ClientTickHandler.checkClientWeather();
 			ClientWeather weather = ClientWeather.get();
 
-			tryParticleSpawning();
+			if (weather.hasWeather() || windMan.getWindSpeed() > 0) {
+				tryParticleSpawning();
+			}
 
 			if (weather.hasWeather()) {
 				tickParticlePrecipitation();
@@ -946,7 +953,7 @@ public class SceneEnhancer implements Runnable {
     	PlayerEntity player = Minecraft.getInstance().player;
         WeatherManagerClient manager = ClientTickHandler.weatherManager;
 
-        if (worldRef == null || player == null || manager == null || manager.wind == null)
+        if (worldRef == null || player == null || manager == null || manager.wind == null || manager.wind.getWindSpeed() == 0)
         {
         	try {
         		Thread.sleep(1000L);
