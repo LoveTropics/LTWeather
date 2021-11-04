@@ -71,8 +71,8 @@ public class FogAdjuster {
         if (lerpAmount == 0 || lerpAmount == 1) {
             PlayerEntity player = Minecraft.getInstance().player;
             //use non cached version of isPlayerOutside to fix data mismatch that is timing crucial here
-            //boolean isPlayerOutside = WeatherUtilEntity.isEntityOutside(player);
-            boolean playerOutside = SceneEnhancer.isPlayerOutside || player.isInWater();
+            boolean isPlayerOutside = WeatherUtilEntity.isEntityOutside(player);
+            boolean playerOutside = isPlayerOutside || player.isInWater();
             boolean setFogFar = !playerOutside || player.isSpectator();
             /*System.out.println("set to far mode?: " + setFogFar);
             System.out.println("playerOutside: " + SceneEnhancer.isPlayerOutside);

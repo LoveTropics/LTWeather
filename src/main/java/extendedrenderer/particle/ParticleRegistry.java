@@ -53,6 +53,7 @@ public class ParticleRegistry {
 	public static List<TextureAtlasSprite> listFish = new ArrayList<>();
 	//public static List<TextureAtlasSprite> listSeaweed = new ArrayList<>();
 	public static TextureAtlasSprite grass;
+	public static TextureAtlasSprite hail;
 
 	@SubscribeEvent
 	@OnlyIn(Dist.CLIENT)
@@ -117,6 +118,7 @@ public class ParticleRegistry {
 		}*/
 		//used indirectly not via reference
 		event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/grass"));
+		event.addSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/hail"));
 	}
 
 	@SubscribeEvent
@@ -168,6 +170,7 @@ public class ParticleRegistry {
 		}*/
 		//used indirectly not via reference
 		grass = event.getMap().getSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/grass"));
+		hail = event.getMap().getSprite(new ResourceLocation(ExtendedRenderer.modid + ":particles/hail"));
 
 		//TODO: 1.14 uncomment
 		/*if (RotatingParticleManager.useShaders) {

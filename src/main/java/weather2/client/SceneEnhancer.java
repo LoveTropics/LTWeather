@@ -136,12 +136,12 @@ public class SceneEnhancer implements Runnable {
 			ClientTickHandler.checkClientWeather();
 			ClientWeather weather = ClientWeather.get();
 
-			WeatherEventType curWeather = getLastWeatherState();
+			WeatherEventType curWeather = getWeatherState();
 			if (curWeather != lastWeatherType) {
 				System.out.println("new weather changed to: " + curWeather);
 				particleRateLerp = 0;
 			}
-			lastWeatherType = getLastWeatherState();
+			lastWeatherType = getWeatherState();
 			if (particleRateLerp < particleRateLerpMax) {
 				particleRateLerp++;
 			}
@@ -561,6 +561,86 @@ public class SceneEnhancer implements Runnable {
 							}
 						}
 					}
+
+					spawnCount = 0;
+					spawnNeed = 25;
+
+                    if (getWeatherState() == WeatherEventType.HAIL && rainParticle && spawnNeed > 0) {
+                        for (int i = 0; i < safetyCutout; i++) {
+                            BlockPos pos = new BlockPos(
+                                    entP.getPosX() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2),
+                                    entP.getPosY() - 5 + rand.nextInt(25),
+                                    entP.getPosZ() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2));
+
+                            //EntityRenderer.addRainParticles doesnt actually use isRainingAt,
+                            //switching to match what that method does to improve consistancy and tough as nails compat
+                            if (canPrecipitateAt(world, pos)/*world.isRainingAt(pos)*/) {
+                                ParticleTexExtraRender rain = new ParticleTexExtraRender((ClientWorld) entP.world,
+                                        pos.getX(),
+                                        pos.getY(),
+                                        pos.getZ(),
+                                        0D, 0D, 0D, ParticleRegistry.hail);
+                                //rain.setCanCollide(true);
+                                //rain.setKillOnCollide(true);
+                                rain.setKillWhenUnderTopmostBlock(true);
+                                rain.setCanCollide(false);
+                                rain.setKillOnCollide(true);
+                                rain.killWhenUnderCameraAtLeast = 5;
+                                rain.setTicksFadeOutMaxOnDeath(5);
+                                rain.setDontRenderUnderTopmostBlock(true);
+                                rain.setExtraParticlesBaseAmount(1);
+                                rain.noExtraParticles = true;
+                                rain.fastLight = true;
+                                rain.setSlantParticleToWind(true);
+                                rain.windWeight = 50F;
+
+                                //old slanty rain way
+                                rain.setFacePlayer(false);
+
+                                //rain.setFacePlayer(true);
+                                rain.setScale(1F * 0.15F);
+                                rain.isTransparent = true;
+                                rain.setGravity(5.5F);
+                                //rain.isTransparent = true;
+                                rain.setMaxAge(50);
+                                //opted to leave the popin for rain, its not as bad as snow, and using fade in causes less rain visual overall
+                                rain.setTicksFadeInMax(5);
+                                rain.setTicksFadeInMax(5);
+                                rain.setTicksFadeOutMax(5);
+                                rain.setTicksFadeOutMaxOnDeath(5);
+                                //float alpha = ((float)fadeInTimer / (float)fadeInTimerMax);
+
+                                rain.setFullAlphaTarget(1F);
+                                rain.setAlphaF(0);
+
+                                rain.rotationYaw = rain.getWorld().rand.nextInt(360) - 180F;
+                                rain.setMotionY(-0.5D/*-5D - (entP.world.rand.nextInt(5) * -1D)*/);
+
+                                //windMan.applyWindForceNew(rain, 10F, 0.5F);
+
+                                if (weather.getRainType() == RainType.ACID) {
+                                    rain.particleRed = acidRainRed;
+                                    rain.particleGreen = acidRainGreen;
+                                    rain.particleBlue = acidRainBlue;
+                                } else {
+                                    rain.particleRed = vanillaRainRed;
+                                    rain.particleGreen = vanillaRainGreen;
+                                    rain.particleBlue = vanillaRainBlue;
+                                }
+
+								rain.particleRed = 0.9F;
+								rain.particleGreen = 0.9F;
+								rain.particleBlue = 0.9F;
+
+                                rain.spawnAsWeatherEffect();
+
+                                spawnCount++;
+                                if (spawnCount >= spawnNeed) {
+                                    break;
+                                }
+                            }
+                        }
+                    }
 
 					//TODO: make ground splash and downfall use spawnNeed var style design
 
@@ -1441,7 +1521,7 @@ public class SceneEnhancer implements Runnable {
 		return fogAdjuster;
 	}
 
-	public static WeatherEventType getLastWeatherState() {
+	public static WeatherEventType getWeatherState() {
 		ClientWeather clientWeather = ClientWeather.get();
 		if (clientWeather.isSandstorm()) {
 			return WeatherEventType.SANDSTORM;
@@ -1453,6 +1533,8 @@ public class SceneEnhancer implements Runnable {
 			return WeatherEventType.ACID_RAIN;
 		} else if (clientWeather.getRainAmount() > 0 && clientWeather.getRainType() == RainType.NORMAL) {
 			return WeatherEventType.HEAVY_RAIN;
+		} else if (clientWeather.getRainAmount() > 0 && clientWeather.getRainType() == RainType.HAIL) {
+			return WeatherEventType.HAIL;
 		} else {
 			return null;
 		}
