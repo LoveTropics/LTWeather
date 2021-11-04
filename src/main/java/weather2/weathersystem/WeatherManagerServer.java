@@ -6,6 +6,7 @@ import com.lovetropics.minigames.common.core.game.weather.StormState;
 import com.lovetropics.minigames.common.core.game.weather.WeatherController;
 import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
 import it.unimi.dsi.fastutil.longs.Long2ObjectLinkedOpenHashMap;
+import net.minecraft.block.Block;
 import net.minecraft.block.Blocks;
 import net.minecraft.nbt.CompoundNBT;
 import net.minecraft.util.math.BlockPos;
@@ -51,9 +52,9 @@ public class WeatherManagerServer extends WeatherManager {
 			StormState snowstorm = controller.getSnowstorm();
 			StormState sandstorm = controller.getSandstorm();
 			if (snowstorm != null) {
-				tickSnowstorm(snowstorm);
+				tickStormBlockBuildup(snowstorm, Blocks.SNOW);
 			} else if (sandstorm != null) {
-				tickSandstorm(sandstorm);
+				tickStormBlockBuildup(sandstorm, WeatherBlocks.blockSandLayer);
 			}
 		}
 
@@ -67,22 +68,15 @@ public class WeatherManagerServer extends WeatherManager {
 		}
 	}
 
-	public void tickSnowstorm(StormState snowstorm) {
-
+	public void tickStormBlockBuildup(StormState stormState, Block block) {
 		World world = getWorld();
 		WindManager windMan = getWindManager();
 		Random rand = world.rand;
 
 		float angle = windMan.getWindAngle();
 
-		int delay = snowstorm.getBuildupTickRate();
-
-		if (world.getGameTime() % delay == 0) {
-			//TODO: switch to AT when not using borked dev env
-			Long2ObjectLinkedOpenHashMap<ChunkHolder> loadedChunksImmutable = ObfuscationReflectionHelper.getPrivateValue(ChunkManager.class, ((ServerWorld) world).getChunkProvider().chunkManager, "immutableLoadedChunks");
-
-			//List<ChunkHolder> list = Lists.newArrayList(((ServerWorld)world).getChunkProvider().chunkManager.getLoadedChunksIterable());
-			List<ChunkHolder> list = Lists.newArrayList(Iterables.unmodifiableIterable(loadedChunksImmutable.values()));
+		if (world.getGameTime() % stormState.getBuildupTickRate() == 0) {
+			List<ChunkHolder> list = Lists.newArrayList(((ServerWorld)world).getChunkProvider().chunkManager.getLoadedChunksIterable());
 			Collections.shuffle(list);
 			list.forEach((p_241099_7_) -> {
 				Optional<Chunk> optional = p_241099_7_.getTickingFuture().getNow(ChunkHolder.UNLOADED_CHUNK).left();
@@ -91,40 +85,7 @@ public class WeatherManagerServer extends WeatherManager {
 						BlockPos blockPos = new BlockPos((optional.get().getPos().x * 16) + rand.nextInt(16), 0, (optional.get().getPos().z * 16) + rand.nextInt(16));
 						int y = WeatherUtilBlock.getPrecipitationHeightSafe(world, blockPos).getY();
 						Vector3d pos = new Vector3d(blockPos.getX(), y, blockPos.getZ());
-						int maxBlockStackingAllowed = snowstorm.getMaxStackable();
-						WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, Blocks.SNOW, maxBlockStackingAllowed);
-					}
-				}
-			});
-		}
-	}
-
-	public void tickSandstorm(StormState sandstorm) {
-
-		World world = getWorld();
-		WindManager windMan = getWindManager();
-		Random rand = world.rand;
-
-		float angle = windMan.getWindAngle();
-
-		int delay = sandstorm.getBuildupTickRate();
-
-		if (world.getGameTime() % delay == 0) {
-			//TODO: switch to AT when not using borked dev env
-			Long2ObjectLinkedOpenHashMap<ChunkHolder> loadedChunksImmutable = ObfuscationReflectionHelper.getPrivateValue(ChunkManager.class, ((ServerWorld) world).getChunkProvider().chunkManager, "immutableLoadedChunks");
-
-			//List<ChunkHolder> list = Lists.newArrayList(((ServerWorld)world).getChunkProvider().chunkManager.getLoadedChunksIterable());
-			List<ChunkHolder> list = Lists.newArrayList(Iterables.unmodifiableIterable(loadedChunksImmutable.values()));
-			Collections.shuffle(list);
-			list.forEach((p_241099_7_) -> {
-				Optional<Chunk> optional = p_241099_7_.getTickingFuture().getNow(ChunkHolder.UNLOADED_CHUNK).left();
-				if (optional.isPresent()) {
-					for (int i = 0; i < 10; i++) {
-						BlockPos blockPos = new BlockPos((optional.get().getPos().x * 16) + rand.nextInt(16), 0, (optional.get().getPos().z * 16) + rand.nextInt(16));
-						int y = WeatherUtilBlock.getPrecipitationHeightSafe(world, blockPos).getY();
-						Vector3d pos = new Vector3d(blockPos.getX(), y, blockPos.getZ());
-						int maxBlockStackingAllowed = sandstorm.getMaxStackable();
-						WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, WeatherBlocks.blockSandLayer, maxBlockStackingAllowed);
+						WeatherUtilBlock.fillAgainstWallSmoothly(world, pos, angle, 15, 2, block, stormState.getMaxStackable());
 					}
 				}
 			});
