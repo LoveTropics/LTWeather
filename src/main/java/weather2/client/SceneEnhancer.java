@@ -222,7 +222,10 @@ public class SceneEnhancer implements Runnable {
 
 		            		long lastPlayTime = 0;
 
-
+							float soundMuffle = 0.6F;
+							if (getWeatherState() == WeatherEventType.SANDSTORM || getWeatherState() == WeatherEventType.SNOWSTORM) {
+								soundMuffle = 0.15F;
+							}
 
 		            		if (soundTimeLocations.containsKey(cCor)) {
 		            			lastPlayTime = soundTimeLocations.get(cCor);
@@ -236,7 +239,7 @@ public class SceneEnhancer implements Runnable {
 										soundTimeLocations.put(cCor, System.currentTimeMillis() + 12000 + rand.nextInt(50));
 										//client.getSoundHandler().playSound(Weather.modID + ":wind_calmfade", cCor.getPosX(), cCor.getPosY(), cCor.getPosZ(), (float)(windSpeed * 4F * ConfigMisc.volWindTreesScale), 0.70F + (rand.nextFloat() * 0.1F));
 										//client.world.playSound(cCor.getPosX(), cCor.getPosY(), cCor.getPosZ(), Weather.modID + ":env.wind_calmfade", (float)(windSpeed * 4F * ConfigMisc.volWindTreesScale), 0.70F + (rand.nextFloat() * 0.1F), false);
-										client.world.playSound(cCor, SoundRegistry.get("env.wind_calmfade"), SoundCategory.AMBIENT, (float)(windSpeed * 2F), 0.70F + (rand.nextFloat() * 0.1F), false);
+										client.world.playSound(cCor, SoundRegistry.get("env.wind_calmfade"), SoundCategory.AMBIENT, (float)(windSpeed * 2F) * soundMuffle, 0.70F + (rand.nextFloat() * 0.1F), false);
 										//System.out.println("play leaves sound at: " + cCor.getPosX() + " - " + cCor.getPosY() + " - " + cCor.getPosZ() + " - windSpeed: " + windSpeed);
 									} else {
 										windSpeed = WindReader.getWindSpeed(client.world);
@@ -245,7 +248,7 @@ public class SceneEnhancer implements Runnable {
 											soundTimeLocations.put(cCor, System.currentTimeMillis() + 12000 + rand.nextInt(50));
 											//client.getSoundHandler().playSound(Weather.modID + ":wind_calmfade", cCor.getPosX(), cCor.getPosY(), cCor.getPosZ(), (float)(windSpeed * 2F * ConfigMisc.volWindTreesScale), 0.70F + (rand.nextFloat() * 0.1F));
 											//client.world.playSound(cCor.getPosX(), cCor.getPosY(), cCor.getPosZ(), Weather.modID + ":env.wind_calmfade", (float)(windSpeed * 2F * ConfigMisc.volWindTreesScale), 0.70F + (rand.nextFloat() * 0.1F), false);
-											client.world.playSound(cCor, SoundRegistry.get("env.wind_calmfade"), SoundCategory.AMBIENT, windSpeed, 0.70F + (rand.nextFloat() * 0.1F), false);
+											client.world.playSound(cCor, SoundRegistry.get("env.wind_calmfade"), SoundCategory.AMBIENT, windSpeed * soundMuffle, 0.70F + (rand.nextFloat() * 0.1F), false);
 										}
 											//System.out.println("play leaves sound at: " + cCor.getPosX() + " - " + cCor.getPosY() + " - " + cCor.getPosZ() + " - windSpeed: " + windSpeed);
 										//}
@@ -976,6 +979,9 @@ public class SceneEnhancer implements Runnable {
 						}
 					}
 				}
+
+				//works for snowstorms too
+				tickSandstormSound();
 			}
 
 			boolean groundFire = ClientWeather.get().isHeatwave();
@@ -1510,6 +1516,32 @@ public class SceneEnhancer implements Runnable {
 
 
 				}
+			}
+		}
+
+		tickSandstormSound();
+	}
+
+	public static void tickSandstormSound() {
+		/**
+		 * dist + storm intensity
+		 * 0F - 1F
+		 *
+		 * 0 = low
+		 * 0.33 = med
+		 * 0.66 = high
+		 *
+		 * static sound volume, keep at player
+		 */
+
+		Minecraft mc = Minecraft.getInstance();
+		if (particleRateLerp > 0) {
+			if (particleRateLerp < 0.66F) {
+				tryPlayPlayerLockedSound(WeatherUtilSound.snd_sandstorm_low, 5, mc.player, 0.6F);
+			} else if (particleRateLerp < 0.85F) {
+				tryPlayPlayerLockedSound(WeatherUtilSound.snd_sandstorm_med, 4, mc.player, 0.6F);
+			} else {
+				tryPlayPlayerLockedSound(WeatherUtilSound.snd_sandstorm_high, 3, mc.player, 0.6F);
 			}
 		}
 	}
