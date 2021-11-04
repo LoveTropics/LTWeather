@@ -1,6 +1,7 @@
 package weather2.weathersystem.fog;
 
 import CoroUtil.util.CoroUtilMisc;
+import com.lovetropics.minigames.common.core.game.weather.WeatherEventType;
 import com.mojang.blaze3d.platform.GlStateManager;
 import com.mojang.blaze3d.systems.RenderSystem;
 import net.minecraft.client.Minecraft;
@@ -68,7 +69,7 @@ public class FogAdjuster {
         //System.out.println("isFogOverriding(): " + isFogOverriding());
 
         //only adjust when the active transition is complete
-        if (lerpAmount == 0 || lerpAmount == 1) {
+        if ((lerpAmount == 0 || lerpAmount == 1) && (SceneEnhancer.getWeatherState() == WeatherEventType.SANDSTORM || SceneEnhancer.getWeatherState() == WeatherEventType.SNOWSTORM)) {
             PlayerEntity player = Minecraft.getInstance().player;
             //use non cached version of isPlayerOutside to fix data mismatch that is timing crucial here
             boolean isPlayerOutside = WeatherUtilEntity.isEntityOutside(player);

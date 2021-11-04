@@ -859,7 +859,7 @@ public class SceneEnhancer implements Runnable {
 				if (farSpawn) {
 					safetyCutout = 20;
 					spawnAreaSize = 100;
-					yetAnotherRateNumber = 40;
+					yetAnotherRateNumber = 40 * getParticleFadeInLerpForNewWeatherState();
 				}
 
 				if (spawnNeed > 0) {
@@ -1341,14 +1341,13 @@ public class SceneEnhancer implements Runnable {
 
 		boolean farSpawn = Minecraft.getInstance().player.isSpectator() || !isPlayerOutside;
 
-		//TODO: temp, rewire this
-		float adjustAmountSmooth = 0;
-		if (weather.isSandstorm()) {
-			adjustAmountSmooth = 1 * getParticleFadeInLerpForNewWeatherState();
-		}
+		float adjustAmountSmooth = 1;
+
 
 		//enhance the scene further with particles around player, check for sandstorm to account for pocket sand modifying adjustAmountTarget
 		if (adjustAmountSmooth > 0.25F/* && sandstorm != null*/) {
+
+
 
 			Vector3d windForce = windMan.getWindForce();
 
@@ -1361,11 +1360,19 @@ public class SceneEnhancer implements Runnable {
 			float adjustAmountSmooth75 = (adjustAmountSmooth * 8F) - 7F;
 
 			if (farSpawn) {
-				adjustAmountSmooth75 *= 0.1F;
+				adjustAmountSmooth75 *= 0.3F;
 			}
 
+			if (Minecraft.getInstance().gameSettings.particles == ParticleStatus.DECREASED) {
+				adjustAmountSmooth75 *= 0.5F;
+			} else if (Minecraft.getInstance().gameSettings.particles == ParticleStatus.MINIMAL) {
+				adjustAmountSmooth75 *= 0.25F;
+			}
+
+			adjustAmountSmooth75 *= getParticleFadeInLerpForNewWeatherState();
+
 			//extra dust
-			for (int i = 0; i < ((float)30 * adjustAmountSmooth75 * sandstormParticleRateDust)/*adjustAmountSmooth * 20F * ConfigMisc.Particle_Precipitation_effect_rate*/; i++) {
+			for (int i = 0; i < ((float)60 * adjustAmountSmooth75 * sandstormParticleRateDust)/*adjustAmountSmooth * 20F * ConfigMisc.Particle_Precipitation_effect_rate*/; i++) {
 
 				BlockPos pos = new BlockPos(
 						player.getPosX() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2),
