@@ -3,8 +3,8 @@ package weather2.client;
 import CoroUtil.util.ChunkCoordinatesBlock;
 import CoroUtil.util.CoroUtilBlock;
 import CoroUtil.util.CoroUtilEntOrParticle;
-import CoroUtil.util.CoroUtilMisc;
 import com.lovetropics.minigames.common.core.game.weather.RainType;
+import com.lovetropics.minigames.common.core.game.weather.WeatherEventType;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.behavior.ParticleBehaviorSandstorm;
 import extendedrenderer.particle.entity.EntityRotFX;
@@ -90,6 +90,11 @@ public class SceneEnhancer implements Runnable {
 
 	public static boolean isPlayerOutside = true;
 
+	public static WeatherEventType lastWeatherType = null;
+
+	public static int particleRateLerp = 0;
+	public static int particleRateLerpMax = 100;
+
 	public SceneEnhancer() {
 		listPosRandom.clear();
 		listPosRandom.add(new BlockPos(0, -1, 0));
@@ -130,6 +135,16 @@ public class SceneEnhancer implements Runnable {
 
 			ClientTickHandler.checkClientWeather();
 			ClientWeather weather = ClientWeather.get();
+
+			WeatherEventType curWeather = getLastWeatherState();
+			if (curWeather != lastWeatherType) {
+				System.out.println("new weather changed to: " + curWeather);
+				particleRateLerp = 0;
+			}
+			lastWeatherType = getLastWeatherState();
+			if (particleRateLerp < particleRateLerpMax) {
+				particleRateLerp++;
+			}
 
 			if (weather.hasWeather() || windMan.getWindSpeed() > 0) {
 				tryParticleSpawning();
@@ -754,7 +769,7 @@ public class SceneEnhancer implements Runnable {
 				int safetyCutout = 60;
 				int spawnAreaSize = 20;
 				double closeDistCutoff = 7D;
-				float yetAnotherRateNumber = 120 * fogAdjuster.getLerpAmount();
+				float yetAnotherRateNumber = 120 * getParticleFadeInLerpForNewWeatherState();
 				boolean farSpawn = Minecraft.getInstance().player.isSpectator() || !isPlayerOutside;
 				if (farSpawn) {
 					safetyCutout = 20;
@@ -766,6 +781,12 @@ public class SceneEnhancer implements Runnable {
 
 					if (adjustedRate == 2F) {
 						adjustedRate = 1F;
+					}
+
+					if (getParticleFadeInLerpForNewWeatherState() > 0.5F) {
+						adjustedRate *= (getParticleFadeInLerpForNewWeatherState() - 0.5F) * 2F;
+					} else {
+						adjustedRate = 0;
 					}
 
 					//snow
@@ -1235,7 +1256,7 @@ public class SceneEnhancer implements Runnable {
 		//TODO: temp, rewire this
 		float adjustAmountSmooth = 0;
 		if (weather.isSandstorm()) {
-			adjustAmountSmooth = 1 * fogAdjuster.getLerpAmount();
+			adjustAmountSmooth = 1 * getParticleFadeInLerpForNewWeatherState();
 		}
 
 		//enhance the scene further with particles around player, check for sandstorm to account for pocket sand modifying adjustAmountTarget
@@ -1418,5 +1439,26 @@ public class SceneEnhancer implements Runnable {
 			fogAdjuster = new FogAdjuster();
 		}
 		return fogAdjuster;
+	}
+
+	public static WeatherEventType getLastWeatherState() {
+		ClientWeather clientWeather = ClientWeather.get();
+		if (clientWeather.isSandstorm()) {
+			return WeatherEventType.SANDSTORM;
+		} else if (clientWeather.isSnowstorm()) {
+			return WeatherEventType.SNOWSTORM;
+		} else if (clientWeather.isHeatwave()) {
+			return WeatherEventType.HEATWAVE;
+		} else if (clientWeather.getRainAmount() > 0 && clientWeather.getRainType() == RainType.ACID) {
+			return WeatherEventType.ACID_RAIN;
+		} else if (clientWeather.getRainAmount() > 0 && clientWeather.getRainType() == RainType.NORMAL) {
+			return WeatherEventType.HEAVY_RAIN;
+		} else {
+			return null;
+		}
+	}
+
+	public static float getParticleFadeInLerpForNewWeatherState() {
+    	return (float)particleRateLerp / (float)particleRateLerpMax;
 	}
 }

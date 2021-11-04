@@ -64,15 +64,23 @@ public class FogAdjuster {
     public void tickGame(ClientWeather weather) {
         updateWeatherState();
 
+        //System.out.println("lerpAmount: " + lerpAmount);
+        //System.out.println("isFogOverriding(): " + isFogOverriding());
+
         //only adjust when the active transition is complete
         if (lerpAmount == 0 || lerpAmount == 1) {
             PlayerEntity player = Minecraft.getInstance().player;
-            boolean playerOutside = SceneEnhancer.isPlayerOutside;
+            //use non cached version of isPlayerOutside to fix data mismatch that is timing crucial here
+            //boolean isPlayerOutside = WeatherUtilEntity.isEntityOutside(player);
+            boolean playerOutside = SceneEnhancer.isPlayerOutside || player.isInWater();
             boolean setFogFar = !playerOutside || player.isSpectator();
+            /*System.out.println("set to far mode?: " + setFogFar);
+            System.out.println("playerOutside: " + SceneEnhancer.isPlayerOutside);
+            System.out.println("isInWater: " + player.isInWater());
+            System.out.println("setFogFar: " + setFogFar);*/
             if (player != null) {
                 if ((setFogFar && !useFarFog) || !setFogFar && useFarFog) {
                     initProfiles(setFogFar);
-                    //System.out.println("set to far mode?: " + setFogFar);
                 }
                 useFarFog = setFogFar;
             }
