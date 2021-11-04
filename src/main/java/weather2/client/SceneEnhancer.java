@@ -154,7 +154,9 @@ public class SceneEnhancer implements Runnable {
 				tickParticlePrecipitation();
 				trySoundPlaying();
 				tryWind(client.world);
-				tickSandstorm();
+				if (weather.isSandstorm()) {
+					tickSandstorm();
+				}
 			}
 
 			tickMisc();
