@@ -22,9 +22,9 @@ public class ParticleCrossSection extends ParticleTexFX {
 	public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
 
 		Vector3d Vector3d = renderInfo.getProjectedView();
-		float f = (float)(MathHelper.lerp((double)partialTicks, this.prevPosX, this.posX) - Vector3d.getX());
-		float f1 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - Vector3d.getY());
-		float f2 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - Vector3d.getZ());
+		float f = (float)(MathHelper.lerp(partialTicks, this.prevPosX, this.posX) - Vector3d.getX());
+		float f1 = (float)(MathHelper.lerp(partialTicks, this.prevPosY, this.posY) - Vector3d.getY());
+		float f2 = (float)(MathHelper.lerp(partialTicks, this.prevPosZ, this.posZ) - Vector3d.getZ());
 		Quaternion quaternion;
 		if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
 			quaternion = renderInfo.getRotation();
@@ -32,7 +32,6 @@ public class ParticleCrossSection extends ParticleTexFX {
 			// override rotations
 			quaternion = new Quaternion(0, 0, 0, 1);
 			if (facePlayerYaw) {
-				float wat = renderInfo.getYaw();
 				quaternion.multiply(Vector3f.YP.rotationDegrees(-renderInfo.getYaw()));
 			} else {
 				quaternion.multiply(Vector3f.YP.rotationDegrees(MathHelper.lerp(partialTicks, this.prevRotationYaw, rotationYaw)));
@@ -40,25 +39,24 @@ public class ParticleCrossSection extends ParticleTexFX {
 			quaternion.multiply(Vector3f.XP.rotationDegrees(MathHelper.lerp(partialTicks, this.prevRotationPitch, rotationPitch)));
 		}
 
-		Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
-		vector3f1.transform(quaternion);
-		Vector3f[] avector3f =
-				new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F),
+		Vector3f[] avector3f = new Vector3f[]{
+				new Vector3f(-1.0F, -1.0F, 0.0F),
 				new Vector3f(-1.0F, 1.0F, 0.0F),
 				new Vector3f(1.0F, 1.0F, 0.0F),
 				new Vector3f(1.0F, -1.0F, 0.0F)};
 
-		Vector3f[] avector3f2 =
-				new Vector3f[]{new Vector3f(0.0F, -1.0F, -1.0F),
+		Vector3f[] avector3f2 = new Vector3f[]{
+				new Vector3f(0.0F, -1.0F, -1.0F),
 				new Vector3f(0.0F, 1.0F, -1.0F),
 				new Vector3f(0.0F, 1.0F, 1.0F),
 				new Vector3f(0.0F, -1.0F, 1.0F)};
 
-		Vector3f[] avector3f3 =
-				new Vector3f[]{new Vector3f(-1.0F, 0.0F, -1.0F),
-						new Vector3f(-1.0F, 0.0F, 1.0F),
-						new Vector3f(1.0F, 0.0F, 1.0F),
-						new Vector3f(1.0F, 0.0F, -1.0F)};
+		Vector3f[] avector3f3 = new Vector3f[]{
+				new Vector3f(-1.0F, 0.0F, -1.0F),
+				new Vector3f(-1.0F, 0.0F, 1.0F),
+				new Vector3f(1.0F, 0.0F, 1.0F),
+				new Vector3f(1.0F, 0.0F, -1.0F)};
+
 		float f4 = this.getScale(partialTicks);
 
 		for(int i = 0; i < 4; ++i) {
@@ -87,14 +85,11 @@ public class ParticleCrossSection extends ParticleTexFX {
 		float f5 = this.getMinV();
 		float f6 = this.getMaxV();
 		int j = this.getBrightnessForRender(partialTicks);
-		//int j = 15728800;
 		if (j > 0) {
 			lastNonZeroBrightness = j;
 		} else {
 			j = lastNonZeroBrightness;
 		}
-		//TODO: temp to prevent downfall rendering black as it fades out
-		//j = 15728800;
 		buffer.pos(avector3f[0].getX(), avector3f[0].getY(), avector3f[0].getZ()).tex(f8, f6).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();
 		buffer.pos(avector3f[1].getX(), avector3f[1].getY(), avector3f[1].getZ()).tex(f8, f5).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();
 		buffer.pos(avector3f[2].getX(), avector3f[2].getY(), avector3f[2].getZ()).tex(f7, f5).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();

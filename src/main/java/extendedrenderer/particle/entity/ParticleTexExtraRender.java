@@ -157,23 +157,7 @@ public class ParticleTexExtraRender extends ParticleTexFX {
 				} else {
 					i = getLastNonZeroBrightness();
 				}
-				//i = 15728640;
-				//i = 0;
-				//int j = i >> 16 & 65535;
-				//int k = i & 65535;
 
-				//range between 0 and 240 for first value, second value always 0
-				//j = 240;
-				//k = 120;
-
-				/*int what = 13 << 20 | 15 << 4;
-				int what2 = what >> 16 & 65535;
-				int what3 = what & 65535;*/
-
-//		        Vector3f[] aVector3d = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
-
-		        Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
-		        vector3f1.transform(quaternion);
 		        Vector3f[] avector3f = new Vector3f[]{new Vector3f(-1.0F, -1.0F, 0.0F), new Vector3f(-1.0F, 1.0F, 0.0F), new Vector3f(1.0F, 1.0F, 0.0F), new Vector3f(1.0F, -1.0F, 0.0F)};
 		        float scale = this.getScale(partialTicks);
 
