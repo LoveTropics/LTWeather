@@ -99,6 +99,7 @@ public class EntityRotFX extends SpriteTexturedParticle
     public double bounceSpeedMaxAhead = 0.25D;
 
     public boolean spinFast = false;
+    public float spinFastRate = 10F;
     public boolean spinTowardsMotionDirection = false;
 
     private float ticksFadeInMax = 0;
@@ -303,15 +304,15 @@ public class EntityRotFX extends SpriteTexturedParticle
         }
 
         if (spinFast) {
-            this.rotationPitch += this.entityID % 2 == 0 ? 10 : -10;
-            this.rotationYaw += this.entityID % 2 == 0 ? -10 : 10;
+            this.rotationPitch += this.entityID % 2 == 0 ? spinFastRate : -spinFastRate;
+            this.rotationYaw += this.entityID % 2 == 0 ? -spinFastRate : spinFastRate;
         }
 
         float angleToMovement = (float) (Math.toDegrees(Math.atan2(motionX, motionZ)));
 
         if (spinTowardsMotionDirection) {
             this.rotationYaw = angleToMovement;
-            this.rotationPitch += 10;
+            this.rotationPitch += spinFastRate;
         }
 
         if (!fadingOut) {

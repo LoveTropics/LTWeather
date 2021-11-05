@@ -598,6 +598,8 @@ public class SceneEnhancer implements Runnable {
                                 rain.fastLight = true;
                                 rain.setSlantParticleToWind(true);
                                 rain.windWeight = 5F;
+                                rain.spinFast = true;
+                                rain.spinFastRate = 100F;
 
                                 //old slanty rain way
                                 rain.setFacePlayer(false);
