@@ -7,10 +7,7 @@ import com.lovetropics.minigames.common.core.game.weather.RainType;
 import com.lovetropics.minigames.common.core.game.weather.WeatherEventType;
 import extendedrenderer.particle.ParticleRegistry;
 import extendedrenderer.particle.behavior.ParticleBehaviorSandstorm;
-import extendedrenderer.particle.entity.EntityRotFX;
-import extendedrenderer.particle.entity.ParticleTexExtraRender;
-import extendedrenderer.particle.entity.ParticleTexFX;
-import extendedrenderer.particle.entity.ParticleTexLeafColor;
+import extendedrenderer.particle.entity.*;
 import net.minecraft.block.Block;
 import net.minecraft.block.BlockState;
 import net.minecraft.block.Blocks;
@@ -1430,7 +1427,7 @@ public class SceneEnhancer implements Runnable {
 				if (canPrecipitateAt(world, pos)) {
 					TextureAtlasSprite sprite = ParticleRegistry.tumbleweed;
 
-					ParticleSandstorm part = new ParticleSandstorm(world, pos.getX(),
+					ParticleCrossSection part = new ParticleCrossSection(world, pos.getX(),
 							pos.getY(),
 							pos.getZ(),
 							0, 0, 0, sprite);
@@ -1439,7 +1436,9 @@ public class SceneEnhancer implements Runnable {
 					part.setMotionX(windForce.x);
 					part.setMotionZ(windForce.z);
 
-					part.setFacePlayer(true);
+					part.setFacePlayer(false);
+					part.facePlayerYaw = false;
+					part.spinTowardsMotionDirection = true;
 					//part.spinFast = true;
 					part.isTransparent = true;
 					part.rotationYaw = (float)rand.nextInt(360);

@@ -31,62 +31,62 @@ import java.util.stream.Stream;
 @OnlyIn(Dist.CLIENT)
 public class EntityRotFX extends SpriteTexturedParticle
 {
-	protected static final IParticleRenderType SORTED_TRANSLUCENT = new IParticleRenderType() {
-		
-		@Override
-		public void beginRender(BufferBuilder p_217600_1_, TextureManager p_217600_2_) {
-			IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.beginRender(p_217600_1_, p_217600_2_);
-		}
-		
-		@Override
-		public void finishRender(Tessellator p_217599_1_) {
-			p_217599_1_.getBuffer().sortVertexData(0, 0, 0);
-			IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.finishRender(p_217599_1_);
-		}
+    protected static final IParticleRenderType SORTED_TRANSLUCENT = new IParticleRenderType() {
 
-		@Override
-		public String toString() {
-			return "PARTICLE_SHEET_SORTED_TRANSLUCENT";
-		}
-	};
+        @Override
+        public void beginRender(BufferBuilder p_217600_1_, TextureManager p_217600_2_) {
+            IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.beginRender(p_217600_1_, p_217600_2_);
+        }
+
+        @Override
+        public void finishRender(Tessellator p_217599_1_) {
+            p_217599_1_.getBuffer().sortVertexData(0, 0, 0);
+            IParticleRenderType.PARTICLE_SHEET_TRANSLUCENT.finishRender(p_217599_1_);
+        }
+
+        @Override
+        public String toString() {
+            return "PARTICLE_SHEET_SORTED_TRANSLUCENT";
+        }
+    };
     public boolean weatherEffect = false;
 
     public float spawnY = -1;
-    
+
     //this field and 2 methods below are for backwards compatibility with old particle system from the new icon based system
     public int particleTextureIndexInt = 0;
-    
+
     public float brightness = 0.7F;
-    
+
     public boolean callUpdateSuper = true;
     public boolean callUpdatePB = true;
-    
+
     public float renderRange = 128F;
-    
+
     //used in RotatingEffectRenderer to assist in solving some transparency ordering issues, eg, tornado funnel before clouds
     public int renderOrder = 0;
-    
+
     //not a real entity ID now, just used for making rendering of entities slightly unique
     private int entityID = 0;
-    
+
     public int debugID = 0;
-    
+
     public float prevRotationYaw;
     public float rotationYaw;
     public float prevRotationPitch;
     public float rotationPitch;
-    
+
     public float windWeight = 5;
     public boolean isTransparent = true;
-    
-    public boolean killOnCollide = false;
-	
-	public boolean facePlayer = false;
 
-	//facePlayer will override this
+    public boolean killOnCollide = false;
+
+    public boolean facePlayer = false;
+
+    //facePlayer will override this
     public boolean facePlayerYaw = false;
-	
-	public boolean vanillaMotionDampen = true;
+
+    public boolean vanillaMotionDampen = true;
 
     //for particle behaviors
     public double aboveGroundHeight = 4.5D;
@@ -99,6 +99,7 @@ public class EntityRotFX extends SpriteTexturedParticle
     public double bounceSpeedMaxAhead = 0.25D;
 
     public boolean spinFast = false;
+    public boolean spinTowardsMotionDirection = false;
 
     private float ticksFadeInMax = 0;
     private float ticksFadeOutMax = 0;
@@ -151,7 +152,7 @@ public class EntityRotFX extends SpriteTexturedParticle
     public Vector3f rotationAround = new Vector3f();
 
     //workaround for particles that are fading out while partially in the ground, keeps them rendering at previous brightness instead of 0
-    private int lastNonZeroBrightness = 15728640;
+    protected int lastNonZeroBrightness = 15728640;
 
     public EntityRotFX(ClientWorld par1World, double par2, double par4, double par6, double par8, double par10, double par12)
     {
@@ -159,7 +160,7 @@ public class EntityRotFX extends SpriteTexturedParticle
         setSize(0.3F, 0.3F);
         //this.isImmuneToFire = true;
         //this.setMaxAge(100);
-        
+
         this.entityID = par1World.rand.nextInt(100000);
 
         //rotation = new Quaternion();
@@ -215,45 +216,45 @@ public class EntityRotFX extends SpriteTexturedParticle
     public void setTicksFadeOutMax(float ticksFadeOutMax) {
         this.ticksFadeOutMax = ticksFadeOutMax;
     }
-    
+
     public int getParticleTextureIndex()
     {
         return this.particleTextureIndexInt;
     }
-    
+
     public void setMaxAge(int par) {
-    	maxAge = par;
+        maxAge = par;
     }
-    
+
     public float getAlphaF()
     {
         return this.particleAlpha;
     }
-    
+
     @Override
     public void setExpired() {
-    	super.setExpired();
+        super.setExpired();
     }
-    
+
     @Override
     public void tick() {
-    	super.tick();
-    	this.prevRotationPitch = this.rotationPitch;
-    	this.prevRotationYaw = this.rotationYaw;
+        super.tick();
+        this.prevRotationPitch = this.rotationPitch;
+        this.prevRotationYaw = this.rotationYaw;
 
         Entity ent = Minecraft.getInstance().getRenderViewEntity();
 
         //if (this.entityID % 400 == 0) System.out.println("tick time: " + this.worldObj.getGameTime());
-    	
-    	if (!isVanillaMotionDampen()) {
-    		//cancel motion dampening (which is basically air resistance)
-    		//keep this up to date with the inverse of whatever Particle.tick uses
-        	this.motionX /= 0.9800000190734863D;
+
+        if (!isVanillaMotionDampen()) {
+            //cancel motion dampening (which is basically air resistance)
+            //keep this up to date with the inverse of whatever Particle.tick uses
+            this.motionX /= 0.9800000190734863D;
             this.motionY /= 0.9800000190734863D;
             this.motionZ /= 0.9800000190734863D;
-    	}
+        }
 
-    	if (!this.isExpired && !fadingOut) {
+        if (!this.isExpired && !fadingOut) {
             if (killOnCollide) {
                 if (this.isCollided()) {
                     startDeath();
@@ -291,7 +292,7 @@ public class EntityRotFX extends SpriteTexturedParticle
             }
         }
 
-    	if (!collisionSpeedDampen) {
+        if (!collisionSpeedDampen) {
             //if (this.isCollided()) {
             if (this.onGround) {
                 this.motionX /= 0.699999988079071D;
@@ -302,6 +303,13 @@ public class EntityRotFX extends SpriteTexturedParticle
         if (spinFast) {
             this.rotationPitch += this.entityID % 2 == 0 ? 10 : -10;
             this.rotationYaw += this.entityID % 2 == 0 ? -10 : 10;
+        }
+
+        float angleToMovement = (float) (Math.toDegrees(Math.atan2(motionX, motionZ)));
+
+        if (spinTowardsMotionDirection) {
+            this.rotationYaw = angleToMovement;
+            this.rotationPitch += 10;
         }
 
         if (!fadingOut) {
@@ -319,10 +327,10 @@ public class EntityRotFX extends SpriteTexturedParticle
                 this.setAlphaF(getFullAlphaTarget());
             }
         } else {
-    	    if (ticksFadeOutCurOnDeath < ticksFadeOutMaxOnDeath) {
+            if (ticksFadeOutCurOnDeath < ticksFadeOutMaxOnDeath) {
                 ticksFadeOutCurOnDeath++;
             } else {
-    	        this.setExpired();
+                this.setExpired();
             }
             float val = 1F - (ticksFadeOutCurOnDeath / ticksFadeOutMaxOnDeath);
             //System.out.println(val);
@@ -412,17 +420,17 @@ public class EntityRotFX extends SpriteTexturedParticle
         // MC-12269 - fix particle being offset to the NW
         this.setPosition(posX, posY, posZ);
     }
-    
+
     public void setGravity(float par) {
-    	particleGravity = par;
+        particleGravity = par;
     }
-    
+
     public float maxRenderRange() {
-    	return renderRange;
+        return renderRange;
     }
 
     public void setScale(float parScale) {
-    	particleScale = parScale;
+        particleScale = parScale;
     }
 
     public Vector3f getPosition() {
@@ -440,144 +448,128 @@ public class EntityRotFX extends SpriteTexturedParticle
     }*/
 
     public float getScale() {
-    	return particleScale;
+        return particleScale;
     }
 
     public Vector3d getPos() {
         return new Vector3d(posX, posY, posZ);
     }
 
-	public double getPosX() {
-		return posX;
-	}
+    public double getPosX() {
+        return posX;
+    }
 
-	public void setPosX(double posX) {
-		this.posX = posX;
-	}
+    public void setPosX(double posX) {
+        this.posX = posX;
+    }
 
-	public double getPosY() {
-		return posY;
-	}
+    public double getPosY() {
+        return posY;
+    }
 
-	public void setPosY(double posY) {
-		this.posY = posY;
-	}
+    public void setPosY(double posY) {
+        this.posY = posY;
+    }
 
-	public double getPosZ() {
-		return posZ;
-	}
+    public double getPosZ() {
+        return posZ;
+    }
 
-	public void setPosZ(double posZ) {
-		this.posZ = posZ;
-	}
+    public void setPosZ(double posZ) {
+        this.posZ = posZ;
+    }
 
-	public double getMotionX() {
-		return motionX;
-	}
+    public double getMotionX() {
+        return motionX;
+    }
 
-	public void setMotionX(double motionX) {
-		this.motionX = motionX;
-	}
+    public void setMotionX(double motionX) {
+        this.motionX = motionX;
+    }
 
-	public double getMotionY() {
-		return motionY;
-	}
+    public double getMotionY() {
+        return motionY;
+    }
 
-	public void setMotionY(double motionY) {
-		this.motionY = motionY;
-	}
+    public void setMotionY(double motionY) {
+        this.motionY = motionY;
+    }
 
-	public double getMotionZ() {
-		return motionZ;
-	}
+    public double getMotionZ() {
+        return motionZ;
+    }
 
-	public void setMotionZ(double motionZ) {
-		this.motionZ = motionZ;
-	}
+    public void setMotionZ(double motionZ) {
+        this.motionZ = motionZ;
+    }
 
-	public double getPrevPosX() {
-		return prevPosX;
-	}
+    public double getPrevPosX() {
+        return prevPosX;
+    }
 
-	public void setPrevPosX(double prevPosX) {
-		this.prevPosX = prevPosX;
-	}
+    public void setPrevPosX(double prevPosX) {
+        this.prevPosX = prevPosX;
+    }
 
-	public double getPrevPosY() {
-		return prevPosY;
-	}
+    public double getPrevPosY() {
+        return prevPosY;
+    }
 
-	public void setPrevPosY(double prevPosY) {
-		this.prevPosY = prevPosY;
-	}
+    public void setPrevPosY(double prevPosY) {
+        this.prevPosY = prevPosY;
+    }
 
-	public double getPrevPosZ() {
-		return prevPosZ;
-	}
+    public double getPrevPosZ() {
+        return prevPosZ;
+    }
 
-	public void setPrevPosZ(double prevPosZ) {
-		this.prevPosZ = prevPosZ;
-	}
+    public void setPrevPosZ(double prevPosZ) {
+        this.prevPosZ = prevPosZ;
+    }
 
-	public int getEntityId() {
-		return entityID;
-	}
-	
-	public World getWorld() {
-		return this.world;
-	}
-	
-	public void setCanCollide(boolean val) {
-		this.canCollide = val;
-	}
-	
-	public boolean getCanCollide() {
-		return this.canCollide;
-	}
-	
-	public boolean isCollided() {
-		return this.onGround || isCollidedHorizontally;
-	}
-	
-	public double getDistance(double x, double y, double z)
+    public int getEntityId() {
+        return entityID;
+    }
+
+    public World getWorld() {
+        return this.world;
+    }
+
+    public void setCanCollide(boolean val) {
+        this.canCollide = val;
+    }
+
+    public boolean getCanCollide() {
+        return this.canCollide;
+    }
+
+    public boolean isCollided() {
+        return this.onGround || isCollidedHorizontally;
+    }
+
+    public double getDistance(double x, double y, double z)
     {
         double d0 = this.posX - x;
         double d1 = this.posY - y;
         double d2 = this.posZ - z;
         return (double)MathHelper.sqrt(d0 * d0 + d1 * d1 + d2 * d2);
     }
-	
-	@Override
-	public float getScale(float scaleFactor) {
-		return this.particleScale;
-	}
-	
-	@Override
-	public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
-		
-		/*IBlockState state = this.getWorld().getBlockState(new BlockPos(posX, posY, posZ));
-		if (state.getBlock() != Blocks.AIR) {
-			System.out.println("particle in: " + state);
-		}*/
 
-		//particleScale = 30;
+    @Override
+    public float getScale(float scaleFactor) {
+        return this.particleScale;
+    }
 
-        //1.12 did 0.1F * scale in render, but removed it, this makes my scales backwards compatible
-        //changing just for render, yes, very hacky
-//        particleScale *= 0.1F;
-//
-//        super.renderParticle(worldRendererIn, entityIn, partialTicks, rotationX,
-//                rotationZ, rotationYZ, rotationXY, rotationXZ);
-//
-//        particleScale *= 10F;
+    @Override
+    public void renderParticle(IVertexBuilder buffer, ActiveRenderInfo renderInfo, float partialTicks) {
 
         Vector3d Vector3d = renderInfo.getProjectedView();
-        float f = (float)(MathHelper.lerp((double)partialTicks, this.prevPosX, this.posX) - Vector3d.getX());
-        float f1 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosY, this.posY) - Vector3d.getY());
-        float f2 = (float)(MathHelper.lerp((double)partialTicks, this.prevPosZ, this.posZ) - Vector3d.getZ());
+        float f = (float)(MathHelper.lerp(partialTicks, this.prevPosX, this.posX) - Vector3d.getX());
+        float f1 = (float)(MathHelper.lerp(partialTicks, this.prevPosY, this.posY) - Vector3d.getY());
+        float f2 = (float)(MathHelper.lerp(partialTicks, this.prevPosZ, this.posZ) - Vector3d.getZ());
         Quaternion quaternion;
         if (this.facePlayer || (this.rotationPitch == 0 && this.rotationYaw == 0)) {
-           quaternion = renderInfo.getRotation();
+            quaternion = renderInfo.getRotation();
         } else {
             // override rotations
             quaternion = new Quaternion(0, 0, 0, 1);
@@ -585,10 +577,10 @@ public class EntityRotFX extends SpriteTexturedParticle
                 float wat = renderInfo.getYaw();
                 quaternion.multiply(Vector3f.YP.rotationDegrees(-renderInfo.getYaw()));
             } else {
-                quaternion.multiply(Vector3f.YP.rotationDegrees(this.rotationYaw));
+                quaternion.multiply(Vector3f.YP.rotationDegrees(MathHelper.lerp(partialTicks, this.prevRotationYaw, rotationYaw)));
             }
-            quaternion.multiply(Vector3f.XP.rotationDegrees(this.rotationPitch));
-         }
+            quaternion.multiply(Vector3f.XP.rotationDegrees(MathHelper.lerp(partialTicks, this.prevRotationPitch, rotationPitch)));
+        }
 
         Vector3f vector3f1 = new Vector3f(-1.0F, -1.0F, 0.0F);
         vector3f1.transform(quaternion);
@@ -596,10 +588,10 @@ public class EntityRotFX extends SpriteTexturedParticle
         float f4 = this.getScale(partialTicks);
 
         for(int i = 0; i < 4; ++i) {
-           Vector3f vector3f = avector3f[i];
-           vector3f.transform(quaternion);
-           vector3f.mul(f4);
-           vector3f.add(f, f1, f2);
+            Vector3f vector3f = avector3f[i];
+            vector3f.transform(quaternion);
+            vector3f.mul(f4);
+            vector3f.add(f, f1, f2);
         }
 
         float f7 = this.getMinU();
@@ -619,8 +611,8 @@ public class EntityRotFX extends SpriteTexturedParticle
         buffer.pos((double)avector3f[1].getX(), (double)avector3f[1].getY(), (double)avector3f[1].getZ()).tex(f8, f5).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();
         buffer.pos((double)avector3f[2].getX(), (double)avector3f[2].getY(), (double)avector3f[2].getZ()).tex(f7, f5).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();
         buffer.pos((double)avector3f[3].getX(), (double)avector3f[3].getY(), (double)avector3f[3].getZ()).tex(f7, f6).color(this.particleRed, this.particleGreen, this.particleBlue, this.particleAlpha).lightmap(j).endVertex();
-     
-	}
+
+    }
 
     //TODO: 1.14 uncomment
 	/*public void renderParticleForShader(InstancedMeshParticle mesh, Transformation transformation, Matrix4fe viewMatrix, Entity entityIn,
@@ -684,16 +676,16 @@ public class EntityRotFX extends SpriteTexturedParticle
         mesh.curBufferPos++;
     }*/
 
-	//TODO: 1.14 now sets depth buffer use in IParticleRenderType types
+    //TODO: 1.14 now sets depth buffer use in IParticleRenderType types
     /*@Override
     public boolean shouldDisableDepth() {
     	return isTransparent;
     }*/
-    
+
     public void setKillOnCollide(boolean val) {
-    	this.killOnCollide = val;
+        this.killOnCollide = val;
     }
-    
+
     //override for extra isCollided types
     @Override
     public void move(double x, double y, double z) {
@@ -725,22 +717,22 @@ public class EntityRotFX extends SpriteTexturedParticle
         }
 
     }
-    
-    public void setFacePlayer(boolean val) {
-    	this.facePlayer = val;
-    }
-    
-    public TextureAtlasSprite getParticleTexture() {
-    	return this.sprite;
-    }
-    
-    public boolean isVanillaMotionDampen() {
-		return vanillaMotionDampen;
-	}
 
-	public void setVanillaMotionDampen(boolean motionDampen) {
-		this.vanillaMotionDampen = motionDampen;
-	}
+    public void setFacePlayer(boolean val) {
+        this.facePlayer = val;
+    }
+
+    public TextureAtlasSprite getParticleTexture() {
+        return this.sprite;
+    }
+
+    public boolean isVanillaMotionDampen() {
+        return vanillaMotionDampen;
+    }
+
+    public void setVanillaMotionDampen(boolean motionDampen) {
+        this.vanillaMotionDampen = motionDampen;
+    }
 
     @Override
     public int getBrightnessForRender(float p_189214_1_) {
@@ -792,7 +784,7 @@ public class EntityRotFX extends SpriteTexturedParticle
     }
 
     public boolean isCollidedVertically() {
-	    return isCollidedVerticallyDownwards || isCollidedVerticallyUpwards;
+        return isCollidedVerticallyDownwards || isCollidedVerticallyUpwards;
     }
 
     @Override
