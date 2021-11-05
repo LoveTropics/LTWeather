@@ -550,6 +550,8 @@ public class SceneEnhancer implements Runnable {
 									rain.particleGreen = acidRainGreen;
 									rain.particleBlue = acidRainBlue;
 								} else {
+									//make blue rain a biiiiiit more visible
+									rain.setFullAlphaTarget(0.8F);
 									rain.particleRed = vanillaRainRed;
 									rain.particleGreen = vanillaRainGreen;
 									rain.particleBlue = vanillaRainBlue;
