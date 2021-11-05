@@ -144,6 +144,8 @@ public class EntityRotFX extends SpriteTexturedParticle
 
     public float extraYRotation = 0;
 
+    public boolean markCollided = false;
+
     public boolean isCollidedHorizontally = false;
     public boolean isCollidedVerticallyDownwards = false;
     public boolean isCollidedVerticallyUpwards = false;
@@ -716,6 +718,13 @@ public class EntityRotFX extends SpriteTexturedParticle
             this.motionZ = 0.0D;
         }
 
+        if (!markCollided) {
+            if (onGround || isCollidedVerticallyDownwards || isCollidedHorizontally || isCollidedVerticallyUpwards) {
+                onHit();
+                markCollided = true;
+            }
+        }
+
     }
 
     public void setFacePlayer(boolean val) {
@@ -817,5 +826,9 @@ public class EntityRotFX extends SpriteTexturedParticle
 
     public void setLastNonZeroBrightness(int lastNonZeroBrightness) {
         this.lastNonZeroBrightness = lastNonZeroBrightness;
+    }
+
+    public void onHit() {
+
     }
 }

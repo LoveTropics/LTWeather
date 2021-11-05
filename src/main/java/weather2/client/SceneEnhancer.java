@@ -40,6 +40,7 @@ import weather2.ClientTickHandler;
 import weather2.ClientWeather;
 import weather2.SoundRegistry;
 import weather2.Weather;
+import weather2.client.entity.particle.ParticleHail;
 import weather2.client.entity.particle.ParticleSandstorm;
 import weather2.config.ConfigSand;
 import weather2.util.*;
@@ -135,7 +136,7 @@ public class SceneEnhancer implements Runnable {
 
 			WeatherEventType curWeather = getWeatherState();
 			if (curWeather != lastWeatherType) {
-				System.out.println("new weather changed to: " + curWeather);
+				//System.out.println("new weather changed to: " + curWeather);
 				particleRateLerp = 0;
 			}
 			lastWeatherType = getWeatherState();
@@ -568,7 +569,7 @@ public class SceneEnhancer implements Runnable {
 					spawnNeed = 25;
 
                     if (getWeatherState() == WeatherEventType.HAIL && rainParticle && spawnNeed > 0) {
-                        for (int i = 0; i < safetyCutout; i++) {
+                        for (int i = 0; i < safetyCutout / 4; i++) {
                             BlockPos pos = new BlockPos(
                                     entP.getPosX() + rand.nextInt(spawnAreaSize) - (spawnAreaSize / 2),
                                     entP.getPosY() - 5 + rand.nextInt(25),
@@ -577,30 +578,32 @@ public class SceneEnhancer implements Runnable {
                             //EntityRenderer.addRainParticles doesnt actually use isRainingAt,
                             //switching to match what that method does to improve consistancy and tough as nails compat
                             if (canPrecipitateAt(world, pos)/*world.isRainingAt(pos)*/) {
-                                ParticleTexExtraRender rain = new ParticleTexExtraRender((ClientWorld) entP.world,
+								ParticleHail rain = new ParticleHail((ClientWorld) entP.world,
                                         pos.getX(),
                                         pos.getY(),
                                         pos.getZ(),
                                         0D, 0D, 0D, ParticleRegistry.hail);
                                 //rain.setCanCollide(true);
                                 //rain.setKillOnCollide(true);
-                                rain.setKillWhenUnderTopmostBlock(true);
-                                rain.setCanCollide(false);
+                                rain.setKillWhenUnderTopmostBlock(false);
+                                rain.setCanCollide(true);
                                 rain.setKillOnCollide(true);
                                 rain.killWhenUnderCameraAtLeast = 5;
                                 rain.setTicksFadeOutMaxOnDeath(5);
                                 rain.setDontRenderUnderTopmostBlock(true);
-                                rain.setExtraParticlesBaseAmount(1);
-                                rain.noExtraParticles = true;
+                                /*rain.setExtraParticlesBaseAmount(1);
+                                rain.noExtraParticles = true;*/
+								rain.rotationYaw = rand.nextInt(360);
+								rain.rotationPitch = rand.nextInt(360);
                                 rain.fastLight = true;
                                 rain.setSlantParticleToWind(true);
-                                rain.windWeight = 50F;
+                                rain.windWeight = 5F;
 
                                 //old slanty rain way
                                 rain.setFacePlayer(false);
 
                                 //rain.setFacePlayer(true);
-                                rain.setScale(1F * 0.15F);
+                                rain.setScale(0.6F * 0.15F);
                                 rain.isTransparent = true;
                                 rain.setGravity(5.5F);
                                 //rain.isTransparent = true;
@@ -609,7 +612,7 @@ public class SceneEnhancer implements Runnable {
                                 rain.setTicksFadeInMax(5);
                                 rain.setTicksFadeInMax(5);
                                 rain.setTicksFadeOutMax(5);
-                                rain.setTicksFadeOutMaxOnDeath(5);
+                                rain.setTicksFadeOutMaxOnDeath(4);
                                 //float alpha = ((float)fadeInTimer / (float)fadeInTimerMax);
 
                                 rain.setFullAlphaTarget(1F);
@@ -618,17 +621,7 @@ public class SceneEnhancer implements Runnable {
                                 rain.rotationYaw = rain.getWorld().rand.nextInt(360) - 180F;
                                 rain.setMotionY(-0.5D/*-5D - (entP.world.rand.nextInt(5) * -1D)*/);
 
-                                //windMan.applyWindForceNew(rain, 10F, 0.5F);
-
-                                if (weather.getRainType() == RainType.ACID) {
-                                    rain.particleRed = acidRainRed;
-                                    rain.particleGreen = acidRainGreen;
-                                    rain.particleBlue = acidRainBlue;
-                                } else {
-                                    rain.particleRed = vanillaRainRed;
-                                    rain.particleGreen = vanillaRainGreen;
-                                    rain.particleBlue = vanillaRainBlue;
-                                }
+                                windMan.applyWindForceNew(rain, 1F, 0.5F);
 
 								rain.particleRed = 0.9F;
 								rain.particleGreen = 0.9F;
