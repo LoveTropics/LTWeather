@@ -20,7 +20,16 @@ archivesBaseName = 'LTWeather'
 
 ext.buildnumber = 0
 project.buildnumber = System.getenv('BUILD_NUMBER') ?: 'custom'
-version = "${mod_version}-${release_type}+${buildnumber}"
+
+if (System.getenv('GHA_RELEASE_WORKFLOW')) {
+    version = "${mod_version}"
+} else if (System.getenv('GITHUB_RUN_NUMBER')) {
+    project.buildnumber = System.getenv('GITHUB_RUN_NUMBER')
+    version = "${mod_version}-${release_type}+${buildnumber}-gha"
+} else {
+    project.buildnumber = System.getenv('BUILD_NUMBER') ?: 'custom'
+    version = "${mod_version}-${release_type}+${buildnumber}"
+}
 
 sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
