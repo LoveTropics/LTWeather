@@ -1,20 +1,19 @@
-package weather2;
+package com.lovetropics.weather;
 
-import com.lovetropics.minigames.common.core.game.weather.RainType;
+import com.lovetropics.minigames.common.core.game.weather.PrecipitationType;
 import com.lovetropics.minigames.common.core.game.weather.StormState;
 import com.lovetropics.minigames.common.core.game.weather.WeatherController;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.util.RegistryKey;
-import net.minecraft.world.World;
-import net.minecraft.world.server.ServerWorld;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraftforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 
-// TODO: Consolidate with WeatherManager
-@Mod.EventBusSubscriber(modid = Weather.MODID)
+@Mod.EventBusSubscriber(modid = LTWeather.MODID)
 public final class ServerWeatherController implements WeatherController {
 	public static final int UPDATE_INTERVAL = 20;
 
@@ -25,29 +24,29 @@ public final class ServerWeatherController implements WeatherController {
 
 	private final WeatherState state = new WeatherState();
 
-	ServerWeatherController(ServerWorld world) {
-		RegistryKey<World> dimension = world.getDimensionKey();
+	ServerWeatherController(ServerLevel world) {
+		ResourceKey<Level> dimension = world.dimension();
 		this.packetTarget = PacketDistributor.DIMENSION.with(() -> dimension);
 	}
 
 	@Override
-	public void onPlayerJoin(ServerPlayerEntity player) {
-		WeatherNetworking.HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new UpdateWeatherPacket(this.state));
+	public void onPlayerJoin(ServerPlayer player) {
+		LTWeatherNetworking.HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new UpdateWeatherPacket(this.state));
 	}
 
 	@Override
 	public void tick() {
 		if (this.dirty && this.ticks++ % UPDATE_INTERVAL == 0) {
 			this.dirty = false;
-			WeatherNetworking.HANDLER.send(this.packetTarget, new UpdateWeatherPacket(this.state));
+			LTWeatherNetworking.HANDLER.send(this.packetTarget, new UpdateWeatherPacket(this.state));
 		}
 	}
 
 	@Override
-	public void setRain(float amount, RainType type) {
-		if (amount != this.state.rainAmount || type != this.state.rainType) {
+	public void setRain(float amount, PrecipitationType type) {
+		if (amount != this.state.rainAmount || type != this.state.precipitationType) {
 			this.state.rainAmount = amount;
-			this.state.rainType = type;
+			this.state.precipitationType = type;
 			this.dirty = true;
 		}
 	}
@@ -102,8 +101,8 @@ public final class ServerWeatherController implements WeatherController {
 	}
 
 	@Override
-	public RainType getRainType() {
-		return this.state.rainType;
+	public PrecipitationType getPrecipitationType() {
+		return this.state.precipitationType;
 	}
 
 	@Override

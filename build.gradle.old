@@ -1,20 +1,18 @@
 buildscript {
     repositories {
-        maven { url = 'https://maven.minecraftforge.net' }
-        maven { url = 'https://repo.spongepowered.org/maven' }
+        maven { url = 'https://files.minecraftforge.net/maven' }
+        jcenter()
         mavenCentral()
+        mavenLocal()
+        maven { url='https://repo.spongepowered.org/maven' }
     }
     dependencies {
-        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '5.1.+', changing: true
+        classpath group: 'net.minecraftforge.gradle', name: 'ForgeGradle', version: '4.1.+', changing: true
         classpath 'org.spongepowered:mixingradle:0.7-SNAPSHOT'
     }
 }
-plugins {
-    id 'com.github.johnrengelman.shadow' version '7.1.2'
-}
 apply plugin: 'net.minecraftforge.gradle'
 apply plugin: 'eclipse'
-apply plugin: 'maven-publish'
 apply plugin: 'org.spongepowered.mixin'
 
 group = 'com.lovetropics.weather'
@@ -33,10 +31,10 @@ if (System.getenv('GHA_RELEASE_WORKFLOW')) {
     version = "${mod_version}-${release_type}+${buildnumber}"
 }
 
-java.toolchain.languageVersion = JavaLanguageVersion.of(17)
+sourceCompatibility = targetCompatibility = compileJava.sourceCompatibility = compileJava.targetCompatibility = '1.8' // Need this here so eclipse task generates correctly.
 
 minecraft {
-    mappings channel: 'official', version: minecraft_version
+    mappings channel: 'snapshot', version: '20210309-1.16.5'
     
     accessTransformer = file('src/main/resources/META-INF/accesstransformer.cfg')
 
@@ -46,12 +44,12 @@ minecraft {
             
             workingDirectory project.file('run')
             arg "-mixin.config=ltweather.mixins.json"
-            jvmArg '-Dmixin.env.disableRefMap=true'
 
-            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
 
             mods {
-                ltweather {
+                lovetropics {
                     source sourceSets.main
                 }
             }
@@ -62,12 +60,12 @@ minecraft {
         
             workingDirectory project.file('run')
             arg "-mixin.config=ltweather.mixins.json"
-            jvmArg '-Dmixin.env.disableRefMap=true'
 
-            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
 
             mods {
-                ltweather {
+                lovetropics {
                     source sourceSets.main
                 }
             }
@@ -78,19 +76,19 @@ minecraft {
         
             workingDirectory project.file('run')
             arg "-mixin.config=ltweather.mixins.json"
-            jvmArg '-Dmixin.env.disableRefMap=true'
 
             environment 'target', 'fmluserdevdata'
 
-            property 'forge.logging.console.level', 'info'
+            property 'forge.logging.markers', 'REGISTRIES'
+            property 'forge.logging.console.level', 'debug'
 
             mods {
-                ltweather {
+                lovetropics {
                     source sourceSets.main
                 }
             }
             
-            args '--mod', 'ltweather', '--all', '--output', '"' + rootProject.file('src/generated/resources/') + '"',
+            args '--mod', 'lovetropics', '--all', '--output', '"' + rootProject.file('src/generated/resources/') + '"',
                  '--existing', '"' + sourceSets.main.resources.srcDirs[0] + '"' 
             
         }
@@ -103,13 +101,15 @@ sourceSets.main.resources {
 
 configurations {
     shade
+    shadelib
+    implementation.extendsFrom shadelib
 }
 
 repositories {
-    maven { // Registrate
-        url "https://maven.tterrag.com/"
-    }
     mavenLocal()
+    maven {
+        url "http://maven.tterrag.com/"
+    }
     flatDir {
         dirs 'libs/'
     }
@@ -117,16 +117,16 @@ repositories {
 
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
-    
-    // Utilize tropicraft worldgen code
-    implementation fg.deobf('net.tropicraft:Tropicraft:9.3.0-beta+custom')
+
+    // TODO: update when published
     implementation fg.deobf("com.lovetropics.minigames:LTMinigames:${ltminigames_version}")
+    implementation fg.deobf('net.tropicraft:Tropicraft:9.3.0-beta+custom')
 
     // Shaded deps
-    def registrate = "com.tterrag.registrate:Registrate:MC${minecraft_version}-${registrate_version}"
+    def registrate = "com.tterrag.registrate:Registrate:MC1.16.2-${registrate_version}"
     implementation fg.deobf(registrate)
     shade registrate
-    
+
     def ltlib = "com.lovetropics.lib:LTLib:${ltlib_version}"
     implementation fg.deobf(ltlib)
     shade ltlib
@@ -141,22 +141,7 @@ mixin {
     add sourceSets.main, "ltweather.refmap.json"
 }
 
-shadowJar {
-    configurations = [project.configurations.shade]
-    relocate 'com.tterrag.registrate', 'com.lovetropics.weather.repack.registrate'
-    relocate 'com.lovetropics.lib', 'com.lovetropics.weather.repack.ltlib'
-    classifier = ''
-}
-
-reobf {
-    shadowJar {}
-}
-
-build.dependsOn shadowJar
-build.dependsOn reobfShadowJar
-
 jar {
-    classifier = 'slim'
     manifest {
         attributes([
             "Specification-Title": "ltweather",
@@ -171,23 +156,10 @@ jar {
     }
 }
 
-task sourceJar(type: Jar, dependsOn: classes) {
-    classifier = 'sources'
-    from sourceSets.main.java
-}
-
-publishing {
-    tasks.publish.dependsOn 'build'
-    publications {
-        mavenJava(MavenPublication) {
-            artifact shadowJar
-            artifact sourceJar
-        }
-    }
-
-    repositories {
-        if (project.hasProperty('mavendir')) {
-            maven { url mavendir }
+if (System.getProperty("idea.sync.active") == "true") {
+    afterEvaluate {
+        tasks.withType(JavaCompile).all {
+            it.options.annotationProcessorPath = files()
         }
     }
 }

@@ -1,8 +1,8 @@
-package weather2;
+package com.lovetropics.weather;
 
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
-import net.minecraft.network.PacketBuffer;
-import net.minecraftforge.fml.network.NetworkEvent;
+import net.minecraft.network.FriendlyByteBuf;
+import net.minecraftforge.network.NetworkEvent;
 
 import java.util.function.Supplier;
 
@@ -13,11 +13,11 @@ public final class UpdateWeatherPacket {
 		this.weather = weather;
 	}
 
-	public void encode(PacketBuffer buffer) {
+	public void encode(FriendlyByteBuf buffer) {
 		this.weather.serialize(buffer);
 	}
 
-	public static UpdateWeatherPacket decode(PacketBuffer buffer) {
+	public static UpdateWeatherPacket decode(FriendlyByteBuf buffer) {
 		WeatherState weather = new WeatherState();
 		weather.deserialize(buffer);
 		return new UpdateWeatherPacket(weather);
@@ -25,7 +25,6 @@ public final class UpdateWeatherPacket {
 
 	public void handle(Supplier<NetworkEvent.Context> ctx) {
 		ctx.get().enqueueWork(() -> {
-			ClientTickHandler.checkClientWeather();
 			ClientWeather.get().onUpdateWeather(this.weather);
 		});
 
