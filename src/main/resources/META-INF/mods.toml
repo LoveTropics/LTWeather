@@ -4,11 +4,11 @@ issueTrackerURL="https://github.com/LoveTropics/LTWeather/issues"
 license="All Rights Reserved"
 
 [[mods]]
-modId="weather2"
+modId="ltweather"
 version="${file.jarVersion}"
-displayName="Weather2"
+displayName="LTWeather"
 logoFile="itcrowd.png"
 authors="Corosus"
 description='''
-
+Bridging weather2 and ltminigames together without huge cross source dependencies
 '''
