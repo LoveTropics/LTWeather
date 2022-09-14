@@ -18,12 +18,12 @@ public class TypeBridge {
 
     public static Tuple<Integer, Integer> getSandstormData(ServerLevel level) {
         WeatherController controller = WeatherControllerManager.forWorld(level);
-        return controller != null ? new Tuple<>(controller.getSandstorm().buildupTickRate(), controller.getSandstorm().maxStackable()) : null;
+        return controller != null && controller.getSandstorm() != null ? new Tuple<>(controller.getSandstorm().buildupTickRate(), controller.getSandstorm().maxStackable()) : null;
     }
 
     public static Tuple<Integer, Integer> getSnowstormData(ServerLevel level) {
         WeatherController controller = WeatherControllerManager.forWorld(level);
-        return controller != null ? new Tuple<>(controller.getSnowstorm().buildupTickRate(), controller.getSnowstorm().maxStackable()) : null;
+        return controller != null && controller.getSnowstorm() != null ? new Tuple<>(controller.getSnowstorm().buildupTickRate(), controller.getSnowstorm().maxStackable()) : null;
     }
 
 }
