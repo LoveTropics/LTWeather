@@ -56,8 +56,10 @@ public final class ClientWeather {
 		this.state.sandstorm = this.lerpState.sandstorm;
 		this.state.snowstorm = this.lerpState.snowstorm;
 
-		this.state.rainAmount = this.state.rainAmount + (this.state.rainAmount < this.lerpState.rainAmount ? LERP_RATE : -LERP_RATE);
-		this.state.windSpeed = this.state.windSpeed + (this.state.windSpeed < this.lerpState.windSpeed ? LERP_RATE : -LERP_RATE);
+		if (this.state.rainAmount != this.lerpState.rainAmount) this.state.rainAmount = this.state.rainAmount + (this.state.rainAmount < this.lerpState.rainAmount ? LERP_RATE : -LERP_RATE);
+		if (this.state.windSpeed != this.lerpState.windSpeed) this.state.windSpeed = this.state.windSpeed + (this.state.windSpeed < this.lerpState.windSpeed ? LERP_RATE : -LERP_RATE);
+
+
 	}
 
 	public float getRainAmount() {
