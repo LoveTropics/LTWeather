@@ -4,7 +4,7 @@ import com.lovetropics.minigames.common.core.game.weather.PrecipitationType;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.world.WorldEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 
@@ -28,8 +28,8 @@ public final class ClientWeather {
 	}
 
 	@SubscribeEvent
-	public static void onWorldLoad(WorldEvent.Load event) {
-		if (event.getWorld().isClientSide()) {
+	public static void onWorldLoad(LevelEvent.Load event) {
+		if (event.getLevel().isClientSide()) {
 			reset();
 		}
 	}
