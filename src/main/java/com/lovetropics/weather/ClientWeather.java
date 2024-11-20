@@ -2,13 +2,15 @@ package com.lovetropics.weather;
 
 import com.lovetropics.minigames.common.core.game.weather.PrecipitationType;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.event.TickEvent;
-import net.minecraftforge.event.level.LevelEvent;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
+import net.minecraft.client.Minecraft;
+import net.minecraft.world.entity.player.Player;
+import net.neoforged.api.distmarker.Dist;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.neoforge.client.event.ClientTickEvent;
+import net.neoforged.neoforge.event.level.LevelEvent;
 
-@Mod.EventBusSubscriber(modid = LTWeather.MODID, value = Dist.CLIENT)
+
 public final class ClientWeather {
 	private static ClientWeather instance = new ClientWeather();
 
@@ -20,7 +22,8 @@ public final class ClientWeather {
 
 	private WeatherState lerpState = this.state;
 
-	private ClientWeather() {
+	public ClientWeather() {
+
 	}
 
 	public static ClientWeather get() {
@@ -39,10 +42,8 @@ public final class ClientWeather {
 	}
 
 	@SubscribeEvent
-	public static void onClientTick(TickEvent.ClientTickEvent event) {
-		if (event.phase == TickEvent.Phase.START) {
-			instance.tick();
-		}
+	public static void onClientTick(ClientTickEvent.Pre event) {
+		instance.tick();
 	}
 
 	public void onUpdateWeather(WeatherState state) {
@@ -91,5 +92,10 @@ public final class ClientWeather {
 
 	public boolean hasWeather() {
 		return this.state.hasWeather();
+	}
+
+	public static Player getPlayer()
+	{
+		return Minecraft.getInstance().player;
 	}
 }

@@ -4,41 +4,38 @@ import com.lovetropics.minigames.common.core.game.weather.PrecipitationType;
 import com.lovetropics.minigames.common.core.game.weather.StormState;
 import com.lovetropics.minigames.common.core.game.weather.WeatherController;
 import com.lovetropics.minigames.common.core.game.weather.WeatherState;
-import net.minecraft.resources.ResourceKey;
+import com.lovetropics.weather.networking.PacketWeatherStateFromServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.network.PacketDistributor;
+import net.neoforged.neoforge.network.PacketDistributor;
 
 import javax.annotation.Nullable;
 
-@Mod.EventBusSubscriber(modid = LTWeather.MODID)
+
 public final class ServerWeatherController implements WeatherController {
 	public static final int UPDATE_INTERVAL = 20;
 
-	private final PacketDistributor.PacketTarget packetTarget;
+	private final ServerLevel level;
 
 	private int ticks;
 	private boolean dirty;
 
 	private final WeatherState state = new WeatherState();
 
-	ServerWeatherController(ServerLevel world) {
-		ResourceKey<Level> dimension = world.dimension();
-		this.packetTarget = PacketDistributor.DIMENSION.with(() -> dimension);
+	public ServerWeatherController(ServerLevel world) {
+		this.level = world;
 	}
 
 	@Override
 	public void onPlayerJoin(ServerPlayer player) {
-		LTWeatherNetworking.HANDLER.send(PacketDistributor.PLAYER.with(() -> player), new UpdateWeatherPacket(this.state));
+		PacketDistributor.sendToPlayer(player, new PacketWeatherStateFromServer(state));
 	}
 
 	@Override
 	public void tick() {
 		if (this.dirty && this.ticks++ % UPDATE_INTERVAL == 0) {
 			this.dirty = false;
-			LTWeatherNetworking.HANDLER.send(this.packetTarget, new UpdateWeatherPacket(this.state));
+			PacketDistributor.sendToPlayersInDimension(level, new PacketWeatherStateFromServer(state));
 		}
 	}
 

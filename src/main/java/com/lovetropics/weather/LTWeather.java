@@ -1,14 +1,17 @@
 package com.lovetropics.weather;
 
 import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
-import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.event.server.ServerStoppedEvent;
-import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
-import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
-import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import com.lovetropics.weather.networking.WeatherNetworking;
+import net.neoforged.bus.api.SubscribeEvent;
+import net.neoforged.fml.ModContainer;
+import net.neoforged.fml.common.Mod;
+import net.neoforged.fml.event.lifecycle.FMLClientSetupEvent;
+import net.neoforged.fml.event.lifecycle.FMLCommonSetupEvent;
+import net.neoforged.fml.loading.FMLEnvironment;
+import net.neoforged.neoforge.common.NeoForge;
+import net.neoforged.neoforge.event.server.ServerStoppedEvent;
+import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
+import net.neoforged.neoforge.network.registration.PayloadRegistrar;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
@@ -23,19 +26,31 @@ public class LTWeather
 
     public static boolean initProperNeededForWorld = true;
 
-    public LTWeather() {
-        // Register the setup method for modloading
-        IEventBus modBus = FMLJavaModLoadingContext.get().getModEventBus();
-        modBus.addListener(this::setup);
-        MinecraftForge.EVENT_BUS.addListener(this::serverStop);
-        modBus.addListener(this::clientSetup);
+    public LTWeather(ModContainer modContainer) {
 
-        MinecraftForge.EVENT_BUS.register(this);
+        new WeatherNetworking();
+
+        // Register the setup method for modloading
+        modContainer.getEventBus().addListener(this::setup);
+        NeoForge.EVENT_BUS.addListener(this::serverStop);
+        modContainer.getEventBus().addListener(this::clientSetup);
+        modContainer.getEventBus().addListener(this::registerPackets);
+
+        if (FMLEnvironment.dist.isClient()) {
+            NeoForge.EVENT_BUS.register(ClientWeather.class);
+        }
+
+        NeoForge.EVENT_BUS.register(this);
+    }
+
+    public void registerPackets(final RegisterPayloadHandlersEvent event) {
+        final PayloadRegistrar registrar = event.registrar("1.0.0");
+        WeatherNetworking.register(registrar);
     }
 
     private void setup(final FMLCommonSetupEvent event) {
         //DeferredWorkQueue.runLater(WeatherNetworking::register);
-        LTWeatherNetworking.register();
+        //LTWeatherNetworking.register();
 
         WeatherControllerManager.setFactory(ServerWeatherController::new);
     }
