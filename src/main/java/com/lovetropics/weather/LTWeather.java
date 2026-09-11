@@ -1,7 +1,11 @@
 package com.lovetropics.weather;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
 import com.lovetropics.weather.networking.WeatherNetworking;
+
 import net.neoforged.bus.api.SubscribeEvent;
 import net.neoforged.fml.ModContainer;
 import net.neoforged.fml.common.Mod;
@@ -12,8 +16,6 @@ import net.neoforged.neoforge.common.NeoForge;
 import net.neoforged.neoforge.event.server.ServerStoppedEvent;
 import net.neoforged.neoforge.network.event.RegisterPayloadHandlersEvent;
 import net.neoforged.neoforge.network.registration.PayloadRegistrar;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 // The value here should match an entry in the META-INF/mods.toml file
 @Mod(LTWeather.MODID)
@@ -36,7 +38,7 @@ public class LTWeather
         modContainer.getEventBus().addListener(this::clientSetup);
         modContainer.getEventBus().addListener(this::registerPackets);
 
-        if (FMLEnvironment.dist.isClient()) {
+        if (FMLEnvironment.getDist().isClient()) {
             NeoForge.EVENT_BUS.register(ClientWeather.class);
         }
 

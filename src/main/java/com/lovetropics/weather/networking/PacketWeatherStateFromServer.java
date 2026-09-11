@@ -6,12 +6,12 @@ import com.lovetropics.weather.LTWeather;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Player;
 
 public record PacketWeatherStateFromServer(WeatherState weatherState) implements PacketBase
 {
-    public static final Type<PacketWeatherStateFromServer> TYPE = new Type<>(ResourceLocation.fromNamespaceAndPath(LTWeather.MODID, "weather_state"));
+    public static final Type<PacketWeatherStateFromServer> TYPE = new Type<>(Identifier.fromNamespaceAndPath(LTWeather.MODID, "weather_state"));
     public static final StreamCodec<RegistryFriendlyByteBuf, PacketWeatherStateFromServer> STREAM_CODEC = StreamCodec.ofMember(PacketWeatherStateFromServer::serialize, PacketWeatherStateFromServer::deserialize);
 
     private void serialize(RegistryFriendlyByteBuf buffer) {

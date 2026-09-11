@@ -2,8 +2,9 @@ package com.lovetropics.weather;
 
 import com.lovetropics.minigames.common.core.game.weather.WeatherController;
 import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
+import com.mojang.datafixers.util.Pair;
+
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Tuple;
 
 public class TypeBridge {
 
@@ -16,14 +17,14 @@ public class TypeBridge {
         return weatherController.getWindSpeed();
     }
 
-    public static Tuple<Integer, Integer> getSandstormData(ServerLevel level) {
+    public static Pair<Integer, Integer> getSandstormData(ServerLevel level) {
         WeatherController controller = WeatherControllerManager.forWorld(level);
-        return controller != null && controller.getSandstorm() != null ? new Tuple<>(controller.getSandstorm().buildupTickRate(), controller.getSandstorm().maxStackable()) : null;
+        return controller != null && controller.getSandstorm() != null ? new Pair<>(controller.getSandstorm().buildupTickRate(), controller.getSandstorm().maxStackable()) : null;
     }
 
-    public static Tuple<Integer, Integer> getSnowstormData(ServerLevel level) {
+    public static Pair<Integer, Integer> getSnowstormData(ServerLevel level) {
         WeatherController controller = WeatherControllerManager.forWorld(level);
-        return controller != null && controller.getSnowstorm() != null ? new Tuple<>(controller.getSnowstorm().buildupTickRate(), controller.getSnowstorm().maxStackable()) : null;
+        return controller != null && controller.getSnowstorm() != null ? new Pair<>(controller.getSnowstorm().buildupTickRate(), controller.getSnowstorm().maxStackable()) : null;
     }
 
 }
