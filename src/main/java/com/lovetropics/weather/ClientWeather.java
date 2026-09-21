@@ -1,7 +1,7 @@
 package com.lovetropics.weather;
 
-import com.lovetropics.minigames.common.core.game.weather.PrecipitationType;
-import com.lovetropics.minigames.common.core.game.weather.WeatherState;
+import org.lovetropics.games.common.core.game.weather.PrecipitationType;
+import org.lovetropics.games.common.core.game.weather.WeatherState;
 import net.minecraft.client.Minecraft;
 import net.minecraft.world.entity.player.Player;
 import net.neoforged.api.distmarker.Dist;

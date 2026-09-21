@@ -3,7 +3,7 @@ package com.lovetropics.weather;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
-import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
+import org.lovetropics.games.common.core.game.weather.WeatherControllerManager;
 import com.lovetropics.weather.networking.WeatherNetworking;
 
 import net.neoforged.bus.api.SubscribeEvent;

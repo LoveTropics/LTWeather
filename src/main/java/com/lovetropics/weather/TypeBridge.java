@@ -1,7 +1,7 @@
 package com.lovetropics.weather;
 
-import com.lovetropics.minigames.common.core.game.weather.WeatherController;
-import com.lovetropics.minigames.common.core.game.weather.WeatherControllerManager;
+import org.lovetropics.games.common.core.game.weather.WeatherController;
+import org.lovetropics.games.common.core.game.weather.WeatherControllerManager;
 import com.mojang.datafixers.util.Pair;
 
 import net.minecraft.server.level.ServerLevel;

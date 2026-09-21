@@ -1,6 +1,6 @@
 package com.lovetropics.weather.networking;
 
-import com.lovetropics.minigames.common.core.game.weather.WeatherState;
+import org.lovetropics.games.common.core.game.weather.WeatherState;
 import com.lovetropics.weather.ClientWeather;
 import com.lovetropics.weather.LTWeather;
 import net.minecraft.network.RegistryFriendlyByteBuf;

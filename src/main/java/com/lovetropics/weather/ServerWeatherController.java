@@ -1,9 +1,9 @@
 package com.lovetropics.weather;
 
-import com.lovetropics.minigames.common.core.game.weather.PrecipitationType;
-import com.lovetropics.minigames.common.core.game.weather.StormState;
-import com.lovetropics.minigames.common.core.game.weather.WeatherController;
-import com.lovetropics.minigames.common.core.game.weather.WeatherState;
+import org.lovetropics.games.common.core.game.weather.PrecipitationType;
+import org.lovetropics.games.common.core.game.weather.StormState;
+import org.lovetropics.games.common.core.game.weather.WeatherController;
+import org.lovetropics.games.common.core.game.weather.WeatherState;
 import com.lovetropics.weather.networking.PacketWeatherStateFromServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
